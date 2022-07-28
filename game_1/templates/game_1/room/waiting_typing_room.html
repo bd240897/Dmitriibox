@@ -1,14 +1,35 @@
 {% extends 'game_1/base.html' %}
 
-
 {% block title %} waiting_typing_room {% endblock %}
 
 {% block content %}
+    <section class="waiting-typing">
+        <div class="container pt-1 pb-1">
+            <div class="waiting-typing-header">
+                <h1 class="text-center">Ждем всех игроков</h1>
+            </div>
 
-    <h1>Ждем всех игроков</h1>
+            <div class="waiting-typing-players">
+                <h2>Игроки которые уже ответили</h2>
+                <div class="row">
+                    {% for p in players %}
+                        {% if p.answer %}
+                            <div class="col-3 p-auto">
+                                <div class="bg-success text-center text-white fw-bold">
+                                    <div class="pt-2">{{ p.player.username }}</div>
+                                    <div class="pb-2 pt-2">done</div>
+{#                                    <div class="bg-success pb-2 pt-2"> ОТЛАДКА Ответ пользователя {{ p.answer }}</div>#}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
 
-    <div class="alredy_done__block d-flex flex-column">
-        <a href="{% url 'result_room' %}" class="answer_link btn btn-primary m-2 alredy_done__link" >Показать ответы</a>
-    </div>
+            <div class="waiting-typing-done d-flex flex-column pt-2 pb-2">
+                <a href="{% url 'result_room' %}" class="answer_link btn btn-primary alredy_done__link" >Показать ответы</a>
+            </div>
+        </div>
+    </section>
 {% endblock %}
 

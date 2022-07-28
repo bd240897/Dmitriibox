@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, TemplateView, ListView
+from django.views.generic import CreateView, TemplateView, ListView, DetailView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -76,8 +76,21 @@ class MainRoomView(TemplateView):
 
     template_name = 'game_1/room/main_room.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        extra_context = dict()
+        param_request_end_game = self.request.GET.get("gameover", 0)
+        if param_request_end_game:
+            extra_context = delete_all_user_to_game(self.request)
+            extra_context['gameover_massage'] = "Игра окончена"
+
+        context = {**context, **extra_context}
+        return context
+
+
 class WaitingRoomView(View):
     """Ожидание игроков"""
+
     template_name = 'game_1/room/waiting_room.html'
 
     def get(self, *args, **kwargs):
@@ -128,7 +141,7 @@ class TypingRoomView(CreateView):
         # form.instance.player = player
         # form.instance.a = player
 
-        return redirect('result_room') #super().form_valid(form)
+        return redirect('waiting_typing_room') #super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('waiting_typing_room')
@@ -139,6 +152,12 @@ class WaitingTypingRoomView(TemplateView):
     """Ждем всех игроков после typing"""
 
     template_name = 'game_1/room/waiting_typing_room.html'
+    # context_object_name = 'players'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['players'] = GameRoom.objects.get(room_code=TEMP_CODE_ROOM).players_set.all()
+        return context
 
 class ResultRoomView(ListView):
     """Смотрим результаты"""
@@ -147,8 +166,9 @@ class ResultRoomView(ListView):
     context_object_name = 'players'
 
     def get_queryset(self):
-        select = GameRoom.objects.filter(room_code=TEMP_CODE_ROOM)
-        print(select)
+
+        # select = GameRoom.objects.filter(room_code=TEMP_CODE_ROOM)
+        # print(select)
 
         # add_user_to_game(self.request)
         current_game = GameRoom.objects.get(room_code=TEMP_CODE_ROOM)

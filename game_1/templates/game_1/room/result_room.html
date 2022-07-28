@@ -3,12 +3,32 @@
 {% block title %} result_room {% endblock %}
 
 {% block content %}
-    <div style="font-weight: bold; font-size: 26px">Ответы пользователей:</div>
-    {% for p in  players %}
-        <div>
-            {{ p.player }}
-            {{ p.answer }}
+    <section class="results">
+        <div class="container pt-1 pb-1">
+            <div class="results-header">
+                <h1 class="text-center">Ответы пользователей:</h1> {#"#}
+            </div>
+
+            <div class="results-answer pt-2 pb-2" style="background-color: #f5d060; border-radius: 20px;">
+                <h1 class="text-center">Вопрос был:</h1> {#"#}
+                <h1 class="text-center">Почему чукча любит бензобак?</h1>
+            </div>
+
+            <div class="results-body pt-2 pb-2">
+                {% for p in  players %}
+                    <div class="d-flex flex-column bd-highlight mb-3 ">
+                        <div class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">{{ p.player }} написал/а </div>
+                        <div class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 26px; color: red; height: 200px; border-radius: 50px;">{{ p.answer }}</div>
+                        <div class="p-2 bg-warning ms-auto" >Неплохой ответ</div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="results_to_end">
+                <a href="{% url 'main_room' %}?gameover=1" class="answer_link btn btn-primary alredy_done__link" >Закончить игру</a>
+            </div>
+
         </div>
-    {% endfor %}
+    </section>
 {% endblock %}
 

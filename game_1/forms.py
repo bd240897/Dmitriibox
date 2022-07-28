@@ -24,9 +24,23 @@ class LoginUserForm(AuthenticationForm):
 
 class AnswerForm(forms.ModelForm):
 
+
     class Meta:
+        parm_answer = {"type": "text",
+                       "class": "form-control",
+                       "placeholder": "Напишите Ваше сообщение",
+                       "style": "height: 200px", }
+
+        param_round = {"type": "text",
+                       "class": "form-control",
+                       "placeholder": "Напишите номер раунда",}
+
         model = Players
         fields = ('answer', 'round')
+        widgets = {
+            'round': forms.NumberInput(attrs=param_round),
+            'answer': forms.Textarea(attrs=parm_answer)
+        }
 #
 # ########################3
 # class AnswerSimpleForm(forms.Form):

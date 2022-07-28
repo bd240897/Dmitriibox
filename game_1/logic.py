@@ -41,12 +41,12 @@ def add_user_to_game(request):
     return context
 
 def delete_all_user_to_game(request):
-    """Удалить пользователй из игры"""
+    """Удалить всх пользователй из игры"""
 
     context = dict()
     current_user = request.user
     current_game = GameRoom.objects.get(room_code=TEMP_CODE_ROOM)
-    is_current_user_in_game = current_game.players_set.filter(player=current_user)
+    is_current_user_in_game = current_game.players_set.all()
 
     if True:
         temp_str = "Было удалено " + str(len(is_current_user_in_game)) + " пользователей игры " + TEMP_CODE_ROOM

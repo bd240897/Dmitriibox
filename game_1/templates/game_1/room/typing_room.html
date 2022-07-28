@@ -1,14 +1,35 @@
+{% extends 'game_1/base.html' %}
+
 {% block title %} typing_room {% endblock %}
-g
+
 {% block content %}
+    <section class="waiting">
+        <div class="container pt-1 pb-1 border border-success">
 
-    <h1>Печатаем сво ответ тут</h1>
-    <div>{{ massage }}</div>
+            <div class="waiting-header">
+                <h1 class="text-center">Ваши ответы</h1>
+            </div>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary btn-lg" value="Submit">Отправить</button>
-    </form>
+            <div class="results-answer pt-2 pb-2" style="background-color: #f5d060; border-radius: 20px;">
+                <h1 class="text-center">Вопрос:</h1>
+                <h1 class="text-center">Почему чукча любит бензобак?</h1>
+            </div>
 
+            <form method="post">
+                <div class="mb-3">
+                    <label for="round" class="form-label">Номер раунда</label>
+                    {{ form.round }}
+                </div>
+                <div class="mb-3">
+                    <label for="answer" class="form-label">Ответ</label>
+                    {{ form.answer }}
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg" value="Submit">Отправить</button>
+                </div>
+                {% csrf_token %}
+            </form>
+
+        </div>
+    </section>
 {% endblock %}

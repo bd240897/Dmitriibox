@@ -3,21 +3,49 @@
 {% block title %} waiting_room {% endblock %}
 
 {% block content %}
+    <section class="waiting">
+        <div class="container pt-1 pb-1">
 
-    <h1>Ждем игроков</h1>
-    <div>{{ massage }}</div>
-    <div>
-        <p>Список игроков в лобби</p>
-        {% for p in players %}
-            {{ p.player.username }}
-        {% endfor %}
-    </div>
+            <div class="waiting-header">
+                <h1 class="text-center">Ждем игроков</h1>
+            </div>
 
-    <div class="alredy_done__block d-flex flex-column">
-        <a href="#" class="answer_link btn btn-primary m-2 alredy_done__link" >Добавить бота</a>
-        <a href="{% url 'waiting_room' %}?join=1" class="answer_link btn btn-primary m-2 alredy_done__link" >Присоединиться к игре</a>
-        <a href="{% url 'waiting_room' %}?delete=1" class="answer_link btn btn-primary m-2 alredy_done__link" >Удалить всех пользователей</a>
-        <a href="{% url 'typing_room' %}" class="answer_link btn btn-primary m-2 alredy_done__link" >Начать игру</a>
-    </div>
+            <div class="waiting-body">
+                {% if massage %}
+                    <div class="waiting-massage alert alert-success" role="alert">
+                        {{ massage }}
+                    </div>
+                {% endif %}
 
+                <div class="waiting-list border border-primary pt-3 pb-3 mb-3 bt-3 p-3">
+                    <h2 class="waiting-list-text text-center">Список игроков в лобби</h2>
+                    <div class="waiting-player pt-3 pb-3">
+                        {% if not players %}
+                            <div class="text-center">
+                                Пока тут никого нет
+                            </div>
+                        {% endif %}
+
+                        <div class="d-flex align-items-center justify-content-center">
+                            {% for p in players %}
+                                <div class="d-inline p-2 mx-1 bg-success text-white">{{ p.player.username }}</div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="waiting-action d-flex flex-column text-center border border-primary pt-1 pb-1">
+                    <h2>Управление:</h2>
+                    <a href="#" class="answer_link btn btn-primary m-2 alredy_done__link" >Добавить бота</a>
+                    <a href="{% url 'waiting_room' %}?join=1" class="answer_link btn btn-primary m-2 alredy_done__link" >Присоединиться к игре</a>
+                    <a href="{% url 'waiting_room' %}?delete=1" class="answer_link btn btn-primary m-2 alredy_done__link" >Удалить всех пользователей</a>
+                    <a href="{% url 'typing_room' %}" class="answer_link btn btn-primary m-2 alredy_done__link" >Начать игру</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
 {% endblock %}
