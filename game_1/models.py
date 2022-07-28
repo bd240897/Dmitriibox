@@ -31,7 +31,7 @@ class AnswerPlayers(models.Model):
     # увеличивается каждый раунд
     player = models.ForeignKey('Players', on_delete=models.CASCADE, blank=True, null=True)
     answer = models.TextField(blank=True, null=True)
-    round = models.IntegerField(blank=True, default=1)
+    round_of_answer = models.IntegerField(blank=True, default=1)
 
     def __str__(self):
         return str(self.player) + "_AnswerPlayers"

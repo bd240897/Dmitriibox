@@ -36,9 +36,8 @@ class AnswerForm(forms.ModelForm):
                        "placeholder": "Напишите номер раунда",}
 
         model = AnswerPlayers
-        fields = ('answer', 'round')
+        fields = ('answer',)
         widgets = {
-            'round': forms.NumberInput(attrs=param_round),
             'answer': forms.Textarea(attrs=parm_answer)
         }
 #

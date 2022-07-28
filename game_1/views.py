@@ -148,6 +148,7 @@ class TypingRoomView(RounMdixin, CreateView):
         current_user = self.request.user
         current_room = GameRoom.objects.get(room_code=TEMP_CODE_ROOM)
         current_player = current_room.players_set.filter(player_in_room=current_user).last()
+        current_round = get_current_room().round
 
         # MY EXCEPTION
         if not current_player:
@@ -155,20 +156,12 @@ class TypingRoomView(RounMdixin, CreateView):
 
         AnswerPlayers.objects.create(player=current_player,
                                      answer=form.cleaned_data.get("answer"),
-                                     round=1
-                                     )
+                                     round_of_answer=current_round)
 
         return redirect('waiting_typing_room') #super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('waiting_typing_room')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        param_request_nextround = self.request.GET.get("nexround", 0)
-        if param_request_nextround:
-            extra_context = next_round()
-        return context
 
 class WaitingTypingRoomView(TemplateView):
     """Ждем всех игроков после typing"""
@@ -177,8 +170,8 @@ class WaitingTypingRoomView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context['players'] = AnswerPlayers.objects.filter(answer__isnull=False).filter(player__parent_room__room_code=TEMP_CODE_ROOM, round=1)
+        current_round = get_current_room().round
+        context['players'] = AnswerPlayers.objects.filter(answer__isnull=False).filter(round_of_answer=current_round).filter(player__parent_room__room_code=TEMP_CODE_ROOM)
         return context
 
 
@@ -189,6 +182,13 @@ class ResultRoomView(ListView):
     context_object_name = 'players'
 
     def get_queryset(self):
-
-        select = AnswerPlayers.objects.filter(answer__isnull=False).filter(player__parent_room__room_code=TEMP_CODE_ROOM, round=1)
+        current_round = get_current_room().round
+        select = AnswerPlayers.objects.filter(answer__isnull=False).filter(round_of_answer=current_round).filter(player__parent_room__room_code=TEMP_CODE_ROOM,)
         return select
+
+    def get(self, *args, **kwargs):
+        param_request_nextround = self.request.GET.get("nexround", 0)
+        if param_request_nextround:
+            extra_context = next_round()
+            return redirect("typing_room")
+        return super().get(self, *args, **kwargs)

@@ -7,6 +7,10 @@ TEMP_CODE_ROOM = "SQPQ"
 TEMP_NAME_USER = "Dima"
 
 
+class SupportFunction:
+    pass
+
+
 def create_room(room_code=TEMP_CODE_ROOM):
     """Создает игровую комнату с кодом комнаты"""
 
@@ -48,13 +52,15 @@ def is_room_exist(room_code = TEMP_CODE_ROOM):
         return True
 
 def is_user_in_room(user, room_code=TEMP_CODE_ROOM):
-    current_room = GameRoom.objects.get(room_code=room_code)
-    # players_room_in_room = False
-    # is_room_exist()
-    # print(current_room.players_set.filter(player_in_room=user))
+
     if is_room_exist():
+        current_room = GameRoom.objects.get(room_code=room_code)
         players_room_in_room = current_room.players_set.filter(player_in_room=user)
     return bool(players_room_in_room)
+
+def get_current_room(room_code=TEMP_CODE_ROOM):
+    if is_room_exist():
+        return GameRoom.objects.get(room_code=room_code)
 
 class RounMdixin:
     """Получим текущий раунд"""
