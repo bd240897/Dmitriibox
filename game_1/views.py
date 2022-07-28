@@ -18,15 +18,6 @@ class TestApiView(APIView):
     def get(self, request):
         return Response({"dima":"I am groud", 'masha':'I am a girl'})
 
-class TestView(View):
-    """"""
-
-    template_name = 'game_1/main.html'
-
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'form': 1})
-
-
 class RegisterUser(CreateView):
     """Регистрация"""
 
@@ -51,11 +42,6 @@ class LoginUser(LoginView):
 
     def get_success_url(self):
         return reverse_lazy('home')
-
-class HomeView(TemplateView):
-    """Домашняя страницы"""
-
-    template_name = 'game_1/home.html'
 
 class TempView(TemplateView):
     """Заглушка"""
@@ -119,7 +105,6 @@ class TypingRoomView(CreateView):
 
     model = GameRoom
     form_class = AnswerForm
-    # success_url = '/'
     template_name = 'game_1/room/typing_room.html'
 
     # добавить проверку есть ли пользоватль в игре? и один ли он там!
@@ -135,7 +120,6 @@ class TypingRoomView(CreateView):
         current_player.answer = form.cleaned_data.get("answer")
         current_player.parent_room = parent_room
         current_player.save()
-        print()
 
         # form.instance.parent_room = parent_room
         # form.instance.player = player
@@ -147,17 +131,16 @@ class TypingRoomView(CreateView):
         return reverse_lazy('waiting_typing_room')
 
 
-
 class WaitingTypingRoomView(TemplateView):
     """Ждем всех игроков после typing"""
 
     template_name = 'game_1/room/waiting_typing_room.html'
-    # context_object_name = 'players'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['players'] = GameRoom.objects.get(room_code=TEMP_CODE_ROOM).players_set.all()
         return context
+
 
 class ResultRoomView(ListView):
     """Смотрим результаты"""
@@ -166,11 +149,6 @@ class ResultRoomView(ListView):
     context_object_name = 'players'
 
     def get_queryset(self):
-
-        # select = GameRoom.objects.filter(room_code=TEMP_CODE_ROOM)
-        # print(select)
-
-        # add_user_to_game(self.request)
         current_game = GameRoom.objects.get(room_code=TEMP_CODE_ROOM)
         select = current_game.players_set.all()
         return select

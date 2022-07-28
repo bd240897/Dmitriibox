@@ -3,13 +3,10 @@ from django.urls import path, include
 from .views import *
 
 urlpatterns = [
-    path('api/v1/test/', TestApiView.as_view()),
-    path('test/', TestView.as_view()),
 
     # Логин
     path('register/', RegisterUser.as_view(), name='register'),
     path('login/', LoginUser.as_view(), name='login'),
-    path('home/', HomeView.as_view(), name='home'),
     path('logout/', logout_user, name='logout'),
 
     # Игра
