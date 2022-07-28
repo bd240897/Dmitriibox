@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django import forms
 
-from game_1.models import Players
+from game_1.models import Players, AnswerPlayers
 
 
 class RegisterUserForm(UserCreationForm):
@@ -23,7 +23,7 @@ class LoginUserForm(AuthenticationForm):
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
 
 class AnswerForm(forms.ModelForm):
-
+    """Ответы игроков"""
 
     class Meta:
         parm_answer = {"type": "text",
@@ -35,7 +35,7 @@ class AnswerForm(forms.ModelForm):
                        "class": "form-control",
                        "placeholder": "Напишите номер раунда",}
 
-        model = Players
+        model = AnswerPlayers
         fields = ('answer', 'round')
         widgets = {
             'round': forms.NumberInput(attrs=param_round),

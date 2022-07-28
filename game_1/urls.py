@@ -10,8 +10,10 @@ urlpatterns = [
     path('logout/', logout_user, name='logout'),
 
     # Игра
+    path('', RedirectMainRoomView.as_view(), name='redirect_main_room'),
     path('room/main/', MainRoomView.as_view(), name='main_room'),
     path('room/waiting/', WaitingRoomView.as_view(), name='waiting_room'),
+    # path('room/waiting/delete', WaitingRoomDeleteView.as_view(), name='waiting_room_delete'),
     path('room/addbot/', AddBotApiView.as_view(), name='add_bot'),
     path('api/v1/gamers/<slug:slug>/', TempView.as_view(), name='found_gamers'),
     path('room/typing/', TypingRoomView.as_view(), name='typing_room'),

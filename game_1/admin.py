@@ -1,9 +1,10 @@
 from django.contrib import admin
 
-from .models import GameRoom, Players
+from .models import GameRoom, Players, AnswerPlayers
 
 admin.site.register(GameRoom)
 admin.site.register(Players)
+admin.site.register(AnswerPlayers)
 
 # class PostAdmin(admin.ModelAdmin):
 #     pass

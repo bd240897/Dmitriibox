@@ -28,7 +28,7 @@
 
                         <div class="d-flex align-items-center justify-content-center">
                             {% for p in players %}
-                                <div class="d-inline p-2 mx-1 bg-success text-white">{{ p.player.username }}</div>
+                                <div class="d-inline p-2 mx-1 bg-success text-white">{{ p.player_in_room.username }}</div>
                             {% endfor %}
                         </div>
 
@@ -37,10 +37,11 @@
 
                 <div class="waiting-action d-flex flex-column text-center border border-primary pt-1 pb-1">
                     <h2>Управление:</h2>
-                    <a href="#" class="answer_link btn btn-primary m-2 alredy_done__link" >Добавить бота</a>
-                    <a href="{% url 'waiting_room' %}?join=1" class="answer_link btn btn-primary m-2 alredy_done__link" >Присоединиться к игре</a>
-                    <a href="{% url 'waiting_room' %}?delete=1" class="answer_link btn btn-primary m-2 alredy_done__link" >Удалить всех пользователей</a>
-                    <a href="{% url 'typing_room' %}" class="answer_link btn btn-primary m-2 alredy_done__link" >Начать игру</a>
+                    <a href="#" class="disabled btn btn-primary m-2" >Добавить бота</a>
+                    <a href="{% url 'waiting_room' %}?join=1" class="answer_link btn btn-primary m-2 " >Присоединиться к игре</a>
+                    <a href="{% url 'waiting_room' %}?deleteplayers=1" class="answer_link btn btn-primary m-2 " >Удалить всех пользователей</a>
+                    <a href="{% url 'waiting_room' %}?deleteroom=1" class="answer_link btn btn-primary m-2 " >Удалить комнату</a>
+                    <a href="{% url 'waiting_room' %}?startgame=1" class="answer_link btn btn-success m-2 " >Начать игру</a>
                 </div>
 
             </div>

@@ -1,6 +1,6 @@
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -12,11 +12,8 @@ from rest_framework.views import APIView
 
 from .forms import RegisterUserForm, LoginUserForm, AnswerForm
 from .logic import *
+from .models import AnswerPlayers
 
-
-class TestApiView(APIView):
-    def get(self, request):
-        return Response({"dima":"I am groud", 'masha':'I am a girl'})
 
 class RegisterUser(CreateView):
     """Регистрация"""
@@ -65,6 +62,7 @@ class MainRoomView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         extra_context = dict()
+        # параметр конца игры в запросе
         param_request_end_game = self.request.GET.get("gameover", 0)
         if param_request_end_game:
             extra_context = delete_all_user_to_game(self.request)
@@ -73,27 +71,61 @@ class MainRoomView(TemplateView):
         context = {**context, **extra_context}
         return context
 
+class RedirectMainRoomView(View):
+    """Простой редирект на главную"""
+
+    def get(self, *args, **kwargs):
+        return redirect("main_room")
 
 class WaitingRoomView(View):
     """Ожидание игроков"""
 
     template_name = 'game_1/room/waiting_room.html'
+    template_name_main_room = 'game_1/room/main_room.html'
 
     def get(self, *args, **kwargs):
         extra_context = {}
 
-        param_request_delete = self.request.GET.get("delete", 0)
+        param_request_delete_players = self.request.GET.get("deleteplayers", 0)
+        param_request_delete_room = self.request.GET.get("deleteroom", 0)
         param_request_join = self.request.GET.get("join", 0)
+        param_request_create = self.request.GET.get("create", 0)
+        param_request_startgame = self.request.GET.get("startgame", 0)
 
-        if param_request_delete:
+        # создать комнату
+        if param_request_create:
+            extra_context = create_room()
+        # удалить комнату
+        elif param_request_delete_room:
+            extra_context = delete_room()
+            return render(self.request, self.template_name_main_room, extra_context)
+        # удалить игроков
+        elif param_request_delete_players:
             extra_context = delete_all_user_to_game(self.request)
+        # присоединиться к комнате
         elif param_request_join:
             extra_context = add_user_to_game(self.request)
+        # начать игру
+        elif param_request_startgame:
+            extra_context = start_game()
+            return redirect("typing_room")
 
         players_context = players_in_game()
 
         context = {**players_context, **extra_context}
         return render(self.request, self.template_name, context)
+
+
+# class WaitingRoomDeleteView(View):
+#     """Удалить пользователя из списка"""
+#
+#     template_name = 'game_1/room/waiting_room.html'
+#
+#     def get(self, *args, **kwargs):
+#         extra_context = delete_all_user_to_game(self.request)
+#         players_context = players_in_game()
+#         context = {**players_context, **extra_context}
+#         return render(self.request, self.template_name, context)
 
 
 class AddBotApiView(APIView):
@@ -103,27 +135,24 @@ class AddBotApiView(APIView):
 class TypingRoomView(CreateView):
     """Пишем ответы"""
 
-    model = GameRoom
     form_class = AnswerForm
     template_name = 'game_1/room/typing_room.html'
 
     # добавить проверку есть ли пользоватль в игре? и один ли он там!
 
     def form_valid(self, form):
-        parent_room = GameRoom.objects.get(room_code=TEMP_CODE_ROOM)
-        player = self.request.user
-        # round
+        current_user = self.request.user
+        current_room = GameRoom.objects.get(room_code=TEMP_CODE_ROOM)
+        current_player = current_room.players_set.filter(player_in_room=current_user).last()
 
-        # # костыль костыль!!!!!
-        current_player = GameRoom.objects.get(room_code=TEMP_CODE_ROOM).players_set.last()
-        current_player.round = 1
-        current_player.answer = form.cleaned_data.get("answer")
-        current_player.parent_room = parent_room
-        current_player.save()
+        # MY EXCEPTION
+        if not current_player:
+            return HttpResponse('Список игроков наверное пуст - ' + str(current_player))
 
-        # form.instance.parent_room = parent_room
-        # form.instance.player = player
-        # form.instance.a = player
+        AnswerPlayers.objects.create(player=current_player,
+                                     answer=form.cleaned_data.get("answer"),
+                                     round=1
+                                     )
 
         return redirect('waiting_typing_room') #super().form_valid(form)
 
@@ -138,7 +167,8 @@ class WaitingTypingRoomView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['players'] = GameRoom.objects.get(room_code=TEMP_CODE_ROOM).players_set.all()
+
+        context['players'] = AnswerPlayers.objects.filter(answer__isnull=False).filter(player__parent_room__room_code=TEMP_CODE_ROOM, round=1)
         return context
 
 
@@ -149,6 +179,5 @@ class ResultRoomView(ListView):
     context_object_name = 'players'
 
     def get_queryset(self):
-        current_game = GameRoom.objects.get(room_code=TEMP_CODE_ROOM)
-        select = current_game.players_set.all()
+        select = AnswerPlayers.objects.filter(answer__isnull=False).filter(player__parent_room__room_code=TEMP_CODE_ROOM, round=1)
         return select

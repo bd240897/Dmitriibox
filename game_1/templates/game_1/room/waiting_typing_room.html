@@ -13,15 +13,13 @@
                 <h2>Игроки которые уже ответили</h2>
                 <div class="row">
                     {% for p in players %}
-                        {% if p.answer %}
-                            <div class="col-3 p-auto">
-                                <div class="bg-success text-center text-white fw-bold">
-                                    <div class="pt-2">{{ p.player.username }}</div>
-                                    <div class="pb-2 pt-2">done</div>
-{#                                    <div class="bg-success pb-2 pt-2"> ОТЛАДКА Ответ пользователя {{ p.answer }}</div>#}
-                                </div>
+                        <div class="col-3 p-auto">
+                            <div class="bg-success text-center text-white fw-bold">
+                                <div class="pt-2">{{ p.player.player_in_room }}</div>
+                                <div class="pb-2 pt-2">done</div>
+    {#                                    <div class="bg-success pb-2 pt-2"> ОТЛАДКА Ответ пользователя {{ p.answer }}</div>#}
                             </div>
-                        {% endif %}
+                        </div>
                     {% endfor %}
                 </div>
             </div>
