@@ -1,0 +1,23 @@
+{% extends 'game_1/base.html' %}
+
+{% block title %} waiting_room {% endblock %}
+
+{% block content %}
+
+    <h1>Ждем игроков</h1>
+    <div>{{ massage }}</div>
+    <div>
+        <p>Список игроков в лобби</p>
+        {% for p in players %}
+            {{ p.player.username }}
+        {% endfor %}
+    </div>
+
+    <div class="alredy_done__block d-flex flex-column">
+        <a href="#" class="answer_link btn btn-primary m-2 alredy_done__link" >Добавить бота</a>
+        <a href="{% url 'waiting_room' %}?join=1" class="answer_link btn btn-primary m-2 alredy_done__link" >Присоединиться к игре</a>
+        <a href="{% url 'waiting_room' %}?delete=1" class="answer_link btn btn-primary m-2 alredy_done__link" >Удалить всех пользователей</a>
+        <a href="{% url 'typing_room' %}" class="answer_link btn btn-primary m-2 alredy_done__link" >Начать игру</a>
+    </div>
+
+{% endblock %}

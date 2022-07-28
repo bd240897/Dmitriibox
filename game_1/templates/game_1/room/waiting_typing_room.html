@@ -1,0 +1,14 @@
+{% extends 'game_1/base.html' %}
+
+
+{% block title %} waiting_typing_room {% endblock %}
+
+{% block content %}
+
+    <h1>Ждем всех игроков</h1>
+
+    <div class="alredy_done__block d-flex flex-column">
+        <a href="{% url 'result_room' %}" class="answer_link btn btn-primary m-2 alredy_done__link" >Показать ответы</a>
+    </div>
+{% endblock %}
+

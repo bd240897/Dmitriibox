@@ -1,0 +1,15 @@
+{% extends 'game_1/base.html' %}
+
+
+{% block title %} main_room {% endblock %}
+
+{% block content %}
+
+    <h1>Игра номер 1</h1>
+    <div>Краткое поисание тут.Краткое поисание тут.Краткое поисание тут.</div>
+
+    <div class="alredy_done__block d-flex flex-column">
+        <a href="{% url 'waiting_room' %}" class="answer_link btn btn-primary m-2 alredy_done__link" >Играть</a>
+    </div>
+{% endblock %}
+

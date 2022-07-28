@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Like Post App</title>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+</head>
+<body>
+ <div class="message">
+     <div class="field_1">
+        <p class="name_1">Дима</p>
+        <div class="text_1"></div>
+     </div>
+     <div class="field_2">
+        <p class="name_2">Масша</p>
+        <div class="text_2"></div>
+     </div>
+ </div>
+ <button class="my_btn"> Кликни </button>
+
+
+ <script type="text/javascript">
+ $('.my_btn').click(
+     function ajax_1() {
+         $.ajax({
+             url: '/api/v1/test',
+             type: 'get',
+             {#dataType: 'json',#}
+
+             success: function (data) {
+                 {#alert(data.html);#}
+                 {#console.log(data.dima);#}
+
+             },
+             failure: function (data) {
+                 alert('Got an error dude');
+             }
+         })
+         .then(function(data) {$('.text_1').append(data.dima); $('.text_2').append(data.masha);});
+
+        {##}
+        {# var name = JSON.stringify(output);#}
+        {#var block = $('<div class="test_1">' +#}
+        {#    `<p>${name}<p>` +#}
+        {#    '</div>')#}
+        {##}
+        {#$('.message').append(block)#}
+
+
+    });
+
+ {#Запрос каждую секунду#}
+{# https://www.codegrepper.com/code-examples/javascript/refresh+page+every+1+seconds+django#}
+ window.setInterval('ajax_2()', 1000);
+
+ function ajax_2() {$.ajax({
+     url: '/api/v1/test',
+     type: 'get',
+     {#dataType: 'json',#}
+ })
+     .then($('.text_1').empty())
+     .then(function(data) {$('.text_1').append(data.dima); $('.text_2').append(data.masha);});}
+
+
+{#https://djangocentral.com/django-ajax-with-jquery/#}
+{# https://habr.com/ru/post/42426/#}
+{# https://snipp.ru/jquery/ajax-jquery#}
+
+{# обновление - django javascript обновить каждую секунду#}
+{# https://overcoder.net/q/1704771/как-я-могу-обновлять-фотографию-каждую-секунду-в-моем-шаблоне-django#}
+{# https://reddeveloper.ru/questions/prinuditel-naya-perezagruzka-na-veb-stranitse-kliyenta-django-m6dGy#}
+{# https://digitrain.ru/questions/12786793/#}
+</script>
+</body>
+</html>

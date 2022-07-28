@@ -1,0 +1,14 @@
+{% block title %} typing_room {% endblock %}
+g
+{% block content %}
+
+    <h1>Печатаем сво ответ тут</h1>
+    <div>{{ massage }}</div>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary btn-lg" value="Submit">Отправить</button>
+    </form>
+
+{% endblock %}

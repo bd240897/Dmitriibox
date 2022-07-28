@@ -1,0 +1,14 @@
+{% extends 'game_1/base.html' %}
+
+{% block title %} result_room {% endblock %}
+
+{% block content %}
+    <div style="font-weight: bold; font-size: 26px">Ответы пользователей:</div>
+    {% for p in  players %}
+        <div>
+            {{ p.player }}
+            {{ p.answer }}
+        </div>
+    {% endfor %}
+{% endblock %}
+

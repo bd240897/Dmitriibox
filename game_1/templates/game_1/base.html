@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+<h1>Username - {{user.username}}</h1>
+
+<ul class="navbar-nav mr-auto">
+    <li class="nav-item"><a href="{% url 'main_room' %}" class="nav-link active">main_room</a></li>
+    <li class="nav-item"><a href="{% url 'waiting_room' %}" class="nav-link active">waiting_room</a></li>
+    <li class="nav-item"><a href="{% url 'add_bot' %}" class="nav-link active">add_bot</a></li>
+    <li class="nav-item"><a href="{% url 'found_gamers' 1 %}" class="nav-link active">found_gamers</a></li>
+    <li class="nav-item"><a href="{% url 'typing_room' %}" class="nav-link active">typing_room</a></li>
+    <li class="nav-item"><a href="{% url 'waiting_typing_room' %}" class="nav-link active">waiting_typing_room</a></li>
+    <li class="nav-item"><a href="{% url 'result_room' %}" class="nav-link active">result_room</a></li>
+</ul>
+
+{% block content %}
+
+{% endblock %}
+
+</body>
+</html>
