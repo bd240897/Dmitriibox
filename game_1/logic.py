@@ -9,6 +9,7 @@ TEMP_NAME_USER = "Dima"
 
 def create_room(room_code=TEMP_CODE_ROOM):
     """Создает игровую комнату с кодом комнаты"""
+
     extra_context = dict()
 
     if GameRoom.objects.filter(room_code=room_code):
@@ -20,8 +21,9 @@ def create_room(room_code=TEMP_CODE_ROOM):
 
     return extra_context
 
+
 def start_game(room_code=TEMP_CODE_ROOM):
-    """Запускаем игру (меняем в БДЩ= статус)"""
+    """Запускаем игру (меняем в БД статус)"""
 
     extra_context = dict()
 
@@ -37,6 +39,58 @@ def start_game(room_code=TEMP_CODE_ROOM):
 
         return extra_context
 
+def is_room_exist(room_code = TEMP_CODE_ROOM):
+
+    if not GameRoom.objects.filter(room_code=room_code):
+        massage = "(next_round) Комната с кодом " + str(room_code) + " не существует!"
+        return HttpResponse(massage)
+    else:
+        return True
+
+def is_user_in_room(user, room_code=TEMP_CODE_ROOM):
+    current_room = GameRoom.objects.get(room_code=room_code)
+    # players_room_in_room = False
+    # is_room_exist()
+    # print(current_room.players_set.filter(player_in_room=user))
+    if is_room_exist():
+        players_room_in_room = current_room.players_set.filter(player_in_room=user)
+    return bool(players_room_in_room)
+
+class RounMdixin:
+    """Получим текущий раунд"""
+
+    def get_current_round(room_code=TEMP_CODE_ROOM):
+        """Получить текущий раунд"""
+        current_room = GameRoom.objects.filter(room_code=TEMP_CODE_ROOM).last()
+
+        if not current_room:
+            return ('Такой комнаты нет - ' + str(current_room)) #
+        return current_room.round
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['round'] = self.get_current_round()
+        return context
+
+
+def next_round(room_code=TEMP_CODE_ROOM):
+    """Запускаем игру (меняем в БДЩ= статус)"""
+
+    extra_context = dict()
+
+    if not GameRoom.objects.filter(room_code=room_code):
+        massage = "(next_round) Комната с кодом " + str(room_code) + " не существует!"
+        return HttpResponse(massage)
+    else:
+        current_room = GameRoom.objects.get(room_code=room_code)
+        current_room.round += 1
+        current_room.save()
+        massage = "(next_round) Раунд комнаты с кодом " + str(current_room) + " увеличен до " + str(current_room.round)
+        extra_context['massage'] = massage
+
+        return extra_context
+
+
 def delete_room(room_code=TEMP_CODE_ROOM):
     """Удаляет игровую комнату с кодом комнаты"""
     extra_context = dict()
@@ -46,6 +100,7 @@ def delete_room(room_code=TEMP_CODE_ROOM):
     extra_context['massage'] = massage
 
     return extra_context
+
 
 def players_in_game(room_code=TEMP_CODE_ROOM):
     """Выводит игроков в текущей игре с кодом комнаты"""

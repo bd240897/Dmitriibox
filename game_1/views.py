@@ -108,6 +108,10 @@ class WaitingRoomView(View):
         # начать игру
         elif param_request_startgame:
             extra_context = start_game()
+            user = self.request.user
+            if not is_user_in_room(user):
+                context = {"massage" : "Вы не вошли в эту игру!"}
+                return render(self.request, self.template_name, context)
             return redirect("typing_room")
 
         players_context = players_in_game()
@@ -132,7 +136,7 @@ class AddBotApiView(APIView):
     """Добавить бота в игру"""
     pass
 
-class TypingRoomView(CreateView):
+class TypingRoomView(RounMdixin, CreateView):
     """Пишем ответы"""
 
     form_class = AnswerForm
@@ -159,6 +163,12 @@ class TypingRoomView(CreateView):
     def get_success_url(self):
         return reverse_lazy('waiting_typing_room')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        param_request_nextround = self.request.GET.get("nexround", 0)
+        if param_request_nextround:
+            extra_context = next_round()
+        return context
 
 class WaitingTypingRoomView(TemplateView):
     """Ждем всех игроков после typing"""
@@ -179,5 +189,6 @@ class ResultRoomView(ListView):
     context_object_name = 'players'
 
     def get_queryset(self):
+
         select = AnswerPlayers.objects.filter(answer__isnull=False).filter(player__parent_room__room_code=TEMP_CODE_ROOM, round=1)
         return select
