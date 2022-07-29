@@ -13,6 +13,7 @@ ENV PYTHONUNBUFFERED 1
 # Устанавливаем зависимости для Postgre
 RUN apk update \
     && apk add postgresql-dev gcc python3-dev musl-dev
+RUN apk add libffi-dev
 
 # устанавливаем зависимости
 RUN pip install --upgrade pip
