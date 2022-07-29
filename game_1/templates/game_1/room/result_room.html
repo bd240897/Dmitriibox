@@ -23,7 +23,11 @@
             <div class="results-body pt-2 pb-2">
                 {% for p in  players %}
                     <div class="d-flex flex-column bd-highlight mb-3 ">
-                        <div class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">{{ p.player }} написал/а </div>
+                        <div class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">
+                            <div> Игрок</div>
+                            <div style="color: red">&nbsp;"{{ user.username }}&nbsp;</div>
+                            <div> написал/а</div>
+                        </div>
                         <div class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 26px; color: red; height: 200px; border-radius: 50px;">{{ p.answer }}</div>
                         <div class="p-2 bg-warning ms-auto" >Неплохой ответ</div>
                     </div>

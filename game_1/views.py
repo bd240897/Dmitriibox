@@ -203,7 +203,7 @@ class ResultRoomView(RoomMixin, ListView):
     def get_queryset(self):
         current_round = self.get_current_room().round
         select = AnswerPlayers.objects.filter(answer__isnull=False).filter(round_of_answer=current_round).filter(
-            player__parent_room__room_code=TEMP_CODE_ROOM, )
+            player__parent_room__room_code=TEMP_CODE_ROOM)
         return select
 
     def get(self, *args, **kwargs):
