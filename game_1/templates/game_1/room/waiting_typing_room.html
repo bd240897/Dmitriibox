@@ -3,34 +3,40 @@
 {% block title %} waiting_typing_room {% endblock %}
 
 {% block content %}
-    <section class="waiting-typing">
-        <div class="container pt-1 pb-1">
-            <div class="current-round">
-                <h2 class="text-center">Раунд №{{ round }}</h2>
-            </div>
+    <section class="waiting-typing vh-100">
+        <div class="container pt-1 pb-1 h-100">
+            <div class="d-flex flex-column justify-content-center align-items-between h-100">
 
+                {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
+                {% include '../blocks/django_messages.html' %}
 
-            <div class="waiting-typing-header">
-                <h1 class="text-center">Ждем всех игроков</h1>
-            </div>
-
-            <div class="waiting-typing-players">
-                <h2>Игроки которые уже ответили</h2>
-                <div class="row">
-                    {% for p in players %}
-                        <div class="col-3 p-auto pb-2">
-                            <div class="bg-success text-center text-white fw-bold">
-                                <div class="pt-2">{{ p.player.player_in_room }}</div>
-                                <div class="pb-2 pt-2">done</div>
-    {#                                    <div class="bg-success pb-2 pt-2"> ОТЛАДКА Ответ пользователя {{ p.answer }}</div>#}
-                            </div>
-                        </div>
-                    {% endfor %}
+                <div class="current-round">
+                    <h2 class="text-center">Раунд № {{ round }}</h2>
                 </div>
-            </div>
 
-            <div class="waiting-typing-done d-flex flex-column pt-2 pb-2">
-                <a href="{% url 'result_room' %}" class="answer_link btn btn-primary alredy_done__link" >Показать ответы</a>
+
+                <div class="waiting-typing-header">
+                    <h1 class="text-center">Ждем всех игроков</h1>
+                </div>
+
+                <div class="waiting-typing-players text-center">
+                    <h2>Игроки которые уже ответили</h2>
+                    <div class="row">
+                        {% for p in players %}
+                            <div class="col-3 p-auto pb-2">
+                                <div class="bg-success text-center text-white fw-bold">
+                                    <div class="pt-2">{{ p.player.player_in_room }}</div>
+                                    <div class="pb-2 pt-2">done</div>
+                                    {#                                    <div class="bg-success pb-2 pt-2"> ОТЛАДКА Ответ пользователя {{ p.answer }}</div>#}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="waiting-typing-done d-flex flex-column pt-2 pb-2">
+                    <a href="{% url 'result_room' %}" class="answer_link btn btn-primary alredy_done__link" >Показать ответы</a>
+                </div>
             </div>
         </div>
     </section>

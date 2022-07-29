@@ -6,6 +6,9 @@
     <section class="waiting">
         <div class="container pt-1 pb-1 border border-success">
 
+            {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
+            {% include '../blocks/django_messages.html' %}
+
             <div class="current-round">
                 <h2 class="text-center">Раунд №{{ round }}</h2>
             </div>
@@ -16,14 +19,17 @@
 
             <div class="results-answer pt-2 pb-2" style="background-color: #f5d060; border-radius: 20px;">
                 <h2 class="text-center">Вопрос:</h2>
-                <h2 class="text-center">Почему чукча любит бензобак?{{ question }}</h2>
+                <h2 class="text-center">{{ obj_question.question }}</h2>
+            </div>
+            <div class="d-flex flex-column justify-content-center align-items-center" >
+                <img src="{{ obj_question.img.url }}" class="img-fluid" alt="..." style="max-width: 600px">
             </div>
 
             <form method="post">
-{#                <div class="mb-3">#}
-{#                    <label for="round" class="form-label">Номер раунда</label>#}
-{#                    {{ form.round }}#}
-{#                </div>#}
+                {#                <div class="mb-3">#}
+                {#                    <label for="round" class="form-label">Номер раунда</label>#}
+                {#                    {{ form.round }}#}
+                {#                </div>#}
                 <div class="mb-3">
                     <label for="answer" class="form-label">Ответ</label>
                     {{ form.answer }}

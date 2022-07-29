@@ -2,9 +2,10 @@ from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 
 # Create your views here.
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import CreateView, TemplateView, ListView, DetailView
 from rest_framework.response import Response
@@ -13,6 +14,7 @@ from rest_framework.views import APIView
 from .forms import *
 from .logic import *
 from .models import *
+
 
 class RegisterUser(CreateView):
     """Регистрация"""
@@ -39,10 +41,12 @@ class LoginUser(LoginView):
     def get_success_url(self):
         return reverse_lazy('main_room')
 
+
 class TempView(TemplateView):
     """Заглушка"""
 
     template_name = 'game_1/home.html'
+
 
 def logout_user(request):
     """Разлогиниться"""
@@ -60,16 +64,8 @@ class MainRoomView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        extra_context = dict()
-
-        # параметр конца игры в запросе
-        param_request_end_game = self.request.GET.get("gameover", 0)
-        if param_request_end_game:
-            extra_context = SupportFunction.delete_all_user_to_game(self.request)
-            extra_context['gameover_massage'] = "Игра окончена"
-
-        context = {**context, **extra_context}
         return context
+
 
 class RedirectMainRoomView(View):
     """Простой редирект на главную"""
@@ -77,7 +73,8 @@ class RedirectMainRoomView(View):
     def get(self, *args, **kwargs):
         return redirect("main_room")
 
-class WaitingRoomView(View):
+
+class WaitingRoomView(RoomMixin, TemplateView):
     """Ожидание игроков"""
 
     template_name = 'game_1/room/waiting_room.html'
@@ -88,8 +85,6 @@ class WaitingRoomView(View):
         """Если пользователь не авторизован отправить его на регистрацию"""
         if not self.request.user.is_authenticated:
             return redirect("game_login")
-
-
         extra_context = {}
 
         param_request_delete_players = self.request.GET.get("deleteplayers", 0)
@@ -101,33 +96,30 @@ class WaitingRoomView(View):
 
         # создать комнату
         if param_request_create:
-            extra_context = SupportFunction.create_room()
+            self.create_room()
         # удалить комнату
         elif param_request_delete_room:
-            extra_context = SupportFunction.delete_room()
-            return render(self.request, self.template_name_main_room, extra_context)
+            self.delete_room()
+            return render(self.request, self.template_name_main_room)
         # удалить игроков
         elif param_request_delete_players:
-            extra_context = SupportFunction.delete_all_user_to_game(self.request)
+            self.delete_all_users(self.request)
         # присоединиться к комнате
         elif param_request_join:
-            extra_context = SupportFunction.add_user_to_game(self.request)
+            self.join_to_game(self.request)
         # выйти из комнаты
         elif param_request_exit:
-            extra_context = SupportFunction.remove_user_to_game(self.request)
+            self.exit_to_game(self.request)
         # начать игру
         elif param_request_startgame:
-            extra_context = SupportFunction.start_game()
+            self.start_game()
             user = self.request.user
-            if not SupportFunction.is_user_in_room(user):
-                context = {"massage" : "Вы не вошли в эту игру!"}
-                return render(self.request, self.template_name, context)
+            if not self.is_user_in_room(user):
+                return super().get(*args, **kwargs)
             return redirect("typing_room")
 
-        players_context = SupportFunction.players_in_game()
-
-        context = {**players_context, **extra_context}
-        return render(self.request, self.template_name, context)
+        kwargs['players'] = self.players_in_game()
+        return super().get(*args, **kwargs)
 
 
 # class WaitingRoomDeleteView(View):
@@ -146,7 +138,8 @@ class AddBotApiView(APIView):
     """Добавить бота в игру"""
     pass
 
-class TypingRoomView(RounMdixin, CreateView):
+
+class TypingRoomView(RoomMixin, CreateView):
     """Пишем ответы"""
 
     form_class = AnswerForm
@@ -161,65 +154,72 @@ class TypingRoomView(RounMdixin, CreateView):
         """Получаем вопрос из БД"""
 
         # считывает форму и создает запись с ответом пользователя
-        current_room = SupportFunction.get_current_room()
+        current_room = self.get_current_room()
         current_round = current_room.round
-        current_question = get_object_or_404(Questions, round_for_question=current_round).question
-        kwargs['question'] = current_question
+        obj_question = get_object_or_404(Questions, round_for_question=current_round)
+        kwargs['obj_question'] = obj_question
+        kwargs['round'] = current_round
 
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
-
         # считывает форму и создает запись с ответом пользователя
         current_user = self.request.user
-        current_room = SupportFunction.get_current_room()
-        current_player = current_room.players_set.filter(player_in_room=current_user).last()
+        current_room = self.get_current_room()
+        current_player = current_room.players_set.get(player_in_room=current_user) #!!!
         current_round = current_room.round
 
-        # MY EXCEPTION
-        if not current_player:
-            return HttpResponse('Список игроков наверное пуст - ' + str(current_player))
 
         AnswerPlayers.objects.create(player=current_player,
                                      answer=form.cleaned_data.get("answer"),
                                      round_of_answer=current_round)
 
-        return redirect('waiting_typing_room') #super().form_valid(form)
+        return redirect('waiting_typing_room')  # super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('waiting_typing_room')
 
-class WaitingTypingRoomView(RounMdixin, TemplateView):
+
+class WaitingTypingRoomView(RoomMixin, TemplateView):
     """Ждем всех игроков после typing"""
 
     template_name = 'game_1/room/waiting_typing_room.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        current_round = SupportFunction.get_current_room().round
-        context['players'] = AnswerPlayers.objects.filter(answer__isnull=False).filter(round_of_answer=current_round).filter(player__parent_room__room_code=TEMP_CODE_ROOM)
+        current_round = self.get_current_room().round
+        context['players'] = AnswerPlayers.objects.filter(answer__isnull=False).filter(
+            round_of_answer=current_round).filter(player__parent_room__room_code=TEMP_CODE_ROOM)
+        context['round'] = current_round
         return context
 
 
-class ResultRoomView(RounMdixin, ListView):
+class ResultRoomView(RoomMixin, ListView):
     """Смотрим результаты"""
 
     template_name = 'game_1/room/result_room.html'
     context_object_name = 'players'
 
     def get_queryset(self):
-        current_round = SupportFunction.get_current_room().round
-        select = AnswerPlayers.objects.filter(answer__isnull=False).filter(round_of_answer=current_round).filter(player__parent_room__room_code=TEMP_CODE_ROOM,)
+        current_round = self.get_current_room().round
+        select = AnswerPlayers.objects.filter(answer__isnull=False).filter(round_of_answer=current_round).filter(
+            player__parent_room__room_code=TEMP_CODE_ROOM, )
         return select
 
     def get(self, *args, **kwargs):
         param_request_nextround = self.request.GET.get("nexround", 0)
-
+        param_request_end_game = self.request.GET.get("gameover", 0)
+        if param_request_end_game:
+            self.end_game()
+            self.delete_room()
+            return redirect("gameover_room")
         if param_request_nextround:
-            extra_context = SupportFunction.next_round()
             if self.is_questions_end():
+                self.end_game()
+                self.delete_room()
                 return redirect("gameover_room")
             else:
+                self.next_round()
                 return redirect("typing_room")
 
         return super().get(self, *args, **kwargs)
@@ -227,21 +227,22 @@ class ResultRoomView(RounMdixin, ListView):
     def get_context_data(self, *args, **kwargs):
         """Получаем вопрос из БД"""
         # https://django.fun/ru/cbv/Django/3.0/django.views.generic.list/ListView/
-        current_room = SupportFunction.get_current_room()
+        current_room = self.get_current_room()
         current_round = current_room.round
 
         # считывает форму и создает запись с ответом пользователя
-        current_question = get_object_or_404(Questions, round_for_question=current_round).question
-        kwargs['question'] = current_question
-
+        obj_question = get_object_or_404(Questions, round_for_question=current_round)
+        kwargs['obj_question'] = obj_question
+        kwargs['round'] = current_round
         return super().get_context_data(*args, **kwargs)
 
     def is_questions_end(self):
-        current_room = SupportFunction.get_current_room()
+        current_room = self.get_current_room()
         current_round = current_room.round
-        return current_round > MAX_ROUNDS
+        return current_round >= MAX_ROUNDS
 
-class GamveoverRoomView(RounMdixin, TemplateView):
+
+class GamveoverRoomView(RoomMixin, TemplateView):
     """Страница спасибо за игру"""
 
     template_name = 'game_1/room/gameover_room.html'
@@ -249,6 +250,7 @@ class GamveoverRoomView(RounMdixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+
 
 class FindMethodsView(TemplateView):
     """Узнаем в каком порядке вызываютя методы"""
@@ -279,7 +281,12 @@ class FindMethodsView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         print("get")
-        kwargs['find_method'] = self.find_method
+        kwargs['find_method'] = ":::::::::"
+        messages.success(request, '1 Profile updated successfully')
+        messages.success(request, '2 Profile updated successfully')
+        messages.success(request, '3 Profile updated successfully')
+
+        return HttpResponseRedirect(reverse("find_2"))
         return super().get(request, *args, **kwargs)
 
     # def get_queryset(self):
@@ -305,3 +312,13 @@ class FindMethodsView(TemplateView):
     # def as_view(cls, **initkwargs):
     #     print("as_view")
     #     return super().as_view(cls, **initkwargs)
+
+
+class FindMethodsSecondView(TemplateView):
+    """Проверка реверса"""
+
+    template_name = 'game_1/find_methods.html'
+
+    def get(self, request, *args, **kwargs):
+        # kwargs['find_method_2'] = "3333333333"
+        return super().get(request, *args, **kwargs)

@@ -3,5 +3,18 @@
 {% block content %}
 
     <h1>Fine methods</h1>
-    <h1>{{ find_method }}</h1>
+    <h1>find_method {{ find_method }} </h1>
+    <h1>find_method_2 {{ find_method_2 }}</h1>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{ message|safe }}
+                    <a href="#" class="close">✖</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
 {% endblock %}

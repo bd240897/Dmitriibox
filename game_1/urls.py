@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from .views import *
 
 urlpatterns = [
@@ -21,5 +21,6 @@ urlpatterns = [
     path('room/result/', ResultRoomView.as_view(), name='result_room'),
     path('room/gameover/', GamveoverRoomView.as_view(), name='gameover_room'),
     path('find', FindMethodsView.as_view(), name='find'),
+    re_path('find2/', FindMethodsSecondView.as_view(), name='find_2'), #/(?P<find_method_2>^)\d+
 
 ]
