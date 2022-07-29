@@ -5,13 +5,17 @@
 {% block content %}
     <section class="results">
         <div class="container pt-1 pb-1">
+            <div class="current-round">
+                <h2 class="text-center">Раунд №{{ round }}</h2>
+            </div>
+
             <div class="results-header">
                 <h1 class="text-center">Ответы пользователей:</h1> {#"#}
             </div>
 
             <div class="results-answer pt-2 pb-2" style="background-color: #f5d060; border-radius: 20px;">
                 <h1 class="text-center">Вопрос был:</h1> {#"#}
-                <h1 class="text-center">Почему чукча любит бензобак?</h1>
+                <h1 class="text-center">{{ question }}</h1>
             </div>
 
             <div class="results-body pt-2 pb-2">
@@ -24,11 +28,9 @@
                 {% endfor %}
             </div>
 
-            <div class="results_to_end">
-                <a href="{% url 'result_room' %}?nexround=1" class="answer_link btn btn-primary alredy_done__link" >Следующий раунд</a>
-            </div>
-            <div class="results_to_end">
-                <a href="{% url 'main_room' %}?gameover=1" class="answer_link btn btn-primary alredy_done__link" >Закончить игру</a>
+            <div class="results_to_end d-flex justify-content-between">
+                <a href="{% url 'result_room' %}?nexround=1" class="answer_link btn btn-primary" >Следующий раунд</a>
+                <a href="{% url 'main_room' %}?gameover=1" class="answer_link btn btn-primary" >Закончить игру</a>
             </div>
 
         </div>

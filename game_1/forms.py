@@ -8,19 +8,63 @@ from game_1.models import Players, AnswerPlayers
 class RegisterUserForm(UserCreationForm):
     """Форма регитсрации"""
 
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password1', 'password2')
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-input'}),
-            'password1': forms.PasswordInput(attrs={'class': 'form-input'}),
-            'password2': forms.PasswordInput(attrs={'class': 'form-input'}),
-            'email': forms.EmailInput(attrs={'class': 'form-input'}),
-        }
+    parm_username = {"type": "text",
+                     "class": "form-control",
+                     "placeholder": "Ваше имя", }
+
+    param_password1 = {"type": "text",
+                       "class": "form-control",
+                       "placeholder": "Ваш пароль", }
+
+    param_password2 = {"type": "text",
+                       "class": "form-control",
+                       "placeholder": "Повторите пароль", }
+
+    username = forms.CharField(label='Логин', widget=forms.TextInput(attrs=parm_username))
+    password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs=param_password1))
+    password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput(attrs=param_password2))
+
+    # class Meta:
+    #     model = User
+    #     fields = ('username', 'email', 'password1', 'password2')
+    #     widgets = {
+    #         'username': forms.TextInput(attrs={'class': 'form-input'}),
+    #         'password1': forms.PasswordInput(attrs={'class': 'form-input'}),
+    #         'password2': forms.PasswordInput(attrs={'class': 'form-input'}),
+    #         'email': forms.EmailInput(attrs={'class': 'form-input'}),
+    #     }
+
 
 class LoginUserForm(AuthenticationForm):
-    username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
-    password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
+    """Форма логина"""
+
+    parm_username = {"type": "text",
+                     "class": "form-control",
+                     "placeholder": "Ваше имя", }
+
+    param_password = {"type": "text",
+                      "class": "form-control",
+                      "placeholder": "Ваш пароль", }
+
+    username = forms.CharField(label='Логин', widget=forms.TextInput(attrs=parm_username))
+    password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs=param_password))
+
+    # class Meta:
+    #     parm_username = {"type": "text",
+    #                      "class": "form-control",
+    #                      "placeholder": "Напишите Ваше сообщение", }
+    #
+    #     param_password = {"type": "text",
+    #                       "class": "form-control",
+    #                       "placeholder": "Напишите номер раунда", }
+    #
+    #     fields = ('username', 'password')
+    #
+    #     widgets = {
+    #         'username': forms.TextInput(attrs=parm_username),
+    #         'password': forms.PasswordInput(attrs=param_password),
+    #     }
+
 
 class AnswerForm(forms.ModelForm):
     """Ответы игроков"""
@@ -33,32 +77,10 @@ class AnswerForm(forms.ModelForm):
 
         param_round = {"type": "text",
                        "class": "form-control",
-                       "placeholder": "Напишите номер раунда",}
+                       "placeholder": "Напишите номер раунда", }
 
         model = AnswerPlayers
         fields = ('answer',)
         widgets = {
             'answer': forms.Textarea(attrs=parm_answer)
         }
-#
-# ########################3
-# class AnswerSimpleForm(forms.Form):
-#     """Простая форма для теста"""
-#
-#     answer = forms.Textarea()
-#     round = forms.IntegerField()
-#
-# class TypingRoomView(View):
-#     def get(self):
-#         pass
-#
-#     def post(self):
-#         pass
-#
-#         # # костыль костыль!!!!!
-#         current_player = GameRoom.objects.get(room_code=TEMP_CODE_ROOM).players_set.last()
-#         current_player.round = 1
-#         current_player.answer = form.cleaned_data.get("answer")
-#         current_player.parent_room = parent_room
-#         current_player.save()
-#         print()

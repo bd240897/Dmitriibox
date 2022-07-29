@@ -1,162 +1,225 @@
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 from game_1.models import GameRoom, Players
 
 TEMP_CODE_ROOM = "SQPQ"
 TEMP_NAME_USER = "Dima"
-
+MAX_ROUNDS = 3
 
 class SupportFunction:
-    pass
 
+    @classmethod
+    def is_room_exist(self, room_code=TEMP_CODE_ROOM):
+        """Существует ли комната"""
 
-def create_room(room_code=TEMP_CODE_ROOM):
-    """Создает игровую комнату с кодом комнаты"""
+        # https://django.fun/docs/django/ru/4.0/topics/http/shortcuts/
+        # try:
+        #     product = GameRoom.objects.get(room_code=room_code)
+        # except GameRoom.DoesNotExist:
+        #     raise Http404("Given query not found....")
 
-    extra_context = dict()
+        if bool(GameRoom.objects.filter(room_code=room_code)):
+            return True
+        else:
+            massage = "(is_room_exist) Комната с кодом " + str(room_code) + " не существует!"
+            print(massage)
+            return None
 
-    if GameRoom.objects.filter(room_code=room_code):
-        massage = "Комната с кодом " + str(room_code) + " уже существует!"
-    else:
-        GameRoom.objects.create(room_code=room_code)
-        massage = "(create_room) Был создана комната с кодом " + str(room_code)
-    extra_context['massage'] = massage
+    @classmethod
+    def is_room_exist_exception(self, room_code=TEMP_CODE_ROOM):
+        pass
 
-    return extra_context
+    @classmethod
+    def get_current_room(self, room_code=TEMP_CODE_ROOM):
+        """Получить текущую комнату"""
 
+        if self.is_room_exist():
+            return GameRoom.objects.get(room_code=room_code)
+        else:
+            massage = "(get_current_room) Комнаты с кодом " + str(room_code) + " не существует!"
+            print(massage)
+            return None
 
-def start_game(room_code=TEMP_CODE_ROOM):
-    """Запускаем игру (меняем в БД статус)"""
+    @classmethod
+    def get_current_user(self, room_code=TEMP_CODE_ROOM):
+        """Получить текущего пользователя"""
+        pass
 
-    extra_context = dict()
+    @classmethod
+    def is_user_in_room(self, user, room_code=TEMP_CODE_ROOM):
+        """Есть ли пользователь в комнате"""
 
-    if GameRoom.objects.filter(room_code=room_code):
-        massage = "(start_game) Комната с кодом " + str(room_code) + " не уже существует!"
-        return HttpResponse(massage)
-    else:
-        current_room = GameRoom.objects.get(room_code=room_code)
-        current_room.status_game = True
-        current_room.save()
-        massage = "(start_game) Игра запущена с кодом " + str(current_room)
-        extra_context['massage'] = massage
+        if self.is_room_exist():
+            current_room = self.get_current_room()
+            players_room_in_room = current_room.players_set.filter(player_in_room=user)
+            return bool(players_room_in_room)
+        else:
+            massage = "(is_user_in_room) Пользователя " + str(user) + " нет в комнате + str(room_code)!"
+            print(massage)
+            return None
+
+    @classmethod
+    def is_user_in_room_exception(self, room_code=TEMP_CODE_ROOM):
+        pass
+
+    @classmethod
+    def delete_room(self, room_code=TEMP_CODE_ROOM):
+        """Удаляет игровую комнату с кодом комнаты"""
+
+        self.get_current_room().delete()
+        massage = "(delete_room) Была удалена комната с кодом " + str(room_code)
+        extra_context = {'massage': massage}
 
         return extra_context
 
-def is_room_exist(room_code = TEMP_CODE_ROOM):
+    @classmethod
+    def create_room(self, room_code=TEMP_CODE_ROOM):
+        """Создает игровую комнату с кодом комнаты"""
 
-    if not GameRoom.objects.filter(room_code=room_code):
-        massage = "(next_round) Комната с кодом " + str(room_code) + " не существует!"
-        return HttpResponse(massage)
-    else:
-        return True
+        if self.is_room_exist():
+            massage = "Комната с кодом " + str(room_code) + " уже существует!"
+        else:
+            GameRoom.objects.create(room_code=room_code)
+            massage = "(create_room) Был создана комната с кодом " + str(room_code)
 
-def is_user_in_room(user, room_code=TEMP_CODE_ROOM):
+        extra_context = {'massage': massage}
 
-    if is_room_exist():
-        current_room = GameRoom.objects.get(room_code=room_code)
-        players_room_in_room = current_room.players_set.filter(player_in_room=user)
-    return bool(players_room_in_room)
+        return extra_context
 
-def get_current_room(room_code=TEMP_CODE_ROOM):
-    if is_room_exist():
-        return GameRoom.objects.get(room_code=room_code)
+    @classmethod
+    def start_game(self, room_code=TEMP_CODE_ROOM):
+        """Запускаем игру (меняем в БД статус)"""
+
+        if self.is_room_exist():
+            current_room = SupportFunction.get_current_room()
+            current_room.status_game = True
+            current_room.save()
+            massage = "(start_game) Игра запущена с кодом " + str(current_room)
+            extra_context = {'massage': massage}
+
+            return extra_context
+        else:
+            return None
+
+    def end_game(self):
+        """Завершаем игру (меняем в БД статус)"""
+
+        if self.is_room_exist():
+            current_room = SupportFunction.get_current_room()
+            current_room.status_game = False
+            current_room.save()
+            massage = "(start_game) Игра окончена с кодом комнаты" + str(current_room)
+            extra_context = {'massage': massage}
+
+            return extra_context
+        else:
+            return None
+
+    @classmethod
+    def next_round(self, room_code=TEMP_CODE_ROOM):
+        """Повышаем раунд игры (меняем в БД статус)"""
+
+        extra_context = dict()
+
+        if self.is_room_exist():
+            current_room = self.get_current_room()
+            current_room.round += 1
+            current_room.save()
+            massage = "(next_round) Раунд комнаты с кодом " + str(current_room) + " увеличен до " + str(
+                current_room.round)
+            extra_context['massage'] = massage
+
+            return extra_context
+        else:
+            return None
+
+    @classmethod
+    def players_in_game(self, room_code=TEMP_CODE_ROOM):
+        """Выводит игроков в текущей игре с кодом комнаты"""
+
+        extra_context = dict()
+
+        # Список игроков
+        players = self.get_current_room().players_set.all()
+        extra_context["players"] = players
+
+        return extra_context
+
+    @classmethod
+    def add_user_to_game(self, request):
+        """Добавить пользователя к комнате"""
+
+        current_user = request.user
+        current_game = self.get_current_room()
+        status_game = current_game.status_game
+        is_current_user_in_game = bool(current_game.players_set.filter(player_in_room=current_user))
+
+        if is_current_user_in_game:
+            massage = "(add_user_to_game) Пользователь " + current_user.username + " уже есть в игре " + TEMP_CODE_ROOM
+        # elif status_game:
+        #     massage = "(add_user_to_game) Игра закончена? - " + str(status_game)
+        else:
+            Players.objects.create(parent_room=current_game, player_in_room=current_user)
+            massage = "(add_user_to_game) Пользователь " + current_user.username + " был добавлен в игру " + TEMP_CODE_ROOM
+
+        extra_context = {'massage': massage}
+        return extra_context
+
+    @classmethod
+    def remove_user_to_game(self, request):
+        """Добавить пользователя к комнате"""
+
+        current_user = request.user
+        current_game = self.get_current_room()
+        status_game = current_game.status_game
+        is_current_user_in_game = bool(current_game.players_set.filter(player_in_room=current_user))
+
+        if not is_current_user_in_game:
+            massage = "(remove_user_to_game) Пользователь " + current_user.username + " нет в игре " + TEMP_CODE_ROOM
+        else:
+            Players.objects.get(parent_room=current_game, player_in_room=current_user).delete()
+            massage = "(remove_user_to_game) Пользователь " + current_user.username + " был удален из игры " + TEMP_CODE_ROOM
+
+        extra_context = {'massage': massage}
+        return extra_context
+
+    @classmethod
+    def delete_all_user_to_game(self, request, room_code=TEMP_CODE_ROOM):
+        """Удалить всх пользователй из игры c кодом"""
+
+        current_game = self.get_current_room()
+        players_in_current_game = current_game.players_set.all()
+
+        massage = "Было удалено " + str(len(players_in_current_game)) + " пользователей игры " + TEMP_CODE_ROOM
+        players_in_current_game.delete()
+
+        extra_context = {'massage': massage}
+        return extra_context
+
 
 class RounMdixin:
     """Получим текущий раунд"""
 
-    def get_current_round(room_code=TEMP_CODE_ROOM):
+    def get_current_round(self, room_code=TEMP_CODE_ROOM):
         """Получить текущий раунд"""
-        current_room = GameRoom.objects.filter(room_code=TEMP_CODE_ROOM).last()
-
-        if not current_room:
-            return ('Такой комнаты нет - ' + str(current_room)) #
-        return current_room.round
+        if SupportFunction.is_room_exist():
+            return SupportFunction.get_current_room().round
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['round'] = self.get_current_round()
         return context
 
+class MassageMdixin:
+    """Добавим переменную где хранятся мои сообщения"""
 
-def next_round(room_code=TEMP_CODE_ROOM):
-    """Запускаем игру (меняем в БДЩ= статус)"""
+    def __init__(self, **kwargs):
+        # переменная класса для сообщений
+        self.game_massage = []
+        super().__init__(**kwargs)
 
-    extra_context = dict()
-
-    if not GameRoom.objects.filter(room_code=room_code):
-        massage = "(next_round) Комната с кодом " + str(room_code) + " не существует!"
-        return HttpResponse(massage)
-    else:
-        current_room = GameRoom.objects.get(room_code=room_code)
-        current_room.round += 1
-        current_room.save()
-        massage = "(next_round) Раунд комнаты с кодом " + str(current_room) + " увеличен до " + str(current_room.round)
-        extra_context['massage'] = massage
-
-        return extra_context
-
-
-def delete_room(room_code=TEMP_CODE_ROOM):
-    """Удаляет игровую комнату с кодом комнаты"""
-    extra_context = dict()
-
-    GameRoom.objects.get(room_code=room_code).delete()
-    massage = "(delete_room) Была удалена комната с кодом " + str(room_code)
-    extra_context['massage'] = massage
-
-    return extra_context
-
-
-def players_in_game(room_code=TEMP_CODE_ROOM):
-    """Выводит игроков в текущей игре с кодом комнаты"""
-    extra_context = dict()
-
-    # Список игроков
-    players = GameRoom.objects.get(room_code=room_code).players_set.all()
-    extra_context["players"] = players
-
-    # # Сообщение
-    # players_in_game_list = [player.player_in_room.username for player in players]
-    # massage = "(players_in_game) Был возвращен список игроков " + " ".join(players_in_game_list)
-    # extra_context['massage'] = massage
-
-    return extra_context
-
-
-def add_user_to_game(request):
-    """Добавить пользователя к комнате"""
-
-    extra_context = dict()
-
-    current_user = request.user
-    current_game = GameRoom.objects.get(room_code=TEMP_CODE_ROOM)
-
-    status_game = current_game.status_game
-    is_current_user_in_game = bool(current_game.players_set.filter(player_in_room=current_user))
-
-    if is_current_user_in_game and not status_game:
-        massage = "(add_user_to_game) Пользователь " + current_user.username + " уже есть в игре " + TEMP_CODE_ROOM
-    elif status_game:
-        massage = "(add_user_to_game) Игра закончена? - " + str(status_game)
-    else:
-        Players.objects.create(parent_room=current_game, player_in_room=current_user)
-        massage = "(add_user_to_game) Пользователь " + current_user.username + " был добавлен в игру " + TEMP_CODE_ROOM
-    print(massage)
-
-    extra_context['massage'] = massage
-    return extra_context
-
-
-def delete_all_user_to_game(request, room_code=TEMP_CODE_ROOM):
-    """Удалить всх пользователй из игры c кодом"""
-
-    context = dict()
-    current_game = GameRoom.objects.get(room_code=room_code)
-    players_in_current_game = current_game.players_set.all()
-
-    temp_str = "Было удалено " + str(len(players_in_current_game)) + " пользователей игры " + TEMP_CODE_ROOM
-    players_in_current_game.delete()
-
-    context['massage'] = temp_str
-    return context
+    def get(self, request, *args, **kwargs):
+        # добавдяем все что было в сообщений в context
+        kwargs['game_massage'] = self.game_massage
+        return super().get(request, *args, **kwargs)

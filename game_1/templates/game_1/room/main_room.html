@@ -9,6 +9,17 @@
             <div class="main-room-header">
                 <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Игра #1</h1>
             </div>
+            <div class="main-room-user">
+                <h2 class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 20px; color: black; border-radius: 50px;">
+                    {% if user.is_authenticated %}
+                        <div>Вы вошли как:&nbsp;</div>
+                        <div style="color: red"> {{ user.username }}</div>
+                    {% else %}
+                        <div>Вы не вошли в систему&nbsp;</div>
+                    {% endif %}
+                </h2>
+            </div>
+
             <div class="main-room-description">
                 <h1 class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 20px; color: black; height: 200px; border-radius: 50px;"">Краткое поисание тут.Краткое поисание тут.Краткое поисание тут</h1>
             </div>

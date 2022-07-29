@@ -35,3 +35,17 @@ class AnswerPlayers(models.Model):
 
     def __str__(self):
         return str(self.player) + "_AnswerPlayers"
+
+
+class Questions(models.Model):
+    """Список вопросов"""
+
+    # увеличивается каждый раунд
+    question = models.TextField(blank=True, null=True)
+    round_for_question = models.IntegerField(blank=True, default=1)
+    author = models.CharField(max_length=16, default='Dmitrii')
+    img = models.ImageField(upload_to='images/', blank=True, null=True)
+
+    def __str__(self):
+        return str(self.author) + "_Questions"
+

@@ -5,9 +5,9 @@ from .views import *
 urlpatterns = [
 
     # Логин
-    path('register/', RegisterUser.as_view(), name='register'),
-    path('login/', LoginUser.as_view(), name='login'),
-    path('logout/', logout_user, name='logout'),
+    path('register/', RegisterUser.as_view(), name='game_register'),
+    path('login/', LoginUser.as_view(), name='game_login'),
+    path('logout/', logout_user, name='game_logout'),
 
     # Игра
     path('', RedirectMainRoomView.as_view(), name='redirect_main_room'),
@@ -19,5 +19,7 @@ urlpatterns = [
     path('room/typing/', TypingRoomView.as_view(), name='typing_room'),
     path('room/waiting/typing/', WaitingTypingRoomView.as_view(), name='waiting_typing_room'),
     path('room/result/', ResultRoomView.as_view(), name='result_room'),
+    path('room/gameover/', GamveoverRoomView.as_view(), name='gameover_room'),
+    path('find', FindMethodsView.as_view(), name='find'),
 
 ]
