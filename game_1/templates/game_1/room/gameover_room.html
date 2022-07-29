@@ -6,11 +6,17 @@
 {% block content %}
     <section class="gameover-room vh-100">
 
+        <div class="results-header">
+            <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Финальный экран</h1>
+        </div>
+
+        {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
+        {% include '../blocks/django_messages.html' %}
+
         <div class="gameover-room-body container h-100">
             <div class="gameover-text row d-flex justify-content-center align-items-center h-100">
 
-                {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
-                {% include '../blocks/django_messages.html' %}
+
 
                 <div class="col-8">
                     <h2 class="p-2 d-flex justify-content-center rounded-pill" style="font-weight: bold; font-size: 46px; color: orange">Спасибо за игру!</h2>

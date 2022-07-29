@@ -5,17 +5,12 @@
 {% block content %}
     <section class="results">
         <div class="container pt-1 pb-1">
+            <div class="results-header">
+                <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Результаты раунда №{{ round }}</h1>
+            </div>
 
             {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
             {% include '../blocks/django_messages.html' %}
-
-            <div class="current-round">
-                <h2 class="text-center">Раунд №{{ round }}</h2>
-            </div>
-
-            <div class="results-header">
-                <h1 class="text-center">Ответы пользователей:</h1> {#"#}
-            </div>
 
             <div class="results-answer pt-2 pb-2" style="background-color: #f5d060; border-radius: 20px;">
                 <h1 class="text-center">Вопрос был:</h1> {#"#}

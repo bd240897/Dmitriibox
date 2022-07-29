@@ -6,15 +6,15 @@
     <section class="waiting vh-100 ">
         <div class="container pt-1 pb-1 h-100">
             <div class="d-flex flex-column justify-content-center align-items-between h-100">
+
                 <div class="waiting-header">
-                    <h1 class="text-center">Ждем игроков</h1>
+                    <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Ждем игроков</h1>
                 </div>
 
+                {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
+                {% include '../blocks/django_messages.html' %}
+
                 <div class="waiting-body">
-
-                    {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
-                    {% include '../blocks/django_messages.html' %}
-
 
                     <div class="waiting-list border border-primary pt-3 pb-3 mb-3 bt-3 p-3">
                         <h2 class="waiting-list-text text-center">Список игроков в лобби</h2>
