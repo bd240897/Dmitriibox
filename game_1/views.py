@@ -96,59 +96,6 @@ class MainRoomView(RoomMixin, CreateView):
         self.create_room(room_code=form_room_code)
         return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': form_room_code}))
 
-    # def get_success_url(self):
-    #     return reverse_lazy('waiting_room')
-
-
-# class WaitingRoomView(RoomMixin, TemplateView):
-#     """Ожидание игроков"""
-#
-#     template_name = 'game_1/room/waiting_room_test.html'
-#     template_name_main_room = 'game_1/room/main_room.html'
-#
-#     def get(self, *args, **kwargs):
-#
-#         """Если пользователь не авторизован отправить его на регистрацию"""
-#         if not self.request.user.is_authenticated:
-#             return redirect("game_login")
-#
-#         print('WaitingRoomView')
-#
-#         param_request_delete_players = self.request.GET.get("deleteplayers", 0)
-#         param_request_delete_room = self.request.GET.get("deleteroom", 0)
-#         param_request_join = self.request.GET.get("join", 0)
-#         param_request_exit = self.request.GET.get("exit", 0)
-#         param_request_create = self.request.GET.get("create", 0)
-#         param_request_startgame = self.request.GET.get("startgame", 0)
-#
-#         # создать комнату
-#         if param_request_create:
-#             self.create_room()
-#         # удалить комнату
-#         elif param_request_delete_room:
-#             self.delete_room()
-#             return render(self.request, self.template_name_main_room)
-#         # удалить игроков
-#         elif param_request_delete_players:
-#             self.delete_all_users(self.request)
-#         # присоединиться к комнате
-#         elif param_request_join:
-#             self.join_to_game(self.request)
-#         # выйти из комнаты
-#         elif param_request_exit:
-#             self.exit_to_game(self.request)
-#         # начать игру
-#         elif param_request_startgame:
-#             self.start_game()
-#             user = self.request.user
-#             if not self.is_user_in_room(user):
-#                 return super().get(*args, **kwargs)
-#             return redirect("typing_room")
-#
-#         kwargs['players'] = self.players_in_game()
-#         return super().get(*args, **kwargs)
-
-
 class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
     """Ожидание игроков"""
     """
@@ -166,7 +113,7 @@ class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
             return redirect("game_login")
 
         # получим код текущей комнаты из запроса /<slug:slug>
-        req_room_code = kwargs.get('slug')
+        # req_room_code = kwargs.get('slug')
 
         param_request_delete_players = self.request.GET.get("deleteplayers", 0)
         param_request_delete_room = self.request.GET.get("deleteroom", 0)
@@ -177,29 +124,29 @@ class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
 
         # создать комнату
         if param_request_create:
-            self.create_room(room_code=req_room_code)
+            self.create_room(room_code=self.room_code)
         # удалить комнату
         elif param_request_delete_room:
-            self.delete_room(room_code=req_room_code)
+            self.delete_room(room_code=self.room_code)
             return render(self.request, self.template_name_main_room)
         # удалить игроков
         elif param_request_delete_players:
-            self.delete_all_users(room_code=req_room_code)
+            self.delete_all_users(room_code=self.room_code)
         # присоединиться к комнате
         elif param_request_join:
-            self.join_to_game(room_code=req_room_code)
+            self.join_to_game(room_code=self.room_code)
         # выйти из комнаты
         elif param_request_exit:
-            self.exit_to_game(room_code=req_room_code)
+            self.exit_to_game(room_code=self.room_code)
         # начать игру
         elif param_request_startgame:
-            self.start_game(room_code=TEMP_CODE_ROOM)
+            self.start_game(room_code=self.room_code)
             user = self.request.user
             if not self.is_user_in_room(user):
                 return super().get(*args, **kwargs)
             return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
 
-        kwargs['players'] = self.players_in_game(room_code=req_room_code)
+        kwargs['players'] = self.players_in_game(room_code=self.room_code)
         return super().get(*args, **kwargs)
 
 
@@ -214,7 +161,7 @@ class AddBotApiView(APIView):
     pass
 
 
-class TypingRoomView(RoomMixin, CreateView):
+class TypingRoomView(RoomCodeMixin, RoomMixin, CreateView):
     """Пишем ответы"""
 
     form_class = AnswerForm
@@ -222,19 +169,11 @@ class TypingRoomView(RoomMixin, CreateView):
 
     # добавить проверку есть ли пользоватль в игре? и один ли он там!
 
-    def setup(self, request, *args, **kwargs):
-        self.room_code = kwargs.get('slug')
-        return super().setup(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.room_code = kwargs.get('slug')
-        return super().post(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         """Получаем вопрос из БД"""
 
         # считывает форму и создает запись с ответом пользователя
-        current_room = self.get_current_room(room_code=TEMP_CODE_ROOM)
+        current_room = self.get_current_room(room_code=self.room_code)
         current_round = current_room.round
         obj_question = get_object_or_404(Questions, round_for_question=current_round)
         kwargs['obj_question'] = obj_question
@@ -253,29 +192,24 @@ class TypingRoomView(RoomMixin, CreateView):
                                      answer=form.cleaned_data.get("answer"),
                                      round_of_answer=current_round)
 
-        return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': self.room_code}))
-
-    # def get_success_url(self):
-    #     return reverse_lazy('waiting_typing_room')
+        return HttpResponseRedirect(reverse("waiting_typing_room", kwargs={'slug': self.room_code}))
 
 
-class WaitingTypingRoomView(RoomMixin, TemplateView):
+class WaitingTypingRoomView(RoomCodeMixin, RoomMixin, TemplateView):
     """Ждем всех игроков после typing"""
 
     template_name = 'game_1/room/waiting_typing_room.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        room_code = kwargs.get('slug')
-        context['slug'] = room_code
-        current_round = self.get_current_room(room_code=room_code).round
+        current_round = self.get_current_room(room_code=self.room_code).round
         context['players'] = AnswerPlayers.objects.filter(answer__isnull=False).filter(
-            round_of_answer=current_round).filter(player__parent_room__room_code=room_code)
+            round_of_answer=current_round).filter(player__parent_room__room_code=self.room_code)
         context['round'] = current_round
         return context
 
 
-class ResultRoomView(RoomMixin, ListView):
+class ResultRoomView(RoomCodeMixin, RoomMixin, ListView):
     """Смотрим результаты"""
 
     template_name = 'game_1/room/result_room.html'
@@ -288,11 +222,9 @@ class ResultRoomView(RoomMixin, ListView):
         return select
 
     def get(self, *args, **kwargs):
-        room_code = kwargs.get('slug')
-        kwargs['slug'] = room_code
-
         param_request_nextround = self.request.GET.get("nexround", 0)
         param_request_end_game = self.request.GET.get("gameover", 0)
+
         if param_request_end_game:
             self.end_game()
             self.delete_room()
@@ -304,7 +236,7 @@ class ResultRoomView(RoomMixin, ListView):
                 return redirect("gameover_room")
             else:
                 self.next_round()
-                return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': room_code}))
+                return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
 
         return super().get(self, *args, **kwargs)
 
@@ -318,9 +250,6 @@ class ResultRoomView(RoomMixin, ListView):
         obj_question = get_object_or_404(Questions, round_for_question=current_round)
         kwargs['obj_question'] = obj_question
         kwargs['round'] = current_round
-
-        room_code = kwargs.get('slug')
-        kwargs['slug'] = room_code
 
         return super().get_context_data(*args, **kwargs)
 
