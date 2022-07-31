@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django import forms
 
-from game_1.models import Players, AnswerPlayers
+from game_1.models import Players, AnswerPlayers, GameRoom
 
 
 class RegisterUserForm(UserCreationForm):
@@ -83,4 +83,21 @@ class AnswerForm(forms.ModelForm):
         fields = ('answer',)
         widgets = {
             'answer': forms.Textarea(attrs=parm_answer)
+        }
+
+
+class CreateRoomForm(forms.ModelForm):
+    """Создать команату"""
+
+    class Meta:
+        param_room_code = {"type": "text",
+                           "class": "form-control",
+                           "placeholder": "Напишите номер комнаты",
+                           "id": "room_code",
+                           "value": "SQPQ"}
+
+        model = GameRoom
+        fields = ('room_code',)
+        widgets = {
+            'room_code': forms.TextInput(attrs=param_room_code)
         }

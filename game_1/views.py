@@ -57,16 +57,20 @@ def logout_user(request):
     return redirect('main_room')
 
 
-# КОМНАТЫ
+# ///////////////// КОМНАТЫ //////////////////////////
 
-class MainRoomView(TemplateView):
-    """Главная страница игры"""
-
-    template_name = 'game_1/room/main_room.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+# class MainRoomView(TemplateView):
+#     """
+#     Главная страница игры
+#     В каждую комнату нужно передавать ее КОД и НОМЕР РАЙНДА
+#     МБ сделать это МИКСИНОМ через __init__
+#     """
+#
+#     template_name = 'game_1/room/main_room.html'
+#
+#     def get_context_data(self, **kwargs):
+#         kwargs['slug'] = 'SQPQ'
+#         return super().get_context_data(**kwargs)
 
 
 class RedirectMainRoomView(View):
@@ -76,10 +80,84 @@ class RedirectMainRoomView(View):
         return redirect("main_room")
 
 
-class WaitingRoomView(RoomMixin, TemplateView):
-    """Ожидание игроков"""
+class MainRoomView(RoomMixin, CreateView):
 
-    template_name = 'game_1/room/waiting_room.html'
+    form_class = CreateRoomForm
+    template_name = 'game_1/room/main_room.html'
+
+    def get_context_data(self, **kwargs):
+
+        # ЗАГЛУШКА ДЛЯ РАБОТЫ ПАНЕЛИ АДМИНА (МОЕЙ РУКОПИСНОЙ)
+        kwargs['slug'] = 'SQPQ'
+        return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        form_room_code = form.cleaned_data.get("room_code")
+        self.create_room(room_code=form_room_code)
+        print(form_room_code)
+        return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': form_room_code}))
+
+    # def get_success_url(self):
+    #     return reverse_lazy('waiting_room')
+
+
+# class WaitingRoomView(RoomMixin, TemplateView):
+#     """Ожидание игроков"""
+#
+#     template_name = 'game_1/room/waiting_room_test.html'
+#     template_name_main_room = 'game_1/room/main_room.html'
+#
+#     def get(self, *args, **kwargs):
+#
+#         """Если пользователь не авторизован отправить его на регистрацию"""
+#         if not self.request.user.is_authenticated:
+#             return redirect("game_login")
+#
+#         print('WaitingRoomView')
+#
+#         param_request_delete_players = self.request.GET.get("deleteplayers", 0)
+#         param_request_delete_room = self.request.GET.get("deleteroom", 0)
+#         param_request_join = self.request.GET.get("join", 0)
+#         param_request_exit = self.request.GET.get("exit", 0)
+#         param_request_create = self.request.GET.get("create", 0)
+#         param_request_startgame = self.request.GET.get("startgame", 0)
+#
+#         # создать комнату
+#         if param_request_create:
+#             self.create_room()
+#         # удалить комнату
+#         elif param_request_delete_room:
+#             self.delete_room()
+#             return render(self.request, self.template_name_main_room)
+#         # удалить игроков
+#         elif param_request_delete_players:
+#             self.delete_all_users(self.request)
+#         # присоединиться к комнате
+#         elif param_request_join:
+#             self.join_to_game(self.request)
+#         # выйти из комнаты
+#         elif param_request_exit:
+#             self.exit_to_game(self.request)
+#         # начать игру
+#         elif param_request_startgame:
+#             self.start_game()
+#             user = self.request.user
+#             if not self.is_user_in_room(user):
+#                 return super().get(*args, **kwargs)
+#             return redirect("typing_room")
+#
+#         kwargs['players'] = self.players_in_game()
+#         return super().get(*args, **kwargs)
+
+
+class WaitingRoomTestView(RoomMixin, TemplateView):
+    """Ожидание игроков"""
+    """
+    TO_DO выводить div с Игра уже идет. Игра еще не началась. и Кнопку начать игру убирать
+    вынести round и room_codе в отдельный метод и запускать его в инит
+    """
+
+    template_name = 'game_1/room/waiting_room_test.html'
     template_name_main_room = 'game_1/room/main_room.html'
 
     def get(self, *args, **kwargs):
@@ -87,7 +165,9 @@ class WaitingRoomView(RoomMixin, TemplateView):
         """Если пользователь не авторизован отправить его на регистрацию"""
         if not self.request.user.is_authenticated:
             return redirect("game_login")
-        extra_context = {}
+
+        # получим код текущей комнаты из запроса /<slug:slug>
+        req_room_code = kwargs.get('slug')
 
         param_request_delete_players = self.request.GET.get("deleteplayers", 0)
         param_request_delete_room = self.request.GET.get("deleteroom", 0)
@@ -98,42 +178,36 @@ class WaitingRoomView(RoomMixin, TemplateView):
 
         # создать комнату
         if param_request_create:
-            self.create_room()
+            self.create_room(room_code=req_room_code)
         # удалить комнату
         elif param_request_delete_room:
-            self.delete_room()
+            self.delete_room(room_code=req_room_code)
             return render(self.request, self.template_name_main_room)
         # удалить игроков
         elif param_request_delete_players:
-            self.delete_all_users(self.request)
+            self.delete_all_users(room_code=req_room_code)
         # присоединиться к комнате
         elif param_request_join:
-            self.join_to_game(self.request)
+            self.join_to_game(room_code=req_room_code)
         # выйти из комнаты
         elif param_request_exit:
-            self.exit_to_game(self.request)
+            self.exit_to_game(room_code=req_room_code)
         # начать игру
         elif param_request_startgame:
-            self.start_game()
+            self.start_game(room_code=req_room_code)
             user = self.request.user
             if not self.is_user_in_room(user):
                 return super().get(*args, **kwargs)
             return redirect("typing_room")
 
-        kwargs['players'] = self.players_in_game()
+        kwargs['players'] = self.players_in_game(room_code=req_room_code)
         return super().get(*args, **kwargs)
 
 
-# class WaitingRoomDeleteView(View):
-#     """Удалить пользователя из списка"""
-#
-#     template_name = 'game_1/room/waiting_room.html'
-#
-#     def get(self, *args, **kwargs):
-#         extra_context = delete_all_user_to_game(self.request)
-#         players_context = players_in_game()
-#         context = {**players_context, **extra_context}
-#         return render(self.request, self.template_name, context)
+class WaitingRoomDeleteView(View):
+    """Удалить пользователя из списка"""
+
+    pass
 
 
 class AddBotApiView(APIView):
@@ -175,7 +249,7 @@ class TypingRoomView(RoomMixin, CreateView):
                                      answer=form.cleaned_data.get("answer"),
                                      round_of_answer=current_round)
 
-        return redirect('waiting_typing_room')  # super().form_valid(form)
+        return redirect('waiting_typing_room')
 
     def get_success_url(self):
         return reverse_lazy('waiting_typing_room')
@@ -325,73 +399,27 @@ class FindMethodsSecondView(TemplateView):
         return super().get(request, *args, **kwargs)
 
 
-class WaitingRoomTestView(RoomMixin, TemplateView):
-    """Ожидание игроков"""
-
-    template_name = 'game_1/room/waiting_room_test.html'
-    template_name_main_room = 'game_1/room/main_room.html'
-
-    def get(self, *args, **kwargs):
-
-        """Если пользователь не авторизован отправить его на регистрацию"""
-        if not self.request.user.is_authenticated:
-            return redirect("game_login")
-        extra_context = {}
-
-        param_request_delete_players = self.request.GET.get("deleteplayers", 0)
-        param_request_delete_room = self.request.GET.get("deleteroom", 0)
-        param_request_join = self.request.GET.get("join", 0)
-        param_request_exit = self.request.GET.get("exit", 0)
-        param_request_create = self.request.GET.get("create", 0)
-        param_request_startgame = self.request.GET.get("startgame", 0)
-
-        # создать комнату
-        if param_request_create:
-            self.create_room()
-        # удалить комнату
-        elif param_request_delete_room:
-            self.delete_room()
-            return render(self.request, self.template_name_main_room)
-        # удалить игроков
-        elif param_request_delete_players:
-            self.delete_all_users(self.request)
-        # присоединиться к комнате
-        elif param_request_join:
-            self.join_to_game(self.request)
-        # выйти из комнаты
-        elif param_request_exit:
-            self.exit_to_game(self.request)
-        # начать игру
-        elif param_request_startgame:
-            self.start_game()
-            user = self.request.user
-            if not self.is_user_in_room(user):
-                return super().get(*args, **kwargs)
-            return redirect("typing_room")
-
-        kwargs['players'] = self.players_in_game()
-        return super().get(*args, **kwargs)
-
-
 class GetCurrentUsersAPI(ListAPIView):
     # queryset = Players.objects.all()
     serializer_class = UserSerializer
     permission_classes = []
 
-    def get_queryset(self):
-        select = Players.objects.filter(parent_room__room_code=TEMP_CODE_ROOM)  # .values_list("player_in_room")
+    def get_queryset_users(self):
+        req_room_code = self.kwargs['slug']
+        select = Players.objects.filter(parent_room__room_code=req_room_code)  # .values_list("player_in_room")
         # получили объект класса Юзер
         select = [s.player_in_room for s in select]
         print("select", select)
         return select
 
     def get_queryset_gameroom(self):
-        select = GameRoom.objects.get(room_code=TEMP_CODE_ROOM)
+        req_room_code = self.kwargs['slug']
+        select = GameRoom.objects.get(room_code=req_room_code)
         return select
 
     def list(self, request, *args, **kwargs):
-        queryset_users  = self.get_queryset()
-        serializer_users  = UserSerializer(queryset_users, many=True)
+        queryset_users = self.get_queryset_users()
+        serializer_users = UserSerializer(queryset_users, many=True)
         queryset_gameroom = self.get_queryset_gameroom()
         serializer_gameroom = GameRoomSerializer(queryset_gameroom, many=False)
         return Response({'users': serializer_users.data, 'gameroom': serializer_gameroom.data})

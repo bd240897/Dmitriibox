@@ -31,13 +31,14 @@
                     <h1 class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 20px; color: black; height: 200px; border-radius: 50px;">Краткое поисание тут.Краткое поисание тут.Краткое поисание тут</h1>
                 </div>
 
+                {# ПРАВИЛА ИГРЫ #}
                 <div class="d-flex justify-content-center ">
                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
                         Правила игры
                     </button>
                 </div>
 
-                <div class="collapse" id="collapseExample">
+                <div class="collapse " id="collapseExample">
 
                     <div class="rules card mx-2" >
                         <div class="card-header text-center">
@@ -64,13 +65,20 @@
                             <p class="rules-text card-text">Небольшой пример текста, который должен основываться на названии карточки и составлять основную часть содержимого карты.</p>
                         </div>
                     </div>
-
                 </div>
 
-
-
-                <div class="alredy_done__block d-flex flex-column">
-                    <a href="{% url 'waiting_room' %}?create=1" class="answer_link btn btn-success m-2 alredy_done__link" >Играть</a>
+                <div class="d-flex flex-column justify-content-center align-items-center">
+                    <form class="row g-3" method="post">
+                        <div class="col-auto">
+                            <label for="room_code" class="visually-hidden">Password</label>
+                            {{ form.room_code }}
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary mb-3">Confirm identity</button>
+                        </div>
+                        {% csrf_token %}
+                    </form>
+{#                    <a href="{% url 'waiting_room' slug %}?create=1" class="answer_link btn btn-success m-2 alredy_done__link" >Играть</a>#}
                 </div>
             </div>
         </div>
