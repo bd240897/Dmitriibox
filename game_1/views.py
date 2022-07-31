@@ -94,7 +94,6 @@ class MainRoomView(RoomMixin, CreateView):
     def form_valid(self, form):
         form_room_code = form.cleaned_data.get("room_code")
         self.create_room(room_code=form_room_code)
-        print(form_room_code)
         return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': form_room_code}))
 
     # def get_success_url(self):
@@ -150,7 +149,7 @@ class MainRoomView(RoomMixin, CreateView):
 #         return super().get(*args, **kwargs)
 
 
-class WaitingRoomTestView(RoomMixin, TemplateView):
+class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
     """Ожидание игроков"""
     """
     TO_DO выводить div с Игра уже идет. Игра еще не началась. и Кнопку начать игру убирать
@@ -194,11 +193,11 @@ class WaitingRoomTestView(RoomMixin, TemplateView):
             self.exit_to_game(room_code=req_room_code)
         # начать игру
         elif param_request_startgame:
-            self.start_game(room_code=req_room_code)
+            self.start_game(room_code=TEMP_CODE_ROOM)
             user = self.request.user
             if not self.is_user_in_room(user):
                 return super().get(*args, **kwargs)
-            return redirect("typing_room")
+            return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
 
         kwargs['players'] = self.players_in_game(room_code=req_room_code)
         return super().get(*args, **kwargs)
@@ -230,11 +229,6 @@ class TypingRoomView(RoomMixin, CreateView):
     def post(self, request, *args, **kwargs):
         self.room_code = kwargs.get('slug')
         return super().post(request, *args, **kwargs)
-
-    # def get(self, request, *args, **kwargs):
-    #     """Получаем код текущей комнаты"""
-    #
-    #     return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """Получаем вопрос из БД"""

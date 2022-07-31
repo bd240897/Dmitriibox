@@ -135,4 +135,14 @@ class RoomMixin:
 
 
 class RoomCodeMixin:
-    pass
+    def setup(self, request, *args, **kwargs):
+        """Сохраняем номер комнаты в класс"""
+
+        self.room_code = kwargs.get('slug')
+        return super().setup(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        """Записываем номер комнаты в контекст"""
+
+        kwargs['slug'] = self.room_code
+        return super().get_context_data(**kwargs)

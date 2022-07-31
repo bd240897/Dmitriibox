@@ -37,13 +37,13 @@
                     <div class="waiting-action d-flex flex-column text-center border border-primary pt-1 pb-1">
                         <h2>Управление:</h2>
                         <a href="#" class="disabled btn btn-primary m-2" >Добавить бота</a>
-                        <a href="{% url 'waiting_room' %}?join=1" class="answer_link btn btn-primary m-2 " >Присоединиться к игре</a>
-                        <a href="{% url 'waiting_room' %}?exit=1" class="answer_link btn btn-primary m-2 " >Выйти из игры</a>
+                        <a href="{% url 'waiting_room' slug %}?join=1" class="answer_link btn btn-primary m-2 " >Присоединиться к игре</a>
+                        <a href="{% url 'waiting_room' slug %}?exit=1" class="answer_link btn btn-primary m-2 " >Выйти из игры</a>
                         {% if user.is_superuser %}
-                            <a href="{% url 'waiting_room' %}?deleteplayers=1" class="answer_link btn btn-primary m-2 " >Удалить всех пользователей</a>
-                            <a href="{% url 'waiting_room' %}?deleteroom=1" class="answer_link btn btn-primary m-2 " >Удалить комнату</a>
+                            <a href="{% url 'waiting_room' slug %}?deleteplayers=1" class="answer_link btn btn-primary m-2 " >Удалить всех пользователей</a>
+                            <a href="{% url 'waiting_room' slug %}?deleteroom=1" class="answer_link btn btn-primary m-2 " >Удалить комнату</a>
                         {% endif %}
-                        <a href="{% url 'waiting_room' %}?startgame=1" class="answer_link btn btn-success m-2 " >Начать игру</a>
+                        <a href="{% url 'waiting_room' slug %}?startgame=1" class="answer_link btn btn-success m-2 " >Начать игру</a>
                     </div>
 
                 </div>
