@@ -1,0 +1,145 @@
+{% extends 'game_1/base.html' %}
+
+{% block title %} waiting_room {% endblock %}
+
+{% block content %}
+    <section class="waiting vh-100 ">
+        <div class="container pt-1 pb-1 h-100">
+            <div class="d-flex flex-column justify-content-center align-items-between h-100">
+
+                <div class="waiting-header">
+                    <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Ждем игроков</h1>
+                </div>
+
+                {# ПОВЕЩЕНИЯ ДЖАНГИ #}
+                {% include '../blocks/django_messages.html' %}
+
+                <div class="waiting-body">
+
+                    <div class="waiting-list border border-primary pt-3 pb-3 mb-3 bt-3 p-3">
+                        <h2 class="waiting-list-text text-center">Список игроков в лобби</h2>
+                        <div class="waiting-player pt-3 pb-3">
+                            {% if not players %}
+                                <div class="text-center">
+                                    Пока тут никого нет
+                                </div>
+                            {% endif %}
+
+                            <div class="waiting-players-there d-flex align-items-center justify-content-center">
+                                {#                                {% for p in players %}#}
+                                {#                                    <div class="d-inline p-2 mx-1 bg-success text-white">{{ p.player_in_room.username }}</div>#}
+                                {#                                {% endfor %}#}
+                            </div>
+                            <button class="waiting-players-there-btn btn"> Кликни </button>
+
+                        </div>
+                    </div>
+
+                    <div class="waiting-action d-flex flex-column text-center border border-primary pt-1 pb-1">
+                        <h2>Управление:</h2>
+                        <a href="#" class="disabled btn btn-primary m-2" >Добавить бота</a>
+                        <a href="{% url 'waiting_room' %}?join=1" class="answer_link btn btn-primary m-2 " >Присоединиться к игре</a>
+                        <a href="{% url 'waiting_room' %}?exit=1" class="answer_link btn btn-primary m-2 " >Выйти из игры</a>
+                        {% if user.is_superuser %}
+                            <a href="{% url 'waiting_room' %}?deleteplayers=1" class="answer_link btn btn-primary m-2 " >Удалить всех пользователей</a>
+                            <a href="{% url 'waiting_room' %}?deleteroom=1" class="answer_link btn btn-primary m-2 " >Удалить комнату</a>
+                        {% endif %}
+                        <a href="{% url 'waiting_room' %}?startgame=1" class="answer_link btn btn-success m-2 " >Начать игру</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+    <h1>Простой пример (1)</h1>
+    <div id="movieListBag">
+    </div>
+
+
+    <button class="my_btn"> Кликни </button>
+{% endblock %}
+
+{% block head_block %}
+
+{% endblock %}
+
+{% block user_scripts %}
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+
+    <script>
+        var dataItems =
+            {'test':
+                    [
+                        {
+                            title: 'Бандиты',
+                            thumbnail: 'Bandits.jpg',
+                            director: 'Барри Левинсон',
+                            actors: ['Брюс Уиллис', 'Билли Боб Торнтон', 'Кейт Бланшетт'],
+                            year: 2001,
+                            budget: 95000000,
+                            grossRevenue: 67631903,
+                            rating: 0,
+                            frames: ['Bandits-1.jpg', 'Bandits-2.jpg', 'Bandits-3.jpg', 'Bandits-4.jpg', 'Bandits-5.jpg']
+                        },
+                        {
+                            title: 'Бандиты',
+                            thumbnail: 'Bandits.jpg',
+                            director: 'Барри Левинсон',
+                            actors: ['Брюс Уиллис', 'Билли Боб Торнтон', 'Кейт Бланшетт'],
+                            year: 2001,
+                            budget: 95000000,
+                            grossRevenue: 67631903,
+                            rating: 0,
+                            frames: ['Bandits-1.jpg', 'Bandits-2.jpg', 'Bandits-3.jpg', 'Bandits-4.jpg', 'Bandits-5.jpg']
+                        },
+                    ]
+            }
+    </script>
+
+    {% verbatim %}
+    <script id="movieTmpl" type="text/x-jquery-tmpl">
+        <div class="movie-bag">
+            <img src="Content/Thumbnails/${thumbnail}" class="thumbnail" />
+            <div class="base-info">
+                {{each dataItems.test}}
+                <h2>
+                    ${title}
+                </h2>
+                <p>
+                    Режиссер: ${director}<br />
+                    В ролях: ${actors}<br />
+                    Год: ${year}
+                </p>
+                {{/each}}
+            </div>
+        </div>
+    </script>
+
+    {% endverbatim %}
+
+    <script type="text/javascript">
+
+        $(function () {
+            $('#movieTmpl').tmpl(dataItems).appendTo('#movieListBag');
+        });
+
+        $('.my_btn').click(
+            function ajax_1() {
+                $.ajax({
+                    url: "{% url 'test-api' %}",
+                    type: 'get',
+
+                    success: function (data) {
+                        alert(data.test[0].username);
+                    },
+                    failure: function (data) {
+                        alert('Got an error dude');
+                    }
+                })
+            }
+        );
+    </script>
+{% endblock %}

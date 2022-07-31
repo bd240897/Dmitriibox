@@ -1,0 +1,141 @@
+{% extends 'game_1/base.html' %}
+
+{% load static %}
+
+{% block title %} waiting_room {% endblock %}
+
+{% block content %}
+    <section class="waiting vh-100 ">
+        <div class="container pt-1 pb-1 h-100">
+            <div class="d-flex flex-column justify-content-center align-items-between h-100">
+
+                <div class="waiting-header">
+                    <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Ждем игроков</h1>
+                </div>
+
+                {# ПОВЕЩЕНИЯ ДЖАНГИ #}
+                {% include '../blocks/django_messages.html' %}
+
+                <div class="waiting-body">
+
+                    <div class="waiting-list border border-primary pt-3 pb-3 mb-3 bt-3 p-3">
+                        <h2 class="waiting-list-text text-center">Список игроков в лобби</h2>
+                        <div class="waiting-player pt-3 pb-3">
+                            {% if not players %}
+                                <div class="text-center">
+                                    Пока тут никого нет
+                                </div>
+                            {% endif %}
+
+                            <div id="waitingPlayersThere" class="d-flex align-items-center justify-content-center">
+                                {#                                {% for p in players %}#}
+                                {#                                    <div class="d-inline p-2 mx-1 bg-success text-white">{{ p.player_in_room.username }}</div>#}
+                                {#                                {% endfor %}#}
+                            </div>
+                            <button class="waiting-players-there-btn btn"> Кликни </button>
+
+                        </div>
+                    </div>
+
+                    <div class="waiting-action d-flex flex-column text-center border border-primary pt-1 pb-1">
+                        <h2>Управление:</h2>
+                        <a href="#" class="disabled btn btn-primary m-2" >Добавить бота</a>
+                        <a href="{% url 'waiting_room' %}?join=1" class="answer_link btn btn-primary m-2 " >Присоединиться к игре</a>
+                        <a href="{% url 'waiting_room' %}?exit=1" class="answer_link btn btn-primary m-2 " >Выйти из игры</a>
+                        {% if user.is_superuser %}
+                            <a href="{% url 'waiting_room' %}?deleteplayers=1" class="answer_link btn btn-primary m-2 " >Удалить всех пользователей</a>
+                            <a href="{% url 'waiting_room' %}?deleteroom=1" class="answer_link btn btn-primary m-2 " >Удалить комнату</a>
+                        {% endif %}
+                        <a href="{% url 'waiting_room' %}?startgame=1" class="answer_link btn btn-success m-2 " >Начать игру</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </section>
+
+{% endblock %}
+
+{% block head_block %}{% endblock %}
+
+{% block user_scripts %}
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+
+    {#  шаблоны html страниц #}
+    {% verbatim %}
+    <script id="playersThereTmpl" type="text/x-jquery-tmpl">
+            <div class="base-info">
+                {{each data_players.users}}
+                    <div class="d-inline p-2 mx-1 bg-success text-white">${username}</div>
+                {{/each}}
+            </div>
+        </div>
+    </script>
+    {% endverbatim %}
+
+    <script type="text/javascript">
+
+        // данные для теста
+        var DATA_PLAYERS =
+            {'test':
+                    [
+                        {username: 'Dima',},
+                        {username: 'Masha',}
+                    ]
+            };
+
+        function add_players_there(data_players) {
+            // добавить игроков в шаблон
+            $('#waitingPlayersThere').empty()
+            $('#playersThereTmpl').tmpl(data_players).appendTo('#waitingPlayersThere');
+        };
+
+
+        function redirect_to_typing(gameroom){
+            // проверит начата ил игра и перенаправит всех пользователей на typing rom
+            // косытьль - нужно делать пост запрос с параметром юзера, и если его игра началась то редиректить его
+
+            if (gameroom.status_game === true){
+                $(location).attr('href',"{% url 'typing_room' %}");
+            }
+        }
+
+        function get_players_ajax() {
+            // получить список игроков и вставить их в шаблон
+
+            $.ajax({
+                url: "{% url 'test-api' %}",
+                type: 'get',
+                dataType: 'json',
+                cache: false,
+                success: function (data) {
+                    add_players_there(data_players=data)
+                    console.log(data.gameroom)
+                    redirect_to_typing(data.gameroom)
+                },
+                failure: function (data) {
+                    alert('Got an error dude');
+                }
+            })
+        }
+
+        // получение списка игроков при заходе на страницу
+        $(function() {get_players_ajax()})
+
+        // обновить список игроков каждые 5 секунд
+        setInterval(function() {
+            get_players_ajax()
+        }, 5000);
+
+        // обновить список при клике на кнопку
+        $(".waiting-players-there-btn").click(function(){
+            get_players_ajax()
+        });
+
+
+
+
+    </script>
+{% endblock %}

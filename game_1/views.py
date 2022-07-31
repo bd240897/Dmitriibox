@@ -8,12 +8,14 @@ from django.contrib import messages
 from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import CreateView, TemplateView, ListView, DetailView
+from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import *
 from .logic import *
 from .models import *
+from .serializers import *
 
 
 class RegisterUser(CreateView):
@@ -166,9 +168,8 @@ class TypingRoomView(RoomMixin, CreateView):
         # считывает форму и создает запись с ответом пользователя
         current_user = self.request.user
         current_room = self.get_current_room()
-        current_player = current_room.players_set.get(player_in_room=current_user) #!!!
+        current_player = current_room.players_set.get(player_in_room=current_user)  # !!!
         current_round = current_room.round
-
 
         AnswerPlayers.objects.create(player=current_player,
                                      answer=form.cleaned_data.get("answer"),
@@ -322,3 +323,81 @@ class FindMethodsSecondView(TemplateView):
     def get(self, request, *args, **kwargs):
         # kwargs['find_method_2'] = "3333333333"
         return super().get(request, *args, **kwargs)
+
+
+class WaitingRoomTestView(RoomMixin, TemplateView):
+    """Ожидание игроков"""
+
+    template_name = 'game_1/room/waiting_room_test.html'
+    template_name_main_room = 'game_1/room/main_room.html'
+
+    def get(self, *args, **kwargs):
+
+        """Если пользователь не авторизован отправить его на регистрацию"""
+        if not self.request.user.is_authenticated:
+            return redirect("game_login")
+        extra_context = {}
+
+        param_request_delete_players = self.request.GET.get("deleteplayers", 0)
+        param_request_delete_room = self.request.GET.get("deleteroom", 0)
+        param_request_join = self.request.GET.get("join", 0)
+        param_request_exit = self.request.GET.get("exit", 0)
+        param_request_create = self.request.GET.get("create", 0)
+        param_request_startgame = self.request.GET.get("startgame", 0)
+
+        # создать комнату
+        if param_request_create:
+            self.create_room()
+        # удалить комнату
+        elif param_request_delete_room:
+            self.delete_room()
+            return render(self.request, self.template_name_main_room)
+        # удалить игроков
+        elif param_request_delete_players:
+            self.delete_all_users(self.request)
+        # присоединиться к комнате
+        elif param_request_join:
+            self.join_to_game(self.request)
+        # выйти из комнаты
+        elif param_request_exit:
+            self.exit_to_game(self.request)
+        # начать игру
+        elif param_request_startgame:
+            self.start_game()
+            user = self.request.user
+            if not self.is_user_in_room(user):
+                return super().get(*args, **kwargs)
+            return redirect("typing_room")
+
+        kwargs['players'] = self.players_in_game()
+        return super().get(*args, **kwargs)
+
+
+class GetCurrentUsersAPI(ListAPIView):
+    # queryset = Players.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = []
+
+    def get_queryset(self):
+        select = Players.objects.filter(parent_room__room_code=TEMP_CODE_ROOM)  # .values_list("player_in_room")
+        # получили объект класса Юзер
+        select = [s.player_in_room for s in select]
+        print("select", select)
+        return select
+
+    def get_queryset_gameroom(self):
+        select = GameRoom.objects.get(room_code=TEMP_CODE_ROOM)
+        return select
+
+    def list(self, request, *args, **kwargs):
+        queryset_users  = self.get_queryset()
+        serializer_users  = UserSerializer(queryset_users, many=True)
+        queryset_gameroom = self.get_queryset_gameroom()
+        serializer_gameroom = GameRoomSerializer(queryset_gameroom, many=False)
+        return Response({'users': serializer_users.data, 'gameroom': serializer_gameroom.data})
+
+    # def list(self, request, *args, **kwargs):
+    #     # https://ilyachch.gitbook.io/django-rest-framework-russian-documentation/overview/navigaciya-po-api/generic-views
+    #     queryset = self.get_queryset()
+    #     serializer = UserSerializer(queryset, many=True)
+    #     return Response({'users': serializer.data})
