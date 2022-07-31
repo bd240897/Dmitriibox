@@ -59,20 +59,6 @@ def logout_user(request):
 
 # ///////////////// КОМНАТЫ //////////////////////////
 
-# class MainRoomView(TemplateView):
-#     """
-#     Главная страница игры
-#     В каждую комнату нужно передавать ее КОД и НОМЕР РАЙНДА
-#     МБ сделать это МИКСИНОМ через __init__
-#     """
-#
-#     template_name = 'game_1/room/main_room.html'
-#
-#     def get_context_data(self, **kwargs):
-#         kwargs['slug'] = 'SQPQ'
-#         return super().get_context_data(**kwargs)
-
-
 class RedirectMainRoomView(View):
     """Простой редирект на главную"""
 
@@ -100,7 +86,7 @@ class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
     """Ожидание игроков"""
     """
     TO_DO выводить div с Игра уже идет. Игра еще не началась. и Кнопку начать игру убирать
-    вынести round и room_codе в отдельный метод и запускать его в инит
+    TO_DO удаление комнаты сделать отдельным вью
     """
 
     template_name = 'game_1/room/waiting_room_test.html'
@@ -113,7 +99,6 @@ class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
             return redirect("game_login")
 
         # получим код текущей комнаты из запроса /<slug:slug>
-        # req_room_code = kwargs.get('slug')
 
         param_request_delete_players = self.request.GET.get("deleteplayers", 0)
         param_request_delete_room = self.request.GET.get("deleteroom", 0)
@@ -142,7 +127,7 @@ class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
         elif param_request_startgame:
             self.start_game(room_code=self.room_code)
             user = self.request.user
-            if not self.is_user_in_room(user):
+            if not self.is_user_in_room(user=user, room_code=self.room_code):
                 return super().get(*args, **kwargs)
             return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
 
@@ -173,24 +158,20 @@ class TypingRoomView(RoomCodeMixin, RoomMixin, CreateView):
         """Получаем вопрос из БД"""
 
         # считывает форму и создает запись с ответом пользователя
-        current_room = self.get_current_room(room_code=self.room_code)
-        current_round = current_room.round
-        obj_question = get_object_or_404(Questions, round_for_question=current_round)
+        obj_question = get_object_or_404(Questions, round_for_question=self.current_round)
         kwargs['obj_question'] = obj_question
-        kwargs['round'] = current_round
 
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         # считывает форму и создает запись с ответом пользователя
+
         current_user = self.request.user
-        current_room = self.get_current_room(room_code=self.room_code)
-        current_player = current_room.players_set.get(player_in_room=current_user)  # !!!
-        current_round = current_room.round
+        current_player = self.current_room.players_set.get(player_in_room=current_user)  # !!!
 
         AnswerPlayers.objects.create(player=current_player,
                                      answer=form.cleaned_data.get("answer"),
-                                     round_of_answer=current_round)
+                                     round_of_answer=self.current_round)
 
         return HttpResponseRedirect(reverse("waiting_typing_room", kwargs={'slug': self.room_code}))
 
@@ -202,10 +183,8 @@ class WaitingTypingRoomView(RoomCodeMixin, RoomMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        current_round = self.get_current_room(room_code=self.room_code).round
         context['players'] = AnswerPlayers.objects.filter(answer__isnull=False).filter(
-            round_of_answer=current_round).filter(player__parent_room__room_code=self.room_code)
-        context['round'] = current_round
+            round_of_answer=self.current_round).filter(player__parent_room__room_code=self.room_code)
         return context
 
 
@@ -216,9 +195,8 @@ class ResultRoomView(RoomCodeMixin, RoomMixin, ListView):
     context_object_name = 'players'
 
     def get_queryset(self):
-        current_round = self.get_current_room().round
-        select = AnswerPlayers.objects.filter(answer__isnull=False).filter(round_of_answer=current_round).filter(
-            player__parent_room__room_code=TEMP_CODE_ROOM)
+        select = AnswerPlayers.objects.filter(answer__isnull=False).filter(round_of_answer=self.current_round).filter(
+            player__parent_room__room_code=self.room_code)
         return select
 
     def get(self, *args, **kwargs):
@@ -231,11 +209,11 @@ class ResultRoomView(RoomCodeMixin, RoomMixin, ListView):
             return redirect("gameover_room")
         if param_request_nextround:
             if self.is_questions_end():
-                self.end_game()
-                self.delete_room()
+                self.end_game(room_code=self.room_code)
+                self.delete_room(room_code=self.room_code)
                 return redirect("gameover_room")
             else:
-                self.next_round()
+                self.next_round(room_code=self.room_code)
                 return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
 
         return super().get(self, *args, **kwargs)
@@ -243,20 +221,15 @@ class ResultRoomView(RoomCodeMixin, RoomMixin, ListView):
     def get_context_data(self, *args, **kwargs):
         """Получаем вопрос из БД"""
         # https://django.fun/ru/cbv/Django/3.0/django.views.generic.list/ListView/
-        current_room = self.get_current_room()
-        current_round = current_room.round
 
         # считывает форму и создает запись с ответом пользователя
-        obj_question = get_object_or_404(Questions, round_for_question=current_round)
+        obj_question = get_object_or_404(Questions, round_for_question=self.current_round)
         kwargs['obj_question'] = obj_question
-        kwargs['round'] = current_round
 
         return super().get_context_data(*args, **kwargs)
 
     def is_questions_end(self):
-        current_room = self.get_current_room()
-        current_round = current_room.round
-        return current_round >= MAX_ROUNDS
+        return self.current_round >= MAX_ROUNDS
 
 
 class GamveoverRoomView(RoomMixin, TemplateView):

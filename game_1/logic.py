@@ -49,7 +49,7 @@ class RoomMixin:
         """Удалить всх пользователй из игры c кодом"""
 
         current_game = self.get_current_room(room_code=room_code)
-        room_code = current_game.room_codes
+        room_code = current_game.room_code
         players_in_current_game = current_game.players_set.all()
 
         game_massage = "Было удалено " + str(len(players_in_current_game)) + " пользователей игры " + str(room_code)
@@ -127,7 +127,7 @@ class RoomMixin:
     def next_round(self, room_code=TEMP_CODE_ROOM):
         """Повышаем раунд игры (меняем в БД статус)"""
 
-        current_room = self.get_current_room()
+        current_room = self.get_current_room(room_code=room_code)
         current_room.round += 1
         current_room.save()
         game_massage = "(next_round) Раунд комнаты с кодом " + str(current_room) + " увеличен до " + str(current_room.round)
@@ -139,13 +139,16 @@ class RoomCodeMixin:
         """Сохраняем номер комнаты в класс"""
 
         self.room_code = kwargs.get('slug')
-        # self.current_room = self.get_current_room(room_code=self.room_code)
-        # self.round = self.get_current_room(room_code=self.room_code)
-        #
+        self.current_room = self.get_current_room(room_code=self.room_code)
+        self.current_round = self.current_room.round
+
         return super().setup(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """Записываем номер комнаты в контекст"""
 
         kwargs['slug'] = self.room_code
+        kwargs['round'] = self.current_round
+
         return super().get_context_data(**kwargs)
+
