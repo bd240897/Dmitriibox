@@ -132,3 +132,7 @@ class RoomMixin:
         current_room.save()
         game_massage = "(next_round) Раунд комнаты с кодом " + str(current_room) + " увеличен до " + str(current_room.round)
         messages.success(self.request, game_massage)
+
+
+class RoomCodeMixin:
+    pass

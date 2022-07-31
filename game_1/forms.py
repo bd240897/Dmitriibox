@@ -68,6 +68,7 @@ class LoginUserForm(AuthenticationForm):
 
 class AnswerForm(forms.ModelForm):
     """Ответы игроков"""
+    room_code = forms.HiddenInput()
 
     class Meta:
         parm_answer = {"type": "text",

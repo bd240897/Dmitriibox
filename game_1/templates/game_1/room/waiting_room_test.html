@@ -98,7 +98,7 @@
             // косытьль - нужно делать пост запрос с параметром юзера, и если его игра началась то редиректить его
 
             if (gameroom.status_game === true){
-                $(location).attr('href',"{% url 'typing_room' %}");
+                {#$(location).attr('href',"{% url 'typing_room' slug %}");#}
             }
         }
 

@@ -16,12 +16,12 @@ urlpatterns = [
     # path('room/waiting/delete', WaitingRoomDeleteView.as_view(), name='waiting_room_delete'),
     path('room/addbot/', AddBotApiView.as_view(), name='add_bot'),
     path('api/v1/gamers/<slug:slug>/', TempView.as_view(), name='found_gamers'),
-    path('room/typing/', TypingRoomView.as_view(), name='typing_room'),
-    path('room/waiting/typing/', WaitingTypingRoomView.as_view(), name='waiting_typing_room'),
-    path('room/result/', ResultRoomView.as_view(), name='result_room'),
+    path('room/typing/<slug:slug>/', TypingRoomView.as_view(), name='typing_room'),
+    path('room/waiting/typing/<slug:slug>/', WaitingTypingRoomView.as_view(), name='waiting_typing_room'),
+    path('room/result/<slug:slug>/', ResultRoomView.as_view(), name='result_room'),
     path('room/gameover/', GamveoverRoomView.as_view(), name='gameover_room'),
     # тесты
-    path('find', FindMethodsView.as_view(), name='find'),
+    path('find/<slug:slug>', FindMethodsView.as_view(), name='find'),
     re_path('find2/', FindMethodsSecondView.as_view(), name='find_2'), #/(?P<find_method_2>^)\d+
     path('test-page/', WaitingRoomTestView.as_view(), name='test-page'),
     path('test-api/', GetCurrentUsersAPI.as_view(), name='test-api'),

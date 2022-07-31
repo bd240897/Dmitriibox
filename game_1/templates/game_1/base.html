@@ -30,21 +30,21 @@
             <h1> ОТЛАДОЧНАЯ ИНФОРМАЦИЯ</h1>
             <h2>Username - {{user.username}}</h2>
         </div>
-        <div class="debug-list">
-            <ul class="list-group">
-                <li class="list-group-item"><a href="{% url 'main_room' %}" class="nav-link active">main_room</a></li>
-                <li class="list-group-item"><a href="{% url 'waiting_room' slug %}" class="nav-link active">waiting_room</a></li>
-                <li class="list-group-item"><a href="{% url 'add_bot' %}" class="nav-link active">add_bot</a></li>
-                <li class="list-group-item"><a href="{% url 'found_gamers' 1 %}" class="nav-link active">found_gamers</a></li>
-                <li class="list-group-item"><a href="{% url 'typing_room' %}" class="nav-link active">typing_room</a></li>
-                <li class="list-group-item"><a href="{% url 'waiting_typing_room' %}" class="nav-link active">waiting_typing_room</a></li>
-                <li class="list-group-item"><a href="{% url 'result_room' %}" class="nav-link active">result_room</a></li>
-                <li class="list-group-item">///////////////////////////////////////////</li>
-                <li class="list-group-item"><a href="{% url 'game_login' %}" class="nav-link active">game_login</a></li>
-                <li class="list-group-item"><a href="{% url 'game_logout' %}" class="nav-link active">game_logout</a></li>
-               <li class="list-group-item"><a href="{% url 'game_register' %}" class="nav-link active">game_register</a></li>
-            </ul>
-        </div>
+{#        <div class="debug-list">#}
+{#            <ul class="list-group">#}
+{#                <li class="list-group-item"><a href="{% url 'main_room' %}" class="nav-link active">main_room</a></li>#}
+{#                <li class="list-group-item"><a href="{% url 'waiting_room' slug %}" class="nav-link active">waiting_room</a></li>#}
+{#                <li class="list-group-item"><a href="{% url 'add_bot' %}" class="nav-link active">add_bot</a></li>#}
+{#                <li class="list-group-item"><a href="{% url 'found_gamers' 1 %}" class="nav-link active">found_gamers</a></li>#}
+{#                <li class="list-group-item"><a href="{% url 'typing_room' %}" class="nav-link active">typing_room</a></li>#}
+{#                <li class="list-group-item"><a href="{% url 'waiting_typing_room' %}" class="nav-link active">waiting_typing_room</a></li>#}
+{#                <li class="list-group-item"><a href="{% url 'result_room' %}" class="nav-link active">result_room</a></li>#}
+{#                <li class="list-group-item">///////////////////////////////////////////</li>#}
+{#                <li class="list-group-item"><a href="{% url 'game_login' %}" class="nav-link active">game_login</a></li>#}
+{#                <li class="list-group-item"><a href="{% url 'game_logout' %}" class="nav-link active">game_logout</a></li>#}
+{#               <li class="list-group-item"><a href="{% url 'game_register' %}" class="nav-link active">game_register</a></li>#}
+{#            </ul>#}
+{#        </div>#}
     </div>
 </section>
 {% endif %}

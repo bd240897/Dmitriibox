@@ -223,14 +223,24 @@ class TypingRoomView(RoomMixin, CreateView):
 
     # добавить проверку есть ли пользоватль в игре? и один ли он там!
 
-    def create_answer(self, form):
-        pass
+    def setup(self, request, *args, **kwargs):
+        self.room_code = kwargs.get('slug')
+        return super().setup(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.room_code = kwargs.get('slug')
+        return super().post(request, *args, **kwargs)
+
+    # def get(self, request, *args, **kwargs):
+    #     """Получаем код текущей комнаты"""
+    #
+    #     return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """Получаем вопрос из БД"""
 
         # считывает форму и создает запись с ответом пользователя
-        current_room = self.get_current_room()
+        current_room = self.get_current_room(room_code=TEMP_CODE_ROOM)
         current_round = current_room.round
         obj_question = get_object_or_404(Questions, round_for_question=current_round)
         kwargs['obj_question'] = obj_question
@@ -241,7 +251,7 @@ class TypingRoomView(RoomMixin, CreateView):
     def form_valid(self, form):
         # считывает форму и создает запись с ответом пользователя
         current_user = self.request.user
-        current_room = self.get_current_room()
+        current_room = self.get_current_room(room_code=self.room_code)
         current_player = current_room.players_set.get(player_in_room=current_user)  # !!!
         current_round = current_room.round
 
@@ -249,10 +259,10 @@ class TypingRoomView(RoomMixin, CreateView):
                                      answer=form.cleaned_data.get("answer"),
                                      round_of_answer=current_round)
 
-        return redirect('waiting_typing_room')
+        return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': self.room_code}))
 
-    def get_success_url(self):
-        return reverse_lazy('waiting_typing_room')
+    # def get_success_url(self):
+    #     return reverse_lazy('waiting_typing_room')
 
 
 class WaitingTypingRoomView(RoomMixin, TemplateView):
@@ -262,9 +272,11 @@ class WaitingTypingRoomView(RoomMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        current_round = self.get_current_room().round
+        room_code = kwargs.get('slug')
+        context['slug'] = room_code
+        current_round = self.get_current_room(room_code=room_code).round
         context['players'] = AnswerPlayers.objects.filter(answer__isnull=False).filter(
-            round_of_answer=current_round).filter(player__parent_room__room_code=TEMP_CODE_ROOM)
+            round_of_answer=current_round).filter(player__parent_room__room_code=room_code)
         context['round'] = current_round
         return context
 
@@ -282,6 +294,9 @@ class ResultRoomView(RoomMixin, ListView):
         return select
 
     def get(self, *args, **kwargs):
+        room_code = kwargs.get('slug')
+        kwargs['slug'] = room_code
+
         param_request_nextround = self.request.GET.get("nexround", 0)
         param_request_end_game = self.request.GET.get("gameover", 0)
         if param_request_end_game:
@@ -295,7 +310,7 @@ class ResultRoomView(RoomMixin, ListView):
                 return redirect("gameover_room")
             else:
                 self.next_round()
-                return redirect("typing_room")
+                return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': room_code}))
 
         return super().get(self, *args, **kwargs)
 
@@ -309,6 +324,10 @@ class ResultRoomView(RoomMixin, ListView):
         obj_question = get_object_or_404(Questions, round_for_question=current_round)
         kwargs['obj_question'] = obj_question
         kwargs['round'] = current_round
+
+        room_code = kwargs.get('slug')
+        kwargs['slug'] = room_code
+
         return super().get_context_data(*args, **kwargs)
 
     def is_questions_end(self):
@@ -347,7 +366,8 @@ class FindMethodsView(TemplateView):
         super().__init__(**kwargs)
 
     def setup(self, request, *args, **kwargs):
-        print("setup")
+        print("setup__113")
+        print("**kwargs -", kwargs)
         return super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
