@@ -92,8 +92,8 @@ class CreateRoomForm(forms.ModelForm):
 
     class Meta:
         param_room_code = {"type": "text",
-                           "class": "form-control",
-                           "placeholder": "Напишите номер комнаты",
+                           "class": "form-control text-center",
+                           "placeholder": "Номер комнаты",
                            "id": "room_code",
                            "value": "SQPQ"}
 

@@ -8,19 +8,6 @@ TEMP_CODE_ROOM = "SQPQ"
 TEMP_NAME_USER = "Dima"
 MAX_ROUNDS = 3
 
-class MassageMdixin:
-    """Добавим переменную где хранятся мои сообщения"""
-
-    def __init__(self, *args, **kwargs):
-        # переменная класса для сообщений
-        self._game_massage = []
-        super().__init__(*args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        # добавдяем все что было в сообщений в context
-        kwargs['game_massage'] = self._game_massage
-        return super().get(request, *args, **kwargs)
-
 class RoomMixin:
 
     def get_current_room(self, room_code=TEMP_CODE_ROOM):

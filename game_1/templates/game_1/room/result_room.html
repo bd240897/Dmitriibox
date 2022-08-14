@@ -3,6 +3,25 @@
 {% block title %} result_room {% endblock %}
 
 {% block content %}
+    <style>
+        @keyframes wipe-enter {
+            0% {
+                transform: scale(0, .025);
+            }
+            50% {
+                transform: scale(1, .025);
+            }
+        }
+
+        .square {
+            animation-name: wipe-enter;
+            animation-duration: 1s;
+            animation-iteration-count: 1;
+            {#animation: wipe-enter 1s ;#}
+        }
+    </style>
+
+
     <section class="results">
         <div class="container pt-1 pb-1">
             <div class="results-header">
@@ -22,7 +41,7 @@
 
             <div class="results-body pt-2 pb-2">
                 {% for p in  players %}
-                    <div class="d-flex flex-column bd-highlight mb-3 ">
+                    <div class="d-flex flex-column bd-highlight mb-3 square ">
                         <div class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">
                             <div> Игрок</div>
                             <div style="color: red">&nbsp;"{{ user.username }}&nbsp;</div>

@@ -8,15 +8,20 @@
     <section class="main-room vh-100">
         <div class="container pt-1 pb-1 h-100">
             <div class="d-flex flex-column justify-content-center align-items-between h-100">
-                <div class="main-room-header">
+
+                {# ЗАГОЛОВОК СТРАНИЦЫ #}
+
+                <div class="main-room-header py-1">
                     <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Игра #1</h1>
                 </div>
 
                 {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
+
                 {% include '../blocks/django_messages.html' %}
 
+                {# ВЫ ВОШЛИ КАК #}
 
-                <div class="main-room-user">
+                <div class="main-room-user py-1">
                     <h2 class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 20px; color: black; border-radius: 50px;">
                         {% if user.is_authenticated %}
                             <div>Вы вошли как:&nbsp;</div>
@@ -27,58 +32,39 @@
                     </h2>
                 </div>
 
-                <div class="main-room-description">
+                {# ЛПИСАНИЕ ИГРЫ #}
+
+                <div class="main-room-description py-1">
                     <h1 class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 20px; color: black; height: 200px; border-radius: 50px;">Краткое поисание тут.Краткое поисание тут.Краткое поисание тут</h1>
                 </div>
 
                 {# ПРАВИЛА ИГРЫ #}
-                <div class="d-flex justify-content-center ">
-                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                        Правила игры
-                    </button>
-                </div>
 
-                <div class="collapse " id="collapseExample">
-
-                    <div class="rules card mx-2" >
-                        <div class="card-header text-center">
-                            Рекомендуемые
-                        </div>
-                        <div class="d-flex justify-content-center">
-                            <img src="{% static 'game_1/img/rules.jpg' %}" class="card-img-top" alt="..." style="width: 100%; height: auto; max-width: 800px;">
-                        </div>
-                        <div class="rules-body card-body">
-                            <h5 class="rules-title card-title">Заголовок карточки</h5>
-                            <p class="rules-text card-text">Небольшой пример текста, который должен основываться на названии карточки и составлять основную часть содержимого карты.</p>
-                        </div>
+                <div class="main-room-rules py-1">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary h-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                            Правила игры
+                        </button>
                     </div>
 
-                    <div class="rules card mx-2" >
-                        <div class="card-header text-center">
-                            Рекомендуемые
-                        </div>
-                        <div class="d-flex justify-content-center">
-                            <img src="{% static 'game_1/img/rules.jpg' %}" class="card-img-top" alt="..." style="width: 100%; height: auto; max-width: 800px;">
-                        </div>
-                        <div class="rules-body card-body">
-                            <h5 class="rules-title card-title">Заголовок карточки</h5>
-                            <p class="rules-text card-text">Небольшой пример текста, который должен основываться на названии карточки и составлять основную часть содержимого карты.</p>
-                        </div>
+                    <div class="collapse " id="collapseExample">
+                        {% include '../blocks/game_rules.html' %}
                     </div>
                 </div>
 
-                <div class="d-flex flex-column justify-content-center align-items-center">
+                {# ВОЙТИ В КОМНАТУ #}
+
+                <div class="d-flex flex-column justify-content-center align-items-center py-2">
                     <form class="row g-3" method="post">
                         <div class="col-auto">
-                            <label for="room_code" class="visually-hidden">Password</label>
                             {{ form.room_code }}
                         </div>
                         <div class="col-auto">
-                            <button type="submit" class="btn btn-primary mb-3">Confirm identity</button>
+                            <button type="submit" class="btn btn-primary mb-3">Войти в комнату</button>
                         </div>
                         {% csrf_token %}
                     </form>
-{#                    <a href="{% url 'waiting_room' slug %}?create=1" class="answer_link btn btn-success m-2 alredy_done__link" >Играть</a>#}
+                    {#                    <a href="{% url 'waiting_room' slug %}?create=1" class="answer_link btn btn-success m-2 alredy_done__link" >Играть</a>#}
                 </div>
             </div>
         </div>

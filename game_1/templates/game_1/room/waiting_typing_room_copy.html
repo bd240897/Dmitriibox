@@ -1,7 +1,5 @@
 {% extends 'game_1/base.html' %}
 
-{% load static %}
-
 {% block title %} waiting_typing_room {% endblock %}
 
 {% block content %}
@@ -18,9 +16,16 @@
 
                 <div class="waiting-typing-players text-center">
                     <h2>Игроки которые уже ответили</h2>
-                    <div id="waitingPlayersThere"></div>
-
-                    <button class="waiting-players-there-btn btn"> Кликни </button>
+                    <div class="row">
+                        {% for p in players %}
+                            <div class="col-3 p-auto pb-2">
+                                <div class="bg-success text-center text-white fw-bold">
+                                    <div class="pt-2">{{ p.player.player_in_room }}</div>
+                                    <div class="pb-2 pt-2">done</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <div class="waiting-typing-done d-flex flex-column pt-2 pb-2">
@@ -32,19 +37,16 @@
 {% endblock %}
 
 {% block user_scripts %}
-{#    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>#}
-    <script type="text/javascript" src="{% static 'game_1/js/jquery.tmpl.1.0.0.js' %}"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
 
     {#  шаблоны html страницы для пользователей в комнате #}
     {% verbatim %}
     <script id="playersThereTmpl" type="text/x-jquery-tmpl">
-            <div class="row">
+            <div class="base-info">
                 {{each data_players.users}}
-                    <div class="col-3 p-auto pb-2">
-                        <div class="bg-success text-center text-white fw-bold">
-                            <div class="pt-2">${username}</div>
-                            <div class="pb-2 pt-2">done</div>
-                        </div>
+                    <div class="bg-success text-center text-white fw-bold">
+                        <div class="pt-2">${username}</div>
+                        <div class="pb-2 pt-2">done</div>
                     </div>
                 {{/each}}
             </div>
@@ -62,17 +64,27 @@
         };
 
 
+        function redirect_to_typing_room(gameroom){
+            // проверит начата ил игра и перенаправит всех пользователей на typing rom
+            // косытьль - нужно делать пост запрос с параметром юзера, и если его игра началась то редиректить его
+
+            if (gameroom.status_game === true){
+                $(location).attr('href',"{% url 'typing_room' slug %}");
+            }
+        }
+
         function get_players_ajax() {
             // получить список игроков и вставить их в шаблон
 
             $.ajax({
-                url: "{% url 'waiting_typing_room_api_gatusers' slug %}",
+                url: "{% url 'waiting_room_api_gatusers' slug %}",
                 type: 'get',
                 dataType: 'json',
                 cache: false,
                 success: function (data) {
                     add_players_there(data_players=data)
                     console.log(data.gameroom)
+                    {#redirect_to_typing_room(data.gameroom)#}
                 },
                 failure: function (data) {
                     alert('Got an error dude');

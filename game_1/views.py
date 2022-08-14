@@ -71,28 +71,59 @@ class MainRoomView(RoomMixin, CreateView):
     form_class = CreateRoomForm
     template_name = 'game_1/room/main_room.html'
 
+    def get(self, request, *args, **kwargs):
+        return super().get(self, request, *args, **kwargs)
+
+
     def get_context_data(self, **kwargs):
 
         # ЗАГЛУШКА ДЛЯ РАБОТЫ ПАНЕЛИ АДМИНА (МОЕЙ РУКОПИСНОЙ)
         kwargs['slug'] = 'SQPQ'
+        kwargs['rules'] = Rules.objects.all()
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         form_room_code = form.cleaned_data.get("room_code")
-        self.create_room(room_code=form_room_code)
+
+        ########################
+        if self.request.user.is_anonymous:
+            # Если пользователь не вошел в систему
+            game_massage = "Вы не залогинились в игру!"
+            messages.error(self.request, game_massage)
+            return HttpResponseRedirect(reverse("game_login"))
+        elif GameRoom.objects.filter(room_code=form_room_code):
+            game_massage = "Комната с кодом " + str(form_room_code) + " уже существует!"
+            messages.error(self.request, game_massage)
+        else:
+            object = form.save(commit=False)
+            object.owner = self.request.user
+            object.save()
+            game_massage = "(create_room) Был создана комната с кодом " + str(form_room_code)
+            messages.success(self.request, game_massage)
+
         return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': form_room_code}))
+        ########################
+
+
+
+
 
 class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
     """Ожидание игроков"""
     """
     TO_DO выводить div с Игра уже идет. Игра еще не началась. и Кнопку начать игру убирать
     TO_DO удаление комнаты сделать отдельным вью
+    TO_DO переписать gamemixin так чтоб current room вычислялось один раз
     """
 
     template_name = 'game_1/room/waiting_room_test.html'
     template_name_main_room = 'game_1/room/main_room.html'
 
     def get(self, *args, **kwargs):
+
+        ################3
+        print(self.current_room.is_user_in_room(self.request.user))
+        ################
 
         """Если пользователь не авторизован отправить его на регистрацию"""
         if not self.request.user.is_authenticated:
@@ -113,7 +144,7 @@ class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
         # удалить комнату
         elif param_request_delete_room:
             self.delete_room(room_code=self.room_code)
-            return render(self.request, self.template_name_main_room)
+            return redirect("main_room")
         # удалить игроков
         elif param_request_delete_players:
             self.delete_all_users(room_code=self.room_code)
@@ -134,6 +165,11 @@ class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
         kwargs['players'] = self.players_in_game(room_code=self.room_code)
         return super().get(*args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_user_in_room'] = self.current_room.is_user_in_room(self.request.user)
+        context['is_user_owner'] = self.current_room.is_user_owner(self.request.user)
+        return context
 
 class WaitingRoomDeleteView(View):
     """Удалить пользователя из списка"""
@@ -241,6 +277,7 @@ class GamveoverRoomView(RoomMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         return context
 
+# //////////////////////////// TESTS ////////////////////////////////////////
 
 class FindMethodsView(TemplateView):
     """Узнаем в каком порядке вызываютя методы"""
@@ -315,8 +352,11 @@ class FindMethodsSecondView(TemplateView):
         return super().get(request, *args, **kwargs)
 
 
-class GetCurrentUsersAPI(ListAPIView):
-    # queryset = Players.objects.all()
+# //////////////////////////// ApiVIew ////////////////////////////////////////
+
+class WaitingRoomGetUsersAPI(ListAPIView):
+    """ Получаем список игроков в typing_room + status_game"""
+
     serializer_class = UserSerializer
     permission_classes = []
 
@@ -334,14 +374,57 @@ class GetCurrentUsersAPI(ListAPIView):
         return select
 
     def list(self, request, *args, **kwargs):
+        # https://ilyachch.gitbook.io/django-rest-framework-russian-documentation/overview/navigaciya-po-api/generic-views
+
         queryset_users = self.get_queryset_users()
         serializer_users = UserSerializer(queryset_users, many=True)
         queryset_gameroom = self.get_queryset_gameroom()
         serializer_gameroom = GameRoomSerializer(queryset_gameroom, many=False)
         return Response({'users': serializer_users.data, 'gameroom': serializer_gameroom.data})
 
-    # def list(self, request, *args, **kwargs):
-    #     # https://ilyachch.gitbook.io/django-rest-framework-russian-documentation/overview/navigaciya-po-api/generic-views
-    #     queryset = self.get_queryset()
-    #     serializer = UserSerializer(queryset, many=True)
-    #     return Response({'users': serializer.data})
+
+class WaitingRoomExitAPI(RoomMixin, APIView):
+    """ API Выход из комнаты """
+
+    def get(self, request, *args, **kwargs):
+        room_code = kwargs["slug"]
+        current_user = request.user
+        self.exit_to_game(room_code=room_code)
+        return Response({'massage': str(current_user) + " вышел из комнаты " + str(room_code)})
+
+
+class WaitingRoomJoinAPI(RoomMixin, APIView):
+    """ API Войти в комнату """
+
+    def get(self, request, *args, **kwargs):
+        room_code = kwargs["slug"]
+        current_user = request.user
+        self.join_to_game(room_code=room_code)
+        return Response({'massage': str(current_user) + " зашел в комнату " + str(room_code)})
+
+
+class WaitingRoomAddBotAPI(ListAPIView):
+    """ Добавить бота в комнату """
+    pass
+
+
+class WaitingTypingRoomGetUsersAPI(RoomMixin, ListAPIView):
+    """ Получаем список игроков в typing_room """
+
+    def get_queryset_users(self):
+        room_code = self.kwargs['slug']
+        current_room = self.get_current_room(room_code=room_code)
+        current_round = current_room.round
+
+        # получили объект класса Юзер
+        select = AnswerPlayers.objects.filter(answer__isnull=False).filter(
+            round_of_answer=current_round).filter(player__parent_room__room_code=room_code)
+        select = [s.player.player_in_room for s in select]
+
+        return select
+
+    def list(self, request, *args, **kwargs):
+        queryset_users = self.get_queryset_users()
+        serializer_users = UserSerializer(queryset_users, many=True)
+        return Response({'users': serializer_users.data})
+

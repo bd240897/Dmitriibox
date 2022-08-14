@@ -3,8 +3,21 @@
 {% block title %} typing_room {% endblock %}
 
 {% block content %}
+    <style>
+        .animation-header {
+            opacity: 0;
+            animation: ani 2.5s forwards;
+        }
+
+        @keyframes ani {
+            0% {opacity: 0;}
+            100% {opacity: 1;}
+        }
+    </style>
+
+
     <section class="waiting">
-        <div class="container pt-1 pb-1 border border-success">
+        <div class="container pt-1 pb-1 border border-success animation-header">
             <div class="waiting-header">
                 <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Пишем ответы раунда №{{ round }}</h1>
             </div>

@@ -6,6 +6,7 @@ admin.site.register(GameRoom)
 admin.site.register(Players)
 admin.site.register(AnswerPlayers)
 admin.site.register(Questions)
+admin.site.register(Rules)
 
 # class PostAdmin(admin.ModelAdmin):
 #     pass

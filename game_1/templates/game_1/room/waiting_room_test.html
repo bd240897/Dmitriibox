@@ -34,19 +34,24 @@
                             </div>
                             <button class="waiting-players-there-btn btn"> Кликни </button>
 
+
+
                         </div>
                     </div>
 
                     <div class="waiting-action d-flex flex-column text-center border border-primary pt-1 pb-1">
                         <h2>Управление:</h2>
                         <a href="#" class="disabled btn btn-primary m-2" >Добавить бота</a>
-                        <a href="{% url 'waiting_room' slug %}?join=1" class="answer_link btn btn-primary m-2 " >Присоединиться к игре</a>
-                        <a href="{% url 'waiting_room' slug %}?exit=1" class="answer_link btn btn-primary m-2 " >Выйти из игры</a>
-                        {% if user.is_superuser %}
+                        {% if not is_user_in_room %}
+                            <a href="{% url 'waiting_room' slug %}?join=1" class="answer_link btn btn-primary m-2 " >Присоединиться к игре</a>
+                        {% else %}
+                            <a href="{% url 'waiting_room' slug %}?exit=1" class="answer_link btn btn-primary m-2 " >Выйти из игры</a>
+                        {% endif %}
+                        {% if is_user_owner %}
                             <a href="{% url 'waiting_room' slug %}?deleteplayers=1" class="answer_link btn btn-primary m-2 " >Удалить всех пользователей</a>
                             <a href="{% url 'waiting_room' slug %}?deleteroom=1" class="answer_link btn btn-primary m-2 " >Удалить комнату</a>
+                            <a href="{% url 'waiting_room' slug %}?startgame=1" class="answer_link btn btn-success m-2 " >Начать игру</a>
                         {% endif %}
-                        <a href="{% url 'waiting_room' slug %}?startgame=1" class="answer_link btn btn-success m-2 " >Начать игру</a>
                     </div>
 
                 </div>
@@ -61,9 +66,11 @@
 {% block head_block %}{% endblock %}
 
 {% block user_scripts %}
-    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+{#    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>#}
+    <script type="text/javascript" src="{% static 'game_1/js/jquery.tmpl.1.0.0.js' %}"></script>
 
-    {#  шаблоны html страниц #}
+
+    {#  шаблоны html страницы для пользователей в комнате #}
     {% verbatim %}
     <script id="playersThereTmpl" type="text/x-jquery-tmpl">
             <div class="base-info">
@@ -72,6 +79,17 @@
                 {{/each}}
             </div>
         </div>
+    </script>
+    {% endverbatim %}
+
+    {% verbatim %}
+    <script id="TimerTmpl" type="text/x-jquery-tmpl">
+    <div class="row begin-countdown">
+        <div class="col-md-12 text-center">
+            <progress value="10" max="10" id="pageBeginCountdown"></progress>
+            <p> Begining in <span id="pageBeginCountdownText">10 </span> seconds</p>
+        </div>
+    </div>
     </script>
     {% endverbatim %}
 
@@ -88,51 +106,93 @@
 
         function add_players_there(data_players) {
             // добавить игроков в шаблон
+
             $('#waitingPlayersThere').empty()
             $('#playersThereTmpl').tmpl(data_players).appendTo('#waitingPlayersThere');
         };
 
 
-        function redirect_to_typing(gameroom){
+        function redirect_to_typing_room(){
             // проверит начата ил игра и перенаправит всех пользователей на typing rom
             // косытьль - нужно делать пост запрос с параметром юзера, и если его игра началась то редиректить его
-
-            if (gameroom.status_game === true){
-                {#$(location).attr('href',"{% url 'typing_room' slug %}");#}
-            }
+            $(location).attr('href',"{% url 'typing_room' slug %}");
         }
+
+
+        // получение списка игроков при заходе на страницу
+        {#$(function() {get_players_ajax()})#}
+
+
+        // обновить список игроков каждые 5 секунд
+
+        {#var interval_ajax = setInterval(function() {#}
+        {#    get_players_ajax()#}
+        {#}, 5000);#}
+
+        // обновить список при клике на кнопку
+        {#$(".waiting-players-there-btn").click(function(){#}
+        {#    get_players_ajax().done(FindPlayers())#}
+        {#});#}
+
+    </script>
+
+    <script type="text/javascript">
+        ///////////////////////// таймер начала ////////////////////////////////////////////////
+
+        get_players_ajax()
 
         function get_players_ajax() {
             // получить список игроков и вставить их в шаблон
+            var countdownTimer = setInterval(() => {
 
-            $.ajax({
-                url: "{% url 'test-api' slug %}",
-                type: 'get',
-                dataType: 'json',
-                cache: false,
-                success: function (data) {
-                    add_players_there(data_players=data)
-                    console.log(data.gameroom)
-                    redirect_to_typing(data.gameroom)
-                },
-                failure: function (data) {
-                    alert('Got an error dude');
-                }
-            })
+                $.ajax({
+                    url: "{% url 'waiting_room_api_gatusers' slug %}",
+                    type: 'get',
+                    dataType: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        {#var session = $.parseJSON(data)#}
+                        add_players_there(data_players=data);
+                        console.log(1)
+                        console.log(data.gameroom.status_game)
+                        if (data.gameroom.status_game === true){
+                            clearInterval(countdownTimer)
+                            RenderTimeTmp()
+                            ProgressCountdown(10, 'pageBeginCountdown', 'pageBeginCountdownText').then(data => {console.log(redirect_to_typing_room())})
+
+                        }
+                    },
+                    failure: function (data) {
+                        alert('Got an error dude');
+                    }
+                })
+            }, 5000);
         }
 
-        // получение списка игроков при заходе на страницу
-        $(function() {get_players_ajax()})
+        function RenderTimeTmp(){
+            $('#waitingPlayersThere').empty()
+            $('#TimerTmpl').tmpl().appendTo('#waitingPlayersThere');
+        }
 
-        // обновить список игроков каждые 5 секунд
-        setInterval(function() {
-            get_players_ajax()
-        }, 5000);
+        async function ProgressCountdown(timeleft, bar, text) {
+            return await new Promise((resolve, reject) => {
+                RenderTimeTmp()
 
-        // обновить список при клике на кнопку
-        $(".waiting-players-there-btn").click(function(){
-            get_players_ajax()
-        });
+                var countdownTimer = setInterval(() => {
+                    timeleft--;
+
+                    document.getElementById(bar).value = timeleft;
+                    document.getElementById(text).textContent = timeleft;
+
+                    if (timeleft <= 0) {
+                        console.log("Отсчет закончен")
+                        clearInterval(countdownTimer);
+                        resolve(true);
+                    }
+                }, 1000);
+            });
+        }
 
 
 
