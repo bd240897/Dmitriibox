@@ -32,9 +32,6 @@
 {% endblock %}
 
 {% block user_scripts %}
-{#    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>#}
-    <script type="text/javascript" src="{% static 'game_1/js/jquery.tmpl.1.0.0.js' %}"></script>
-
     {#  шаблоны html страницы для пользователей в комнате #}
     {% verbatim %}
     <script id="playersThereTmpl" type="text/x-jquery-tmpl">
@@ -53,46 +50,15 @@
     {% endverbatim %}
 
     <script type="text/javascript">
-
-        function add_players_there(data_players) {
-            // добавить игроков в шаблон
-
-            $('#waitingPlayersThere').empty()
-            $('#playersThereTmpl').tmpl(data_players).appendTo('#waitingPlayersThere');
-        };
-
-
-        function get_players_ajax() {
-            // получить список игроков и вставить их в шаблон
-
-            $.ajax({
-                url: "{% url 'waiting_typing_room_api_gatusers' slug %}",
-                type: 'get',
-                dataType: 'json',
-                cache: false,
-                success: function (data) {
-                    add_players_there(data_players=data)
-                    console.log(data.gameroom)
-                },
-                failure: function (data) {
-                    alert('Got an error dude');
-                }
-            })
+        function getResultRoomURL(){
+            return "{% url 'result_room' slug %}"
         }
 
-        // получение списка игроков при заходе на страницу
-        $(function() {get_players_ajax()})
-
-        // обновить список игроков каждые 5 секунд
-        setInterval(function() {
-            get_players_ajax()
-        }, 5000);
-
-        // обновить список при клике на кнопку
-        $(".waiting-players-there-btn").click(function(){
-            get_players_ajax()
-        });
-
-
+        function getWaitingTypingRoomApiURL(){
+            return "{% url 'waiting_typing_room_api_gatusers' slug %}"
+        }
     </script>
+
+    {# ЗАГРУЗКА JS #}
+    <script src="{% static 'game_1/js/room/waiting_typing_room.js' %}"></script>
 {% endblock %}

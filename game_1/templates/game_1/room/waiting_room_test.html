@@ -13,7 +13,7 @@
                     <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Ждем игроков {{ slug }}</h1>
                 </div>
 
-                {# ПОВЕЩЕНИЯ ДЖАНГИ #}
+                {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
                 {% include '../blocks/django_messages.html' %}
 
                 <div class="waiting-body">
@@ -57,18 +57,11 @@
                 </div>
             </div>
         </div>
-
-
     </section>
-
 {% endblock %}
 
-{% block head_block %}{% endblock %}
 
 {% block user_scripts %}
-{#    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>#}
-    <script type="text/javascript" src="{% static 'game_1/js/jquery.tmpl.1.0.0.js' %}"></script>
-
 
     {#  шаблоны html страницы для пользователей в комнате #}
     {% verbatim %}
@@ -93,109 +86,20 @@
     </script>
     {% endverbatim %}
 
-    <script type="text/javascript">
-
-        // данные для теста
-        var DATA_PLAYERS =
-            {'test':
-                    [
-                        {username: 'Dima',},
-                        {username: 'Masha',}
-                    ]
-            };
-
-        function add_players_there(data_players) {
-            // добавить игроков в шаблон
-
-            $('#waitingPlayersThere').empty()
-            $('#playersThereTmpl').tmpl(data_players).appendTo('#waitingPlayersThere');
-        };
-
-
-        function redirect_to_typing_room(){
-            // проверит начата ил игра и перенаправит всех пользователей на typing rom
-            // косытьль - нужно делать пост запрос с параметром юзера, и если его игра началась то редиректить его
-            $(location).attr('href',"{% url 'typing_room' slug %}");
+    <script>
+        function getWaitingRoomApiURL() {
+            return "{% url 'waiting_room_api_gatusers' slug %}"
         }
-
-
-        // получение списка игроков при заходе на страницу
-        {#$(function() {get_players_ajax()})#}
-
-
-        // обновить список игроков каждые 5 секунд
-
-        {#var interval_ajax = setInterval(function() {#}
-        {#    get_players_ajax()#}
-        {#}, 5000);#}
-
-        // обновить список при клике на кнопку
-        {#$(".waiting-players-there-btn").click(function(){#}
-        {#    get_players_ajax().done(FindPlayers())#}
-        {#});#}
-
+        function getTypingRoomApiURL() {
+            return "{% url 'typing_room' slug %}"
+        }
     </script>
 
-    <script type="text/javascript">
-        ///////////////////////// таймер начала ////////////////////////////////////////////////
 
-        get_players_ajax()
-
-        function get_players_ajax() {
-            // получить список игроков и вставить их в шаблон
-            var countdownTimer = setInterval(() => {
-
-                $.ajax({
-                    url: "{% url 'waiting_room_api_gatusers' slug %}",
-                    type: 'get',
-                    dataType: 'json',
-                    cache: false,
-                    async: false,
-                    success: function (data) {
-                        {#var session = $.parseJSON(data)#}
-                        add_players_there(data_players=data);
-                        console.log(1)
-                        console.log(data.gameroom.status_game)
-                        if (data.gameroom.status_game === true){
-                            clearInterval(countdownTimer)
-                            RenderTimeTmp()
-                            ProgressCountdown(10, 'pageBeginCountdown', 'pageBeginCountdownText').then(data => {console.log(redirect_to_typing_room())})
-
-                        }
-                    },
-                    failure: function (data) {
-                        alert('Got an error dude');
-                    }
-                })
-            }, 5000);
-        }
-
-        function RenderTimeTmp(){
-            $('#waitingPlayersThere').empty()
-            $('#TimerTmpl').tmpl().appendTo('#waitingPlayersThere');
-        }
-
-        async function ProgressCountdown(timeleft, bar, text) {
-            return await new Promise((resolve, reject) => {
-                RenderTimeTmp()
-
-                var countdownTimer = setInterval(() => {
-                    timeleft--;
-
-                    document.getElementById(bar).value = timeleft;
-                    document.getElementById(text).textContent = timeleft;
-
-                    if (timeleft <= 0) {
-                        console.log("Отсчет закончен")
-                        clearInterval(countdownTimer);
-                        resolve(true);
-                    }
-                }, 1000);
-            });
-        }
+    {# ЗАГРУЗКА JS #}
+    <script src="{% static 'game_1/js/room/waiting_room_test.js' %}"></script>
 
 
 
-
-    </script>
 {% endblock %}
+
