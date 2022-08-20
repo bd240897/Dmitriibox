@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib import messages
 
 
-
 class GameRoom(models.Model):
     """Игровая комната"""
 
@@ -13,6 +12,17 @@ class GameRoom(models.Model):
     # при создании игры None, при запуске True, при окончании False
     status_game = models.BooleanField(blank=True, null=True)
     round = models.IntegerField(blank=True, default=1)
+
+    #################################
+    CHOICES = {
+        (1, 'created'),
+        (2, 'timer'),
+        (3, 'started'),
+        (4, 'ended'),
+    }
+
+    status = models.IntegerField(default=1, blank=True, choices=CHOICES)
+    #################################
 
     def is_user_in_room(self, user):
         # if self.players_set.filter(player_in_room=user):
@@ -40,6 +50,7 @@ class Players(models.Model):
     def __str__(self):
         return str(self.player_in_room) + "_Players"
 
+
 class AnswerPlayers(models.Model):
     """Ответы игроков по раундам"""
 
@@ -57,12 +68,14 @@ class Questions(models.Model):
 
     # увеличивается каждый раунд
     question = models.TextField(blank=True, null=True)
+    right_answer = models.TextField(blank=True, null=True)
     round_for_question = models.IntegerField(blank=True, default=1)
     author = models.CharField(max_length=16, default='Dmitrii')
     img = models.ImageField(upload_to='images/', blank=True, null=True)
 
     def __str__(self):
-        return str(self.author) + "_Questions"
+        return str(self.round_for_question) + "_Questions"
+
 
 class Rules(models.Model):
     number = models.IntegerField()

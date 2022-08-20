@@ -7,7 +7,7 @@ from django.contrib import messages
 # Create your views here.
 from django.urls import reverse_lazy, reverse
 from django.views import View
-from django.views.generic import CreateView, TemplateView, ListView, DetailView
+from django.views.generic import CreateView, TemplateView, ListView, DetailView, RedirectView
 from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -59,24 +59,23 @@ def logout_user(request):
 
 # ///////////////// КОМНАТЫ //////////////////////////
 
-class RedirectMainRoomView(View):
+class RedirectMainRoomView(RedirectView):
     """Простой редирект на главную"""
 
-    def get(self, *args, **kwargs):
-        return redirect("main_room")
+    # https://ustimov.org/posts/11/
+
+    def get_redirect_url(self):
+        return reverse('main_room')
 
 
 class MainRoomView(RoomMixin, CreateView):
-
     form_class = CreateRoomForm
     template_name = 'game_1/room/main_room.html'
 
     def get(self, request, *args, **kwargs):
         return super().get(self, request, *args, **kwargs)
 
-
     def get_context_data(self, **kwargs):
-
         # ЗАГЛУШКА ДЛЯ РАБОТЫ ПАНЕЛИ АДМИНА (МОЕЙ РУКОПИСНОЙ)
         kwargs['slug'] = 'SQPQ'
         kwargs['rules'] = Rules.objects.all()
@@ -85,7 +84,6 @@ class MainRoomView(RoomMixin, CreateView):
     def form_valid(self, form):
         form_room_code = form.cleaned_data.get("room_code")
 
-        ########################
         if self.request.user.is_anonymous:
             # Если пользователь не вошел в систему
             game_massage = "Вы не залогинились в игру!"
@@ -102,10 +100,6 @@ class MainRoomView(RoomMixin, CreateView):
             messages.success(self.request, game_massage)
 
         return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': form_room_code}))
-        ########################
-
-
-
 
 
 class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
@@ -121,16 +115,11 @@ class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
 
     def get(self, *args, **kwargs):
 
-        ################3
-        print(self.current_room.is_user_in_room(self.request.user))
-        ################
-
-        """Если пользователь не авторизован отправить его на регистрацию"""
+        # Если пользователь не авторизован отправить его на регистрацию
         if not self.request.user.is_authenticated:
             return redirect("game_login")
 
-        # получим код текущей комнаты из запроса /<slug:slug>
-
+        # параметры строки запроса
         param_request_delete_players = self.request.GET.get("deleteplayers", 0)
         param_request_delete_room = self.request.GET.get("deleteroom", 0)
         param_request_join = self.request.GET.get("join", 0)
@@ -171,6 +160,7 @@ class WaitingRoomTestView(RoomCodeMixin, RoomMixin, TemplateView):
         context['is_user_owner'] = self.current_room.is_user_owner(self.request.user)
         return context
 
+
 class WaitingRoomDeleteView(View):
     """Удалить пользователя из списка"""
 
@@ -189,6 +179,15 @@ class TypingRoomView(RoomCodeMixin, RoomMixin, CreateView):
     template_name = 'game_1/room/typing_room.html'
 
     # добавить проверку есть ли пользоватль в игре? и один ли он там!
+
+    def get(self, request, *args, **kwargs):
+
+        # если игрок уже ответил на вопрос
+        current_player = Players.objects.get(parent_room=self.current_room, player_in_room=self.request.user)
+        if AnswerPlayers.objects.filter(player=current_player, round_of_answer=self.current_round).exists():
+            return HttpResponseRedirect(reverse("waiting_typing_room", kwargs={'slug': self.room_code}))
+
+        return super().get(self, request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """Получаем вопрос из БД"""
@@ -276,6 +275,7 @@ class GamveoverRoomView(RoomMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+
 
 # //////////////////////////// TESTS ////////////////////////////////////////
 
@@ -427,4 +427,3 @@ class WaitingTypingRoomGetUsersAPI(RoomMixin, ListAPIView):
         queryset_users = self.get_queryset_users()
         serializer_users = UserSerializer(queryset_users, many=True)
         return Response({'users': serializer_users.data})
-

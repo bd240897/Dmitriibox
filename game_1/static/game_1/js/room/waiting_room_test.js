@@ -24,9 +24,8 @@ function getPlayersAjax() {
         cache: false,
         async: false,
         success: function (data) {
+            console.log(data)
             addPlayersThere(data_players=data);
-            console.log(1)
-            console.log(data.gameroom.status_game)
         },
         failure: function (data) {
             alert('getPlayersAjax - не удалось получить список игроков');
@@ -46,8 +45,6 @@ function getPlayersAjaxInterval() {
             async: false,
             success: function (data) {
                 addPlayersThere(data_players = data);
-                console.log(1)
-                console.log(data.gameroom.status_game)
                 if (data.gameroom.status_game === true) {
                     clearInterval(countdownTimer)
                     renderTimeTmp()

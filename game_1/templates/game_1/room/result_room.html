@@ -17,7 +17,7 @@
             animation-name: wipe-enter;
             animation-duration: 1s;
             animation-iteration-count: 1;
-            {#animation: wipe-enter 1s ;#}
+        {#animation: wipe-enter 1s ;#}
         }
     </style>
 
@@ -35,9 +35,12 @@
                 <h1 class="text-center">Вопрос был:</h1> {#"#}
                 <h1 class="text-center">{{ obj_question.question }}</h1>
             </div>
+
+            {% if obj_question.img %}
             <div class="d-flex flex-column justify-content-center align-items-center" >
                 <img src="{{ obj_question.img.url }}" class="img-fluid" alt="..." style="width: 100%; height: auto; max-width: 600px;">
             </div>
+            {% endif %}
 
             <div class="results-body pt-2 pb-2">
                 {% for p in  players %}
@@ -51,6 +54,15 @@
                         <div class="p-2 bg-warning ms-auto" >Неплохой ответ</div>
                     </div>
                 {% endfor %}
+
+                {% if obj_question.right_answer %}
+                    <div class="d-flex flex-column bd-highlight mb-3 square ">
+                        <div class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">
+                            <div> Правильный ответ</div>
+                        </div>
+                        <div class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 26px; color: red; height: 200px; border-radius: 50px;">{{ obj_question.right_answer }}</div>
+                    </div>
+                {% endif %}
             </div>
 
             <div class="results_to_end d-flex justify-content-between">
