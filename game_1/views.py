@@ -18,6 +18,8 @@ from .models import *
 from .serializers import *
 
 
+# TODO вынести регитсрация, DRF, DF в отдельные View
+
 class RegisterUser(CreateView):
     """Регистрация"""
 

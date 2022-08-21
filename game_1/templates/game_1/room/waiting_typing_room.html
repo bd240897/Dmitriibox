@@ -18,7 +18,11 @@
 
                 <div class="waiting-typing-players text-center">
                     <h2>Игроки которые уже ответили</h2>
-                    <div id="waitingPlayersThere"></div>
+                    <div id="waitingPlayersThere">
+                        {% for p in players %}
+                            <div class="d-inline p-2 mx-1 bg-success text-white">{{ p.username }}</div>
+                        {% endfor %}
+                    </div>
 
                     <button class="waiting-players-there-btn btn"> Кликни </button>
                 </div>
@@ -60,5 +64,5 @@
     </script>
 
     {# ЗАГРУЗКА JS #}
-    <script src="{% static 'game_1/js/room/waiting_typing_room.js' %}"></script>
+    {#    <script src="{% static 'game_1/js/room/waiting_typing_room.js' %}"></script>#}
 {% endblock %}
