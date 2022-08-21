@@ -1,4 +1,4 @@
-from rest_framework.generics import ListCreateAPIView, ListAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..forms import *
@@ -7,6 +7,13 @@ from ..models import *
 from ..serializers import *
 
 # //////////////////////////// ApiVIew ////////////////////////////////////////
+
+
+class GameStatusApi(RetrieveAPIView):
+    serializer_class = GameStatusSerializer
+    queryset = GameRoom.objects.all()
+    lookup_field = 'room_code'
+    lookup_url_kwarg = 'slug'
 
 class WaitingRoomGetUsersAPI(ListAPIView):
     """ Получаем список игроков в typing_room + status_game"""

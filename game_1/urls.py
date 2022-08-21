@@ -21,11 +21,14 @@ urlpatterns_room = [
     path('waiting/typing/<slug:slug>/', WaitingTypingRoomView.as_view(), name='waiting_typing_room'),
     path('result/<slug:slug>/', ResultRoomView.as_view(), name='result_room'),
     path('result/list/<slug:slug>/', ResultListView.as_view(), name='result_list_room'),
-    path('gameover/', GamveoverRoomView.as_view(), name='gameover_room'),
+    # TODO добавил slug к gameover, нужен ли он ему?
+    path('gameover/<slug:slug>/', GamveoverRoomView.as_view(), name='gameover_room'),
 ]
 
 urlpatterns_drf = [
     # ///////////////// ApiView /////////////////////
+    path('gamestatus/<slug:slug>/', GameStatusApi.as_view(), name='game_status_API'),
+    #
     path('gamers/<slug:slug>/', TempView.as_view(), name='found_gamers'),
     path('waiting/<slug:slug>/gatusers/', WaitingRoomGetUsersAPI.as_view(),
          name='waiting_room_api_gatusers'),

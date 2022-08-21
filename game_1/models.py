@@ -14,32 +14,22 @@ class GameRoom(models.Model):
     # https://django.fun/docs/django/ru/3.1/topics/db/examples/many_to_many/
     players = models.ManyToManyField(User, blank=True, related_name='game_players')
     # при создании игры None, при запуске True, при окончании False
-    status_game = models.BooleanField(blank=True, null=True)
     round = models.IntegerField(blank=True, default=1)
 
-    #################################
-    # TODO разобраться со статусом игры
+    # TODO стутусы waiting - мешает, gameover - нужен
+    # создана - таймер-начала - печатаем - ждем - смотрим - следущий раунд(печатаем) ... - закончена - удалена
     CHOICES = {
         ('created', 'Игра создана'),
         ('start_timer', 'Таймер начала'),
-        ('started', 'Игра уже идет'),
+        ('typing', 'Печатаем ответы'),
+        ('waiting', 'Ждем ответы'),
+        ('looking', 'Смотрим ответы'),
         ('ended', 'Игра закончена'),
         ('deleted', 'Игра удалена'),
     }
-
     status = models.CharField(max_length=16, default="created", blank=True, choices=CHOICES)
-    #################################
 
     def is_user_in_room(self, user):
-
-        # TODO
-        # if self.players_set.filter(player_in_room=user):
-        #     game_massage = "Пользователь " + user.username + " есть в комнате " + str(self.room_code)
-        #     messages.success(self.request, game_massage)
-        # else:
-        #     game_massage = "Пользователя " + user.username + " нет в комнате " + str(self.room_code)
-        #     messages.error(self.request, game_massage)
-
         return self.players.filter(pk=user.pk).exists()
 
     def is_user_owner(self, user):

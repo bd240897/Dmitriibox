@@ -22,6 +22,7 @@
                         <h2 class="p-2 d-flex justify-content-center rounded-pill" style="font-weight: bold; font-size: 46px; color: orange">Спасибо за игру!</h2>
                         <div class="waiting-typing-done d-flex flex-column pt-2 pb-2">
                             <a href="{% url 'main_room' %}" class="answer_link btn btn-primary alredy_done__link" >На главную</a>
+                            <a href="{% url 'gameover_room' slug %}?gameover=1" class="answer_link btn btn-primary">Удалить комнату</a>
                         </div>
                     </div>
                 </div>

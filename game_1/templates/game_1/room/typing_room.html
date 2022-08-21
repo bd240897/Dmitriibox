@@ -1,5 +1,7 @@
 {% extends 'game_1/base.html' %}
 
+{% load static %}
+
 {% block title %} typing_room {% endblock %}
 
 {% block content %}
@@ -31,9 +33,9 @@
             </div>
 
             {% if obj_question.img %}
-            <div class="d-flex flex-column justify-content-center align-items-center" >
-                <img src="{{ obj_question.img.url }}" class="img-fluid" alt="..." style="width: 100%; height: auto; max-width: 600px;">
-            </div>
+                <div class="d-flex flex-column justify-content-center align-items-center" >
+                    <img src="{{ obj_question.img.url }}" class="img-fluid" alt="..." style="width: 100%; height: auto; max-width: 600px;">
+                </div>
             {% endif %}
 
             <form method="post">
@@ -49,4 +51,38 @@
 
         </div>
     </section>
+{% endblock %}
+
+{% block user_scripts %}
+    <script>
+        ///////// API ///////////////
+        function getGameStatusApiURL(){
+            return "{% url 'game_status_API' slug %}"
+        }
+        //////// DJANGO ////////////
+        function getWaitingRoomURL(){
+            return "{% url 'waiting_room' slug %}"
+        }
+        function getTypingRoomURL(){
+            return "{% url 'typing_room' slug %}"
+        }
+        function getWaitingTypingRoomURL(){
+            return "{% url 'waiting_typing_room' slug %}"
+        }
+        function getResultRoomURL(){
+            return "{% url 'result_room' slug %}"
+        }
+        function getResultListRoomURL(){
+            return "{% url 'result_list_room' slug %}"
+        }
+        function getMainRoomURL(){
+            return "{% url 'main_room' %}"
+        }
+        function getGameOverRoomURL(){
+            return "{% url 'gameover_room' slug %}"
+        }
+    </script>
+
+    {# ЗАГРУЗКА JS #}
+    <script src="{% static 'game_1/js/room/temp.js' %}"></script>
 {% endblock %}

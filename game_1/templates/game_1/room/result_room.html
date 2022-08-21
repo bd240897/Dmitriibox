@@ -1,5 +1,7 @@
 {% extends 'game_1/base.html' %}
 
+{% load static %}
+
 {% block title %} result_room {% endblock %}
 
 {% block content %}
@@ -37,9 +39,9 @@
             </div>
 
             {% if obj_question.img %}
-            <div class="d-flex flex-column justify-content-center align-items-center" >
-                <img src="{{ obj_question.img.url }}" class="img-fluid" alt="..." style="width: 100%; height: auto; max-width: 600px;">
-            </div>
+                <div class="d-flex flex-column justify-content-center align-items-center" >
+                    <img src="{{ obj_question.img.url }}" class="img-fluid" alt="..." style="width: 100%; height: auto; max-width: 600px;">
+                </div>
             {% endif %}
 
             <div class="results-body pt-2 pb-2">
@@ -65,12 +67,55 @@
                 {% endif %}
             </div>
 
-            <div class="results_to_end d-flex justify-content-between">
-                <a href="{% url 'result_room' slug %}?gameover=1" class="answer_link btn btn-primary" >Показать результаты</a>
-                <a href="{% url 'result_room' slug %}?nexround=1" class="answer_link btn btn-primary" >Следующий раунд</a>
-            </div>
+            {% if is_user_owner or user.is_superuser %}
+                <div class="results_to_end d-flex justify-content-between">
+                    <a href="{% url 'result_room' slug %}?result_list=1" class="answer_link btn btn-primary" >Показать результаты</a>
+                    <a href="{% url 'result_room' slug %}?nexround=1" class="answer_link btn btn-primary" >Следующий раунд</a>
+                </div>
+            {% else %}
+                <div class="waiting-typing-done d-flex flex-column pt-2 pb-2 fw-bold fs-5 text-white justify-content-center align-items-center" style="background-color: orange">
+                <div class="">
+                    <p class="d-inline">Ждем пока создатель комнаты</p>
+                    <p class="d-inline" style="color: red;">{{ owner }}</p>
+                    <p class="d-inline"> начнет следующий раунд. </p>
+                </div>
+            {% endif %}
 
-        </div>
+            </div>
     </section>
+{% endblock %}
+
+{% block user_scripts %}
+    <script>
+        ///////// API ///////////////
+        function getGameStatusApiURL(){
+            return "{% url 'game_status_API' slug %}"
+        }
+        //////// DJANGO ////////////
+        function getWaitingRoomURL(){
+            return "{% url 'waiting_room' slug %}"
+        }
+        function getTypingRoomURL(){
+            return "{% url 'typing_room' slug %}"
+        }
+        function getWaitingTypingRoomURL(){
+            return "{% url 'waiting_typing_room' slug %}"
+        }
+        function getResultRoomURL(){
+            return "{% url 'result_room' slug %}"
+        }
+        function getResultListRoomURL(){
+            return "{% url 'result_list_room' slug %}"
+        }
+        function getMainRoomURL(){
+            return "{% url 'main_room' %}"
+        }
+        function getGameOverRoomURL(){
+            return "{% url 'gameover_room' slug %}"
+        }
+    </script>
+
+    {# ЗАГРУЗКА JS #}
+    <script src="{% static 'game_1/js/room/temp.js' %}"></script>
 {% endblock %}
 
