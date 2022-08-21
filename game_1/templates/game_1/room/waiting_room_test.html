@@ -10,7 +10,7 @@
             <div class="d-flex flex-column justify-content-center align-items-between h-100">
 
                 <div class="waiting-header">
-                    <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Ждем игроков {{ slug }}</h1>
+                    <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Ждем игроков №{{ round }}</h1>
                 </div>
 
                 {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
@@ -45,16 +45,26 @@
                         {% else %}
                             <a href="{% url 'waiting_room' slug %}?exit=1" class="answer_link btn btn-primary m-2 " >Выйти из игры</a>
                         {% endif %}
-                        {% if is_user_owner %}
+                        {% if is_user_owner or user.is_superuser %}
                             <a href="{% url 'waiting_room' slug %}?deleteplayers=1" class="answer_link btn btn-primary m-2 " >Удалить всех пользователей</a>
                             <a href="{% url 'waiting_room' slug %}?deleteroom=1" class="answer_link btn btn-primary m-2 " >Удалить комнату</a>
                             <a href="{% url 'waiting_room' slug %}?startgame=1" class="answer_link btn btn-success m-2 " >Начать игру</a>
+                        {% else %}
+                            <div class="waiting-typing-done d-flex flex-column pt-2 pb-2">
+                                Ждем пока создатель комнаты {{ owner }} начнет игру.
+                            </div>
+                            <div class="waiting-typing-done d-flex flex-column pt-2 pb-2 fw-bold fs-5 text-white justify-content-center align-items-center" style="background-color: orange">
+                            <div class="">
+                                <p class="d-inline">Ждем пока создатель комнаты</p>
+                                <p class="d-inline" style="color: red;">{{ owner }}</p>
+                                <p class="d-inline"> начнет игру. </p>
+                            </div>
                         {% endif %}
-                    </div>
+                        </div>
 
+                    </div>
                 </div>
             </div>
-        </div>
     </section>
 {% endblock %}
 
@@ -95,7 +105,7 @@
 
 
     {# ЗАГРУЗКА JS #}
-{#    <script src="{% static 'game_1/js/room/waiting_room_test.js' %}"></script>#}
+    {#    <script src="{% static 'game_1/js/room/waiting_room_test.js' %}"></script>#}
 
 
 

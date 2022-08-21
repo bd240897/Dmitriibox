@@ -31,6 +31,8 @@ class GameRoom(models.Model):
     #################################
 
     def is_user_in_room(self, user):
+
+        # TODO
         # if self.players_set.filter(player_in_room=user):
         #     game_massage = "Пользователь " + user.username + " есть в комнате " + str(self.room_code)
         #     messages.success(self.request, game_massage)

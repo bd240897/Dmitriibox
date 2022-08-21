@@ -25,7 +25,7 @@
     <section class="results">
         <div class="container pt-1 pb-1">
             <div class="results-header">
-                <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Результаты раунда №{{ round }}</h1>
+                <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Результаты раунда №{{ round }} из {{ max_rounds }}</h1>
             </div>
 
             {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
@@ -50,7 +50,7 @@
                             <div style="color: red">&nbsp;"{{ user.username }}&nbsp;</div>
                             <div> написал/а</div>
                         </div>
-                        <div class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 26px; color: red; height: 200px; border-radius: 50px;">{{ p.answer }}</div>
+                        <div class="p-2 d-flex justify-content-center align-items-center text-center" style="background-color: cornsilk; font-weight:bold; font-size: 26px; color: red; height: 200px; border-radius: 50px;">{{ p.answer }}</div>
                         <div class="p-2 bg-warning ms-auto" >Неплохой ответ</div>
                     </div>
                 {% endfor %}
@@ -60,14 +60,14 @@
                         <div class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">
                             <div> Правильный ответ</div>
                         </div>
-                        <div class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 26px; color: red; height: 200px; border-radius: 50px;">{{ obj_question.right_answer }}</div>
+                        <div class="p-2 d-flex justify-content-center align-items-center text-center" style="background-color: cornsilk; font-weight:bold; font-size: 26px; color: red; height: 200px; border-radius: 50px;">{{ obj_question.right_answer }}</div>
                     </div>
                 {% endif %}
             </div>
 
             <div class="results_to_end d-flex justify-content-between">
+                <a href="{% url 'result_room' slug %}?gameover=1" class="answer_link btn btn-primary" >Показать результаты</a>
                 <a href="{% url 'result_room' slug %}?nexround=1" class="answer_link btn btn-primary" >Следующий раунд</a>
-                <a href="{% url 'result_room' slug %}?gameover=1" class="answer_link btn btn-primary" >Закончить игру</a>
             </div>
 
         </div>

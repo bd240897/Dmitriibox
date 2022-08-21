@@ -13,13 +13,15 @@ urlpatterns_room = [
     # ///////////////// DjangoView ИГРА /////////////////////
     path('main/', MainRoomView.as_view(), name='main_room'),
     path('waiting/<slug:slug>/', WaitingRoomTestView.as_view(), name='waiting_room'),
-    # path('room/waiting/delete', WaitingRoomDeleteView.as_view(), name='waiting_room_delete'),
+    # действия в waiting_room
+    path('waiting/start/<slug:slug>/', StartGameView.as_view(), name='start_game'),
+    path('waiting/rejoin/<slug:slug>/', RejoinGameView.as_view(), name='rejoin_game'),
+
     path('typing/<slug:slug>/', TypingRoomView.as_view(), name='typing_room'),
     path('waiting/typing/<slug:slug>/', WaitingTypingRoomView.as_view(), name='waiting_typing_room'),
     path('result/<slug:slug>/', ResultRoomView.as_view(), name='result_room'),
+    path('result/list/<slug:slug>/', ResultListView.as_view(), name='result_list_room'),
     path('gameover/', GamveoverRoomView.as_view(), name='gameover_room'),
-    path('list/<slug:slug>/', ListResultsView.as_view(),
-         name='result_list_room'),
 ]
 
 urlpatterns_drf = [
