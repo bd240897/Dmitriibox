@@ -20,13 +20,14 @@ class GameRoom(models.Model):
     #################################
     # TODO разобраться со статусом игры
     CHOICES = {
-        (1, 'created'),
-        (2, 'timer'),
-        (3, 'started'),
-        (4, 'ended'),
+        ('created', 'Игра создана'),
+        ('start_timer', 'Таймер начала'),
+        ('started', 'Игра уже идет'),
+        ('ended', 'Игра закончена'),
+        ('deleted', 'Игра удалена'),
     }
 
-    status = models.IntegerField(default=1, blank=True, choices=CHOICES)
+    status = models.CharField(max_length=16, default="created", blank=True, choices=CHOICES)
     #################################
 
     def is_user_in_room(self, user):
@@ -44,17 +45,6 @@ class GameRoom(models.Model):
 
     def __str__(self):
         return str(self.room_code)
-
-
-# TODO удалить модель как всю налажу
-# class Players(models.Model):
-#     """Игроки в игровой комнате"""
-#
-#     parent_room = models.ForeignKey('GameRoom', on_delete=models.CASCADE, blank=True, null=True)
-#     player_in_room = models.ForeignKey(User, on_delete=models.PROTECT)
-#
-#     def __str__(self):
-#         return str(self.player_in_room) + "_Players"
 
 # TODO убрать множественное число из названия модели
 class AnswerPlayers(models.Model):

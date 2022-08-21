@@ -18,6 +18,8 @@ urlpatterns_room = [
     path('waiting/typing/<slug:slug>/', WaitingTypingRoomView.as_view(), name='waiting_typing_room'),
     path('result/<slug:slug>/', ResultRoomView.as_view(), name='result_room'),
     path('gameover/', GamveoverRoomView.as_view(), name='gameover_room'),
+    path('list/<slug:slug>/', ListResultsView.as_view(),
+         name='result_list_room'),
 ]
 
 urlpatterns_drf = [
