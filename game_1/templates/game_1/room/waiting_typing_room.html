@@ -10,7 +10,7 @@
             <div class="d-flex flex-column justify-content-center align-items-between h-100">
 
                 <div class="waiting-header">
-                    <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Ждем игроков раунда №{{ round }} из {{ max_rounds }}</h1>
+                    <h1 class="p-2 mx-2 d-flex justify-content-center bg-primary text-center text-white rounded-pill" style="font-weight: bold; font-size: 26px">Ждем игроков раунда №{{ round }} из {{ max_rounds }}</h1>
                 </div>
 
                 {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
@@ -33,7 +33,7 @@
                     </div>
                 {% else %}
                     <div class="waiting-typing-done d-flex flex-column pt-2 pb-2 fw-bold fs-5 text-white justify-content-center align-items-center" style="background-color: orange">
-                    <div class="">
+                    <div class="text-center">
                         <p class="d-inline">Ждем пока создатель комнаты</p>
                         <p class="d-inline" style="color: red;">{{ owner }}</p>
                         <p class="d-inline"> продолжит игру. </p>
@@ -62,15 +62,15 @@
     </script>
     {% endverbatim %}
 
-    <script type="text/javascript">
-        function getResultRoomURL(){
-            return "{% url 'result_room' slug %}"
-        }
-
-        function getWaitingTypingRoomApiURL(){
-            return "{% url 'waiting_typing_room_api_gatusers' slug %}"
-        }
-    </script>
+{#    <script type="text/javascript">#}
+{#        function getResultRoomURL(){#}
+{#            return "{% url 'result_room' slug %}"#}
+{#        }#}
+{##}
+{#        function getWaitingTypingRoomApiURL(){#}
+{#            return "{% url 'waiting_typing_room_api_gatusers' slug %}"#}
+{#        }#}
+{#    </script>#}
 
     {# ЗАГРУЗКА JS #}
     {#    <script src="{% static 'game_1/js/room/waiting_typing_room.js' %}"></script>#}
@@ -81,6 +81,9 @@
         ///////// API ///////////////
         function getGameStatusApiURL(){
             return "{% url 'game_status_API' slug %}"
+        }
+        function getUsersWaitingTypingRoomApiURL(){
+            return "{% url 'waiting_typing_room_API_gatusers' slug %}"
         }
         //////// DJANGO ////////////
         function getWaitingRoomURL(){
@@ -106,10 +109,11 @@
         }
     </script>
 
-    {# ЗАГРУЗКА JS #}
+    {# ЗАГРУЗКА JS - ОБНОВЛЕНИЕ STATUS GAME #}
     <script src="{% static 'game_1/js/room/temp.js' %}"></script>
 
-
+    {# ЗАГРУЗКА JS - LOAD СПИСОК ИГРОКОВ #}
+    <script src="{% static 'game_1/js/room/waiting_typing_room.js' %}"></script>
 
 
 

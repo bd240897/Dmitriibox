@@ -24,6 +24,7 @@ class GameRoom(models.Model):
         ('typing', 'Печатаем ответы'),
         ('waiting', 'Ждем ответы'),
         ('looking', 'Смотрим ответы'),
+        ('resulting', 'Вспомним все ответы'),
         ('ended', 'Игра закончена'),
         ('deleted', 'Игра удалена'),
     }

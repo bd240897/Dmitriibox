@@ -28,15 +28,17 @@ urlpatterns_room = [
 urlpatterns_drf = [
     # ///////////////// ApiView /////////////////////
     path('gamestatus/<slug:slug>/', GameStatusApi.as_view(), name='game_status_API'),
+    path('waiting/<slug:slug>/gatusers/', WaitingRoomGetUsersAPI.as_view(),
+         name='waiting_room_API_gatusers'),
+    path('waiting/typing/<slug:slug>/gatusers/', WaitingTypingRoomGetUsersAPI.as_view(),
+         name='waiting_typing_room_API_gatusers'),
     #
     path('gamers/<slug:slug>/', TempView.as_view(), name='found_gamers'),
-    path('waiting/<slug:slug>/gatusers/', WaitingRoomGetUsersAPI.as_view(),
-         name='waiting_room_api_gatusers'),
+
     path('waiting/<slug:slug>/exit/', WaitingRoomExitAPI.as_view(), name='waiting_room_api_exit'),
     path('waiting/<slug:slug>/join/', WaitingRoomJoinAPI.as_view(), name='waiting_room_api_join'),
     path('waiting/<slug:slug>/addbot/', WaitingRoomAddBotAPI.as_view(), name='ting_room_api_addbot'),
-    path('waiting/typing/<slug:slug>/gatusers/', WaitingTypingRoomGetUsersAPI.as_view(),
-         name='waiting_typing_room_api_gatusers'),
+
 ]
 
 urlpatterns_test = [

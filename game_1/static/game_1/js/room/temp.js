@@ -14,9 +14,6 @@ function getStatusAjaxInterval() {
             success: function (data) {
                 console.log(data)
                 relocation(data.status)
-                // if (data.gameroom.status_game === true) {
-                //     clearInterval(countdownTimer)
-                // }
             },
             failure: function (data) {
                 alert('getPlayersAjaxInterval - не удалось получить список игроков');
@@ -47,11 +44,10 @@ function relocation(status){
         case 'looking':
             room_location = getResultRoomURL()
             break;
-        case 'ended':
+        case 'resulting':
             room_location = getResultListRoomURL()
             break;
-        // TODO дописать
-        case 'gameover':
+        case 'ended':
             room_location = getGameOverRoomURL()
             break;
         // TODO наверно на главную
@@ -59,7 +55,7 @@ function relocation(status){
             room_location = getGameOverRoomURL()
             break;
         default:
-            room_location = getMainRoomURL()
+            // room_location = getMainRoomURL()
             alert("Пришел статус игры " + status)
             break;
     }

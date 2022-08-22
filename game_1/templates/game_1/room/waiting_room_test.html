@@ -99,6 +99,9 @@
         function getGameStatusApiURL(){
             return "{% url 'game_status_API' slug %}"
         }
+        function getUsersWaitingRoomApiURL(){
+            return "{% url 'waiting_room_API_gatusers' slug %}"
+        }
         //////// DJANGO ////////////
         function getWaitingRoomURL(){
             return "{% url 'waiting_room' slug %}"
@@ -122,13 +125,12 @@
             return "{% url 'gameover_room' slug %}"
         }
     </script>
-    {# ЗАГРУЗКА JS #}
+
+    {# ЗАГРУЗКА JS - ОБНОВЛЕНИЕ STATUS GAME #}
     <script src="{% static 'game_1/js/room/temp.js' %}"></script>
 
-    {# ЗАГРУЗКА JS #}
-    {#    <script src="{% static 'game_1/js/room/waiting_room_test.js' %}"></script>#}
-
-
+    {# ЗАГРУЗКА JS - LOAD СПИСОК ИГРОКОВ #}
+    <script src="{% static 'game_1/js/room/waiting_room_test.js' %}"></script>
 
 {% endblock %}
 

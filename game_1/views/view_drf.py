@@ -23,9 +23,7 @@ class WaitingRoomGetUsersAPI(ListAPIView):
 
     def get_queryset_users(self):
         req_room_code = self.kwargs['slug']
-        select = Players.objects.filter(parent_room__room_code=req_room_code)  # .values_list("player_in_room")
-        # получили объект класса Юзер
-        select = [s.player_in_room for s in select]
+        select = User.objects.filter(game_players__room_code=req_room_code)
         print("select", select)
         return select
 
@@ -74,14 +72,15 @@ class WaitingTypingRoomGetUsersAPI(RoomMixin, ListAPIView):
 
     def get_queryset_users(self):
         room_code = self.kwargs['slug']
-        current_room = self.get_current_room(room_code=room_code)
+        current_room = self.get_current_room()
         current_round = current_room.round
 
         # получили объект класса Юзер
-        select = AnswerPlayers.objects.filter(answer__isnull=False).filter(
-            round_of_answer=current_round).filter(player__parent_room__room_code=room_code)
-        select = [s.player.player_in_room for s in select]
-
+        select = AnswerPlayers.objects\
+            .filter(answer__isnull=False,round_of_answer=current_round)\
+            .filter(room__room_code=room_code)
+        # TODO мб использовать values_list()
+        select = [s.player for s in select]
         return select
 
     def list(self, request, *args, **kwargs):

@@ -18,7 +18,7 @@ function getPlayersAjax() {
     // получить список игроков и вставить их в шаблон
 
     $.ajax({
-        url: getWaitingTypingRoomApiURL(),
+        url: getUsersWaitingTypingRoomApiURL(),
         type: 'get',
         dataType: 'json',
         cache: false,
@@ -36,7 +36,7 @@ function getPlayersAjaxInterval() {
     const countdownTimer = setInterval(() => {
 
         $.ajax({
-            url: getWaitingTypingRoomApiURL(),
+            url: getUsersWaitingTypingRoomApiURL(),
             type: 'get',
             dataType: 'json',
             cache: false,

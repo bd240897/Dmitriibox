@@ -18,7 +18,7 @@ $(".waiting-players-there-btn").click(function(){
 function getPlayersAjax() {
     // получить список игроков и вставить их в шаблон
     $.ajax({
-        url: getWaitingRoomApiURL(),
+        url: getUsersWaitingRoomApiURL(),
         type: 'get',
         dataType: 'json',
         cache: false,
@@ -38,7 +38,7 @@ function getPlayersAjaxInterval() {
     const countdownTimer = setInterval(() => {
 
         $.ajax({
-            url: getWaitingRoomApiURL(),
+            url: getUsersWaitingRoomApiURL(),
             type: 'get',
             dataType: 'json',
             cache: false,
@@ -47,10 +47,11 @@ function getPlayersAjaxInterval() {
                 addPlayersThere(data_players = data);
                 if (data.gameroom.status_game === true) {
                     clearInterval(countdownTimer)
-                    renderTimeTmp()
-                    ProgressCountdown(10, 'pageBeginCountdown', 'pageBeginCountdownText').then(data => {
-                        redirectToTypingRoom()
-                    })
+                    // renderTimeTmp()
+                    // ProgressCountdown(10, 'pageBeginCountdown', 'pageBeginCountdownText').then(data => {
+                    //     redirectToTypingRoom()
+                    // })
+                    redirectToTypingRoom()
 
                 }
             },

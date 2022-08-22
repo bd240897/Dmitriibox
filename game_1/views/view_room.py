@@ -142,8 +142,10 @@ class RejoinGameView(RoomMixin, View):
             messages.success(self.request, game_massage)
 
             # если пользователь дал ответ на этот раунд
+            # TODO check
             if AnswerPlayers.objects.filter(room__room_code=self.current_room,
-                                            round_of_answer=self.current_round).exists():
+                                            round_of_answer=self.current_round,
+                                            player=self.current_user).exists():
                 game_massage = "Вы уже дали ответ в этом раунде " + str(self.current_room)
                 messages.success(self.request, game_massage)
                 return HttpResponseRedirect(reverse("waiting_typing_room", kwargs={'slug': self.room_code}))
@@ -156,7 +158,7 @@ class RejoinGameView(RoomMixin, View):
         else:
             game_massage = "Вернуться в игру" + str(self.current_room) \
                            + " не удалось, статус игры " + str(self.current_room.status) \
-                           + " и вас нет в этой игре"
+                           + " или вас нет в этой комнате"
             messages.error(self.request, game_massage)
             return redirect("main_room")
 
@@ -242,19 +244,20 @@ class ResultRoomView(RoomMixin, ListView):
     def get(self, *args, **kwargs):
 
         param_request_nextround = self.request.GET.get("nexround", 0)
-        param_request_end_game = self.request.GET.get("result_list", 0)
+        param_request_result_list = self.request.GET.get("result_list", 0)
 
         # смотрим все ответы
-        if param_request_end_game:
-            self.switch_game_status("ended")
+        if param_request_result_list:
+            self.switch_game_status("resulting")
+            print("resulting")
             return HttpResponseRedirect(reverse("result_list_room", kwargs={'slug': self.room_code}))
 
         # TODO разобраться что делать если игра закончена - на экран конца или ответы
         # следующий раунд
         if param_request_nextround:
-            # если игра закончены
+            # если вопросы кончились - переходим в "вспомним ответы"
             if self.is_questions_end():
-                self.switch_game_status("ended")
+                self.switch_game_status("resulting")
                 return HttpResponseRedirect(reverse("result_list_room", kwargs={'slug': self.room_code}))
             # следующий раунд
             else:
@@ -262,6 +265,7 @@ class ResultRoomView(RoomMixin, ListView):
                 self.switch_game_status('typing')
                 return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
         else:
+            # простой заход в комнату - смотрим ответы раунды
             self.switch_game_status('looking')
 
         return super().get(self, *args, **kwargs)
@@ -291,8 +295,7 @@ class ResultListView(RoomMixin, ListView):
 
         # смотрим все ответы
         if param_request_end_game:
-            # TODO на что менять статус
-            # self.switch_game_status("ended")
+            self.switch_game_status("ended")
             # TODO добавил slug к gameover, нужен ли он ему?
             return HttpResponseRedirect(reverse("gameover_room", kwargs={'slug': self.room_code}))
         return super().get(self, request, *args, **kwargs)
@@ -312,7 +315,7 @@ class ResultListView(RoomMixin, ListView):
         return select
 
 
-class GamveoverRoomView(TemplateView):
+class GamveoverRoomView(RoomMixin, TemplateView):
     """Страница спасибо за игру"""
 
     template_name = 'game_1/room/gameover_room.html'
@@ -323,8 +326,8 @@ class GamveoverRoomView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         # удалить игру
-        param_request_end_game = self.request.GET.get("gameover", 0)
-        if param_request_end_game:
+        param_request_delete = self.request.GET.get("delete", 0)
+        if param_request_delete:
             self.delete_room()
-            return redirect("gameover_room")
+            return redirect("main_room")
         return super().get(self, request, *args, **kwargs)
