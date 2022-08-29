@@ -39,7 +39,7 @@
             </div>
 
             {% if obj_question.img %}
-                <div class="d-flex flex-column justify-content-center align-items-center" >
+                <div class="d-flex flex-column justify-content-center align-items-center py-2" >
                     <img src="{{ obj_question.img.url }}" class="img-fluid" alt="..." style="width: 100%; height: auto; max-width: 600px;">
                 </div>
             {% endif %}
@@ -62,7 +62,7 @@
                         <div class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">
                             <div> Правильный ответ</div>
                         </div>
-                        <div class="p-2 d-flex justify-content-center align-items-center text-center" style="background-color: cornsilk; font-weight:bold; font-size: 26px; color: red; height: 200px; border-radius: 50px;">{{ obj_question.right_answer }}</div>
+                        <div class="p-2 d-flex justify-content-center align-items-center text-center" style="background-color: rgba(255,255,0,0.5); font-weight:bold; font-size: 26px; color: red; height: 200px; border-radius: 50px;">{{ obj_question.right_answer }}</div>
                     </div>
                 {% endif %}
             </div>

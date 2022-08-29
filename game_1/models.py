@@ -46,7 +46,7 @@ class AnswerPlayers(models.Model):
     # увеличивается каждый раунд
     player = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='answer_player')
     answer = models.TextField(blank=True, null=True)
-    round_of_answer = models.IntegerField(blank=True, default=1)
+    round_of_answer = models.IntegerField() #blank=True, default=1
     room = models.ForeignKey(GameRoom, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
@@ -62,7 +62,7 @@ class Questions(models.Model):
     right_answer = models.TextField(blank=True, null=True)
     round_for_question = models.IntegerField(blank=True, default=1)
     author = models.CharField(max_length=16, default='Dmitrii')
-    img = models.ImageField(upload_to='images/', blank=True, null=True)
+    img = models.ImageField(upload_to='images/game_1/questions', blank=True, null=True)
 
     def __str__(self):
         return str(self.round_for_question) + "_Questions"
@@ -72,7 +72,7 @@ class Rules(models.Model):
     number = models.IntegerField()
     header = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    img = models.ImageField(upload_to='game_1/rules/', blank=True, null=True)
+    img = models.ImageField(upload_to='images/game_1/rules/', blank=True, null=True)
 
     def __str__(self):
         return str(self.number) + "_Rules"
