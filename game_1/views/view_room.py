@@ -217,6 +217,7 @@ class WaitingTypingRoomView(RoomMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         return super().get(self, request, *args, **kwargs)
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         already_answered = AnswerPlayers.objects.filter(answer__isnull=False,
@@ -276,6 +277,7 @@ class ResultRoomView(RoomMixin, ListView):
         # https://django.fun/ru/cbv/Django/3.0/django.views.generic.list/ListView/
         obj_question = get_object_or_404(Questions, round_for_question=self.current_round)
         kwargs['obj_question'] = obj_question
+        kwargs['is_user_owner'] = self.current_room.is_user_owner(self.request.user)
         return super().get_context_data(*args, **kwargs)
 
     def is_questions_end(self):
@@ -322,6 +324,7 @@ class GamveoverRoomView(RoomMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['is_user_owner'] = self.current_room.is_user_owner(self.request.user)
         return context
 
     def get(self, request, *args, **kwargs):
