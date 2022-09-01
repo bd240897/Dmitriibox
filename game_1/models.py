@@ -56,7 +56,7 @@ class AnswerPlayers(models.Model):
 
     # увеличивается каждый раунд
     player = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='answer_player')
-    answer = models.TextField(blank=True, null=True)
+    answer = models.TextField() # blank=True, null=False
     round_of_answer = models.IntegerField() #blank=True, default=1
     room = models.ForeignKey(GameRoom, on_delete=models.CASCADE, null=True)
 

@@ -31,19 +31,11 @@ class MainRoomView(CreateView):
         return super().get(self, request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # ЗАГЛУШКА ДЛЯ РАБОТЫ ПАНЕЛИ АДМИНА (МОЕЙ РУКОПИСНОЙ)
-        # kwargs['slug'] = 'SQPQ'
         kwargs['rules'] = Rules.objects.all()
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         form_room_code = form.cleaned_data.get("room_code")
-
-        # if self.request.user.is_anonymous:
-        #     # Если пользователь не вошел в систему
-        #     game_massage = "Вы не залогинились в игру!"
-        #     messages.error(self.request, game_massage)
-        #     return HttpResponseRedirect(reverse("game_login"))
 
         # игра уже существует
         if GameRoom.objects.filter(room_code=form_room_code).exists():
@@ -58,6 +50,8 @@ class MainRoomView(CreateView):
             object = form.save(commit=False)
             object.owner = self.request.user
             object.save()
+            # добавим сразу в комнату owners
+            object.players.add(self.request.user)
             game_massage = "Был создана комната " + str(form_room_code)
             messages.success(self.request, game_massage)
 
@@ -79,15 +73,11 @@ class WaitingRoomTestView(RoomMixin, TemplateView):
     @method_decorator(get_if_room_not_exist())
     def get(self, *args, **kwargs):
 
-        # Игра status = 'waiting_room'
-        self.switch_game_status(self.name_current_view_room)
-
         # параметры строки запроса
         param_request_delete_players = self.request.GET.get("deleteplayers", 0)
         param_request_delete_room = self.request.GET.get("deleteroom", 0)
         param_request_join = self.request.GET.get("join", 0)
         param_request_exit = self.request.GET.get("exit", 0)
-        param_request_create = self.request.GET.get("create", 0)
         param_request_startgame = self.request.GET.get("startgame", 0)
 
         # удалить комнату
@@ -105,7 +95,10 @@ class WaitingRoomTestView(RoomMixin, TemplateView):
             self.exit_to_game()
         # начать игру
         elif param_request_startgame:
-            return HttpResponseRedirect(reverse("start_game", kwargs={'slug': self.room_code}))
+            return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
+
+        # Игра status = 'waiting_room'
+        self.switch_game_status(self.name_current_view_room)
 
         return super().get(*args, **kwargs)
 
@@ -117,28 +110,26 @@ class WaitingRoomTestView(RoomMixin, TemplateView):
         return context
 
 
-
-
 class StartGameView(RoomMixin, View):
     """Начинает игру (чисто редирект)"""
-
-    def get(self, *args, **kwargs):
-
-        # проверяем есть ли пользователь в комнате
-        if self.is_user_in_room():
-            game_massage = "Пользователь " + str(self.current_user) + " есть в комнате " + str(self.room_code)
-            messages.success(self.request, game_massage)
-            # TODO ЭТА ПРОВЕРКА НЕ НУЖНА Т,К, ДАМИН ПО УМОЛЧАНИЮ В КОМНАТЕ - эта проверка нужна для "присиоединитьсяк игре"
-
-
-            return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
-        # TODO - а нужно ли проверять есть ли owner в комнате - мб сразу его добавить?
-        else:
-            game_massage = "Пользователя " + str(self.current_user) \
-                           + " нет в комнате " + str(self.room_code)
-            messages.error(self.request, game_massage)
-            return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': self.room_code}))
-
+    #
+    # def get(self, *args, **kwargs):
+    #
+    #     # проверяем есть ли пользователь в комнате
+    #     if self.is_user_in_room():
+    #         game_massage = "Пользователь " + str(self.current_user) + " есть в комнате " + str(self.room_code)
+    #         messages.success(self.request, game_massage)
+    #         # TODO ЭТА ПРОВЕРКА НЕ НУЖНА Т,К, ДАМИН ПО УМОЛЧАНИЮ В КОМНАТЕ - эта проверка нужна для "присиоединитьсяк игре"
+    #
+    #
+    #         return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
+    #     # TODO - а нужно ли проверять есть ли owner в комнате - мб сразу его добавить?
+    #     else:
+    #         game_massage = "Пользователя " + str(self.current_user) \
+    #                        + " нет в комнате " + str(self.room_code)
+    #         messages.error(self.request, game_massage)
+    #         return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': self.room_code}))
+    pass
 
 class RejoinGameView(RoomMixin, View):
     pass
@@ -208,8 +199,7 @@ class WaitingTypingRoomView(RoomMixin, TemplateView):
         already_answered = AnswerPlayers.objects.filter(answer__isnull=False,
                                                         round_of_answer=self.current_round,
                                                         room=self.current_room)
-        players = [a.player for a in already_answered]
-        context['players'] = players
+        context['players'] = [a.player for a in already_answered]
         context['is_user_owner'] = self.current_room.is_user_owner(self.request.user)
         return context
 
@@ -224,19 +214,13 @@ class ResultRoomView(RoomMixin, ListView):
     @method_decorator(get_if_room_not_exist())
     def get(self, *args, **kwargs):
 
-        # # TODO status = 'result_room'
-        # # Игра status = 'waiting_typing_room'
-        # self.switch_game_status('result_room')
-
-        param_request_nextround = self.request.GET.get("nexround", 0)
+        # вспомним все ответы
         param_request_result_list = self.request.GET.get("result_list", 0)
-
-        # смотрим все ответы
         if param_request_result_list:
             return HttpResponseRedirect(reverse("result_list_room", kwargs={'slug': self.room_code}))
 
-        # TODO разобраться что делать если игра закончена - на экран конца или ответы
         # следующий раунд
+        param_request_nextround = self.request.GET.get("nexround", 0)
         if param_request_nextround:
             # если вопросы кончились - переходим в "вспомним ответы"
             if self.is_questions_end():
@@ -244,11 +228,10 @@ class ResultRoomView(RoomMixin, ListView):
             # следующий раунд
             else:
                 self.next_round()
-                self.switch_game_status('typing_room')
                 return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
-        else:
-            # простой заход в комнату - смотрим ответы раунды
-            self.switch_game_status(self.name_current_view_room)
+
+        # Игра status = 'waiting_typing_room'
+        self.switch_game_status(self.name_current_view_room)
 
         return super().get(self, *args, **kwargs)
 
@@ -262,8 +245,7 @@ class ResultRoomView(RoomMixin, ListView):
         """Получаем вопрос из БД"""
 
         # https://django.fun/ru/cbv/Django/3.0/django.views.generic.list/ListView/
-        obj_question = get_object_or_404(Questions, round_for_question=self.current_round)
-        kwargs['obj_question'] = obj_question
+        kwargs['obj_question'] = get_object_or_404(Questions, round_for_question=self.current_round)
         kwargs['is_user_owner'] = self.current_room.is_user_owner(self.request.user)
         return super().get_context_data(*args, **kwargs)
 
@@ -282,15 +264,19 @@ class ResultListView(RoomMixin, ListView):
     @method_decorator(get_if_room_not_exist())
     def get(self, request, *args, **kwargs):
 
+        # игра окончена
+        param_request_end_game = self.request.GET.get("gameover", 0)
+        if param_request_end_game:
+            return HttpResponseRedirect(reverse("gameover_room", kwargs={'slug': self.room_code}))
+
+        # продолжить игру
+        param_request_continue = self.request.GET.get("continue", 0)
+        if param_request_continue:
+            return HttpResponseRedirect(reverse("result_room", kwargs={'slug': self.room_code}) + "?nexround=1")
+
         # Игра status = 'result_list_room'
         self.switch_game_status(self.name_current_view_room)
 
-        param_request_end_game = self.request.GET.get("gameover", 0)
-
-        # смотрим все ответы
-        if param_request_end_game:
-            # TODO добавил slug к gameover, нужен ли он ему?
-            return HttpResponseRedirect(reverse("gameover_room", kwargs={'slug': self.room_code}))
         return super().get(self, request, *args, **kwargs)
 
     def get_queryset(self):
@@ -321,13 +307,14 @@ class GamveoverRoomView(RoomMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        # Игра status = 'gameover_room'
-        self.switch_game_status(self.name_current_view_room)
-
         # удалить игру
         param_request_delete = self.request.GET.get("delete", 0)
         if param_request_delete:
             self.delete_room()
             return redirect("main_room")
+
+        # Игра status = 'gameover_room'
+        self.switch_game_status(self.name_current_view_room)
+
         return super().get(self, request, *args, **kwargs)
 

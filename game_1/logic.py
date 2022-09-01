@@ -49,7 +49,7 @@ class RoomMixin:
                            + str(self.current_room.status)
             messages.success(self.request, game_massage)
         elif status not in ALLOWED_STATUS:
-            game_massage = "(switch_game_status) Статусу " + str(status) \
+            game_massage = "(switch_game_status) Статуса " + str(status) \
                            + " не существует"
             messages.error(self.request, game_massage)
 
@@ -74,19 +74,6 @@ class RoomMixin:
             game_massage = "(redirect_to_game_status) Ошибка статуса " + str(status)
             messages.error(self.request, game_massage)
             return redirect("main_room")
-
-
-    def new_name_status(self):
-        a = """
-        main_room - created
-        waiting_room - waiting 
-        typing_room - typing
-        waiting_typing_room
-        result_room - looking
-        result_list_room - resulting
-        gameover_room - ended
-        """
-        pass
 
     def is_game_exist(self):
         """Существует ли комната с игрой"""
@@ -155,46 +142,6 @@ class RoomMixin:
             game_massage = "(remove_user_to_game) Пользователь " + self.current_user.username + " был удален из игры " + str(
                 self.room_code)
             messages.success(self.request, game_massage)
-
-    # def start_game(self):
-    #     """Запускаем игру (меняем в БД статус)"""
-    #
-    #     self.current_room.status = "typing"
-    #     self.current_room.save()
-    #     game_massage = "(start_game) Статус игры с кодом комнаты " \
-    #                    + str(self.current_room) + " изменен на " \
-    #                    + str(self.current_room.status)
-    #     messages.success(self.request, game_massage)
-
-    # def start_game_waiting(self):
-    #     """Запускаем игру (меняем в БД статус)"""
-    #
-    #     self.current_room.status = "waiting"
-    #     self.current_room.save()
-    #     game_massage = "(start_game) Статус игры с кодом комнаты " \
-    #                    + str(self.current_room) + " изменен на " \
-    #                    + str(self.current_room.status)
-    #     messages.success(self.request, game_massage)
-
-    # def start_game_looking(self):
-    #     """Запускаем игру (меняем в БД статус)"""
-    #
-    #     self.current_room.status = "looking"
-    #     self.current_room.save()
-    #     game_massage = "(start_game) Статус игры с кодом комнаты " \
-    #                    + str(self.current_room) + " изменен на " \
-    #                    + str(self.current_room.status)
-    #     messages.success(self.request, game_massage)
-
-    # def end_game(self):
-    #     """Завершаем игру (меняем в БД статус)"""
-    #
-    #     self.current_room.status = "ended"
-    #     self.current_room.save()
-    #     game_massage = "(end_game) Статус игры с кодом комнаты " \
-    #                    + str(self.current_room) \
-    #                    + " изменен на " + str(self.current_room.status)
-    #     messages.success(self.request, game_massage)
 
     def players_in_game(self):
         """Выводит игроков в текущей игре с кодом комнаты"""

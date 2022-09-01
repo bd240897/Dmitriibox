@@ -66,8 +66,12 @@
             {#            {% endfor %}#}
 
             <div class="results_to_end d-flex justify-content-between">
-                <a href="{% url 'result_list_room' slug %}?gameover=1" class="answer_link btn btn-primary" >Закончить игру</a>
             </div>
+            <div class="results_to_end d-flex justify-content-between">
+                <a href="{% url 'result_list_room' slug %}?gameover=1" class="answer_link btn btn-primary" >Закончить игру</a>
+                <a href="{% url 'result_list_room' slug %}?continue=1" class="answer_link btn btn-primary" >Продолжить игру</a>
+            </div>
+
 
         </div>
     </section>
