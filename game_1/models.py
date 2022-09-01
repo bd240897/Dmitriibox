@@ -18,17 +18,28 @@ class GameRoom(models.Model):
 
     # TODO стутусы waiting - мешает, gameover - нужен
     # создана - таймер-начала - печатаем - ждем - смотрим - следущий раунд(печатаем) ... - закончена - удалена
+    # CHOICES_OLD = {
+    #     ('created', 'Игра создана'),
+    #     ('start_timer', 'Таймер начала'),
+    #     ('typing', 'Печатаем ответы'),
+    #     ('waiting', 'Ждем ответы'),
+    #     ('looking', 'Смотрим ответы'),
+    #     ('resulting', 'Вспомним все ответы'),
+    #     ('ended', 'Игра закончена'),
+    #     ('deleted', 'Игра удалена'),
+    # }
+
     CHOICES = {
-        ('created', 'Игра создана'),
-        ('start_timer', 'Таймер начала'),
-        ('typing', 'Печатаем ответы'),
-        ('waiting', 'Ждем ответы'),
-        ('looking', 'Смотрим ответы'),
-        ('resulting', 'Вспомним все ответы'),
-        ('ended', 'Игра закончена'),
-        ('deleted', 'Игра удалена'),
+        ('main_room', 'Игра создана'),
+        ('waiting_room', 'Игра создана'),
+        ('typing_room', 'Печатаем ответы'),
+        ('waiting_typing_room', 'Ждем ответы'),
+        ('result_room', 'Смотрим ответы'),
+        ('result_list_room', 'Вспомним все ответы'),
+        ('gameover_room', 'Игра закончена'),
     }
-    status = models.CharField(max_length=16, default="created", blank=True, choices=CHOICES)
+
+    status = models.CharField(max_length=32, default="main_room", blank=True, choices=CHOICES)
 
     def is_user_in_room(self, user):
         return self.players.filter(pk=user.pk).exists()

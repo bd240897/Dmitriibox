@@ -2,8 +2,9 @@ import functools
 
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import redirect
+from django.urls import reverse
 
 from game_1.models import GameRoom
 
@@ -39,7 +40,7 @@ class RoomMixin:
     def switch_game_status(self, status):
         """Смена статуса игры"""
 
-        ALLOWED_STATUS = ['created', 'start_timer', 'typing', 'waiting', 'looking', 'ended', 'deleted', "resulting"]
+        ALLOWED_STATUS = [i[0] for i in GameRoom.CHOICES]
         if (self.current_room.is_user_owner(self.current_user) or self.current_user.is_superuser) and status in ALLOWED_STATUS:
             self.current_room.status = status
             self.current_room.save()
@@ -52,6 +53,40 @@ class RoomMixin:
                            + " не существует"
             messages.error(self.request, game_massage)
 
+    # TODO
+    def redirect_to_game_status(self):
+        room_code = self.room_code
+        status = self.current_room_status
+
+        if status == 'created':
+            return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': room_code}))
+        elif status == 'typing':
+            return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': room_code}))
+        elif status == 'waiting':
+            return HttpResponseRedirect(reverse("waiting_typing_room", kwargs={'slug': room_code}))
+        elif status == 'looking':
+            return HttpResponseRedirect(reverse("result_room", kwargs={'slug': room_code}))
+        elif status == 'resulting' or status == 'ended':
+            return HttpResponseRedirect(reverse("result_list_room", kwargs={'slug': room_code}))
+        elif status == 'deleted':
+            return redirect("main_room")
+        else:
+            game_massage = "(redirect_to_game_status) Ошибка статуса " + str(status)
+            messages.error(self.request, game_massage)
+            return redirect("main_room")
+
+
+    def new_name_status(self):
+        a = """
+        main_room - created
+        waiting_room - waiting 
+        typing_room - typing
+        waiting_typing_room
+        result_room - looking
+        result_list_room - resulting
+        gameover_room - ended
+        """
+        pass
 
     def is_game_exist(self):
         """Существует ли комната с игрой"""
@@ -190,6 +225,8 @@ def get_if_room_not_exist():
 
             # Если пользователь не авторизован отправить его на регистрацию
             if not request.user.is_authenticated:
+                game_massage = "Вы не залогинились в игру!"
+                messages.error(request, game_massage)
                 return redirect("game_login")
 
             # Если игры не существует направить его не главную

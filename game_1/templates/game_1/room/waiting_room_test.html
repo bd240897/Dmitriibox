@@ -2,6 +2,7 @@
 
 {% load static %}
 
+{#TODO - заменим на название и номер#}
 {% block title %} waiting_room {% endblock %}
 
 {% block content %}
@@ -94,40 +95,8 @@
     </script>
     {% endverbatim %}
 
-    <script>
-        ///////// API ///////////////
-        function getGameStatusApiURL(){
-            return "{% url 'game_status_API' slug %}"
-        }
-        function getUsersWaitingRoomApiURL(){
-            return "{% url 'waiting_room_API_gatusers' slug %}"
-        }
-        //////// DJANGO ////////////
-        function getWaitingRoomURL(){
-            return "{% url 'waiting_room' slug %}"
-        }
-        function getTypingRoomURL(){
-            return "{% url 'typing_room' slug %}"
-        }
-        function getWaitingTypingRoomURL(){
-            return "{% url 'waiting_typing_room' slug %}"
-        }
-        function getResultRoomURL(){
-            return "{% url 'result_room' slug %}"
-        }
-        function getResultListRoomURL(){
-            return "{% url 'result_list_room' slug %}"
-        }
-        function getMainRoomURL(){
-            return "{% url 'main_room' %}"
-        }
-        function getGameOverRoomURL(){
-            return "{% url 'gameover_room' slug %}"
-        }
-    </script>
-
-    {# ЗАГРУЗКА JS - ОБНОВЛЕНИЕ STATUS GAME #}
-    <script src="{% static 'game_1/js/room/temp.js' %}"></script>
+    {# ОПРЕДЕЛИМ УРЛЫ #}
+    {% include '../blocks/urls_js.html' %}
 
     {# ЗАГРУЗКА JS - LOAD СПИСОК ИГРОКОВ #}
     <script src="{% static 'game_1/js/room/waiting_room_test.js' %}"></script>

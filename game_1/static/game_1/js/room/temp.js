@@ -22,36 +22,30 @@ function getStatusAjaxInterval() {
     }, 1000);
 }
 
-
 function relocation(status){
     console.log(status)
     let currentLocation = document.location.href
     console.log(currentLocation)
     let room_location;
     switch(status) {
-        case 'created':
+        case 'waiting_room':
             room_location = getWaitingRoomURL()
             break;
-        case 'start_timer':
-            room_location = getTypingRoomURL()
+        case 'typing_room':
+            // TODO если обычный юзер напечатао раньше адмимна то его будет кидать туда сюда
+            // room_location = getTypingRoomURL()
             break;
-        case 'typing':
-            room_location = getTypingRoomURL()
-            break;
-        case 'waiting':
+        case 'waiting_typing_room':
+            // TODO если админ напечатал раньше обычного юзера то все перекинет сюда
             // room_location = getWaitingTypingRoomURL()
             break;
-        case 'looking':
+        case 'result_room':
             room_location = getResultRoomURL()
             break;
-        case 'resulting':
+        case 'result_list_room':
             room_location = getResultListRoomURL()
             break;
-        case 'ended':
-            room_location = getGameOverRoomURL()
-            break;
-        // TODO наверно на главную
-        case 'deleted':
+        case 'gameover_room':
             room_location = getGameOverRoomURL()
             break;
         default:
@@ -60,7 +54,7 @@ function relocation(status){
             break;
     }
 
-    if (status === 'waiting'){
+    if (status === 'typing_room' || status === 'waiting_typing_room'){
         return;
     }
 

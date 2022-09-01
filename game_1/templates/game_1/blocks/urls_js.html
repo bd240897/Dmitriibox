@@ -1,0 +1,42 @@
+
+{#///////// ОПРЕДЕЛИМ УРЛЫ ///////////////#}
+<script>
+
+    //////// API ////////////
+    function getGameStatusApiURL(){
+        return "{% url 'game_status_API' slug %}"
+    }
+    function getUsersWaitingRoomApiURL(){
+        return "{% url 'waiting_room_API_gatusers' slug %}"
+    }
+    function getUsersWaitingTypingRoomApiURL(){
+        return "{% url 'waiting_typing_room_API_gatusers' slug %}"
+    }
+
+    //////// DJANGO ////////////
+    function getWaitingRoomURL(){
+        return "{% url 'waiting_room' slug %}"
+    }
+    function getTypingRoomURL(){
+        return "{% url 'typing_room' slug %}"
+    }
+    function getWaitingTypingRoomURL(){
+        return "{% url 'waiting_typing_room' slug %}"
+    }
+    function getResultRoomURL(){
+        return "{% url 'result_room' slug %}"
+    }
+    function getResultListRoomURL(){
+        return "{% url 'result_list_room' slug %}"
+    }
+    function getMainRoomURL(){
+        return "{% url 'main_room' %}"
+    }
+    function getGameOverRoomURL(){
+        return "{% url 'gameover_room' slug %}"
+    }
+
+</script>
+
+{# ЗАГРУЗКА JS - ОБНОВЛЕНИЕ STATUS GAME #}
+{#<script src="{% static 'game_1/js/room/temp.js' %}"></script>#}
