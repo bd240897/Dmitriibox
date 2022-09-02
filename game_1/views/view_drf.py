@@ -8,8 +8,9 @@ from ..serializers import *
 
 # //////////////////////////// ApiVIew ////////////////////////////////////////
 
-
 class GameStatusApi(RetrieveAPIView):
+    """ Получить текущий статус комнаты """
+
     serializer_class = GameStatusSerializer
     queryset = GameRoom.objects.all()
     lookup_field = 'room_code'
@@ -41,32 +42,6 @@ class WaitingRoomGetUsersAPI(ListAPIView):
         serializer_gameroom = GameRoomSerializer(queryset_gameroom, many=False)
         return Response({'users': serializer_users.data, 'gameroom': serializer_gameroom.data})
 
-
-class WaitingRoomExitAPI(RoomMixin, APIView):
-    """ API Выход из комнаты """
-
-    def get(self, request, *args, **kwargs):
-        room_code = kwargs["slug"]
-        current_user = request.user
-        self.exit_to_game(room_code=room_code)
-        return Response({'massage': str(current_user) + " вышел из комнаты " + str(room_code)})
-
-
-class WaitingRoomJoinAPI(RoomMixin, APIView):
-    """ API Войти в комнату """
-
-    def get(self, request, *args, **kwargs):
-        room_code = kwargs["slug"]
-        current_user = request.user
-        self.join_to_game(room_code=room_code)
-        return Response({'massage': str(current_user) + " зашел в комнату " + str(room_code)})
-
-
-class WaitingRoomAddBotAPI(ListAPIView):
-    """ Добавить бота в комнату """
-    pass
-
-
 class WaitingTypingRoomGetUsersAPI(RoomMixin, ListAPIView):
     """ Получаем список игроков в typing_room """
 
@@ -87,3 +62,26 @@ class WaitingTypingRoomGetUsersAPI(RoomMixin, ListAPIView):
         queryset_users = self.get_queryset_users()
         serializer_users = UserSerializer(queryset_users, many=True)
         return Response({'users': serializer_users.data})
+
+class WaitingRoomExitAPI(RoomMixin, APIView):
+    """ API Выход из комнаты """
+
+    def get(self, request, *args, **kwargs):
+        self.current_room.exit_to_game(self.request, self.current_user)
+        return Response({'massage': str(self.current_user) + " вышел из комнаты " + str(self.room_code)})
+
+
+class WaitingRoomJoinAPI(RoomMixin, APIView):
+    """ API Войти в комнату """
+
+    def get(self, request, *args, **kwargs):
+        self.current_room.join_to_game(self.request, self.current_user)
+        return Response({'massage': str(self.current_user) + " зашел в комнату " + str(self.room_code)})
+
+
+class WaitingRoomAddBotAPI(ListAPIView):
+    """ Добавить бота в комнату """
+    pass
+
+
+

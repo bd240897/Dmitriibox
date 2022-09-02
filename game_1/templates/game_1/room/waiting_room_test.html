@@ -10,12 +10,15 @@
         <div class="container pt-1 pb-1 h-100">
             <div class="d-flex flex-column justify-content-center align-items-between h-100">
 
-                <div class="waiting-header">
-                    <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Ждем игроков №{{ round }}</h1>
-                </div>
                 <div class="waiting-room-code">
                     <h1 id="pop-room-code" class="pop_instr_1 pop_instr_2 p-2 d-flex justify-content-center bg-success text-white rounded-pill" style="font-weight: bold; font-size: 30px">Комната {{ room_code }}</h1>
                 </div>
+
+                <div class="waiting-header p-2 bg-primary text-white rounded-pill text-center">
+                    <h1 class="" style="font-weight: bold; font-size: 26px"> Вы вошли как {{ user.username }}. </h1>
+                    <h1 class="" style="font-weight: bold; font-size: 26px"> Ждем остальных игроков. </h1>
+                </div>
+
                 {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
                 {% include '../blocks/django_messages.html' %}
 
@@ -44,11 +47,22 @@
                         <h2>Управление:</h2>
                         <a href="#" class="disabled btn btn-primary m-2" >Добавить бота</a>
 
+                        {# ВХОД ВЫХОД DJANGO #}
                         {% if not is_user_in_room and not is_user_owner %}
                             <a id="pop-join" href="{% url 'waiting_room' slug %}?join=1" class=" pop_instr_2 answer_link btn btn-primary m-2 " >Присоединиться к игре</a>
                         {% elif  is_user_in_room and not is_user_owner %}
                             <a href="{% url 'waiting_room' slug %}?exit=1" class="answer_link btn btn-primary m-2 " >Выйти из игры</a>
                         {% endif %}
+
+                        {# ВХОД ВЫХОД API #}
+                        {% if not is_user_in_room and not is_user_owner %}
+                            <a id="waiting_room_API_join" class="pop_instr_2 answer_link btn btn-primary m-2">Присоединиться к игре API</a>
+                            <a id="waiting_room_API_exit" class="answer_link btn btn-primary m-2" style="display: none">Выйти из игры API</a>
+                        {% elif is_user_in_room and not is_user_owner %}
+                            <a id="waiting_room_API_join" class="pop_instr_2 answer_link btn btn-primary m-2">Присоединиться к игре API</a>
+                            <a id="waiting_room_API_exit" class="answer_link btn btn-primary m-2" style="display: none">Выйти из игры API</a>
+                        {% endif %}
+
 
                         {% if is_user_owner or user.is_superuser %}
                             <a href="{% url 'waiting_room' slug %}?deleteplayers=1" class="answer_link btn btn-primary m-2 " >Удалить всех пользователей</a>
@@ -65,15 +79,13 @@
                                 <p class="d-inline"> начнет игру. </p>
                             </div>
                         {% endif %}
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
-    <button type="button" id="example" class="list_example btn btn-primary">example</button>
-
 {% endblock %}
 
 

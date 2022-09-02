@@ -12,6 +12,12 @@
     function getUsersWaitingTypingRoomApiURL(){
         return "{% url 'waiting_typing_room_API_gatusers' slug %}"
     }
+    function joinWaitingTypingRoomApiURL(){
+        return "{% url 'waiting_room_API_join' slug %}"
+    }
+    function exitWaitingTypingRoomApiURL(){
+        return "{% url 'waiting_room_API_exit' slug %}"
+    }
 
     //////// DJANGO ////////////
     function getWaitingRoomURL(){
@@ -35,6 +41,8 @@
     function getGameOverRoomURL(){
         return "{% url 'gameover_room' slug %}"
     }
+
+
 
 </script>
 
