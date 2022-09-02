@@ -22,7 +22,7 @@ urlpatterns_room = [
 ]
 
 urlpatterns_drf = [
-    # ///////////////// ApiView /////////////////////
+    # ///////////////// ApiView ИГРА /////////////////////
     path('gamestatus/<slug:slug>/', GameStatusApi.as_view(), name='game_status_API'),
     path('waiting/<slug:slug>/gatusers/', WaitingRoomGetUsersAPI.as_view(),
          name='waiting_room_API_gatusers'),
@@ -39,8 +39,6 @@ urlpatterns_test = [
     path('find/<slug:slug>', FindMethodsView.as_view(), name='find'),
     re_path('test/', TestView.as_view(), name='test'), #/(?P<find_method_2>^)\d+
     path('test-page/', WaitingRoomTestView.as_view(), name='test-page'),
-    # path('test-api/', GetCurrentUsersAPI.as_view(), name='test-api'),
-    # path('test-api/<slug:slug>', GetCurrentUsersAPI.as_view(), name='test-api'),
 ]
 
 urlpatterns = [
