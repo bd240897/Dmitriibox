@@ -1,6 +1,6 @@
 {% extends 'game_1/base.html' %}
 
-
+{#TODO - заменим на название и номер#}
 {% block title %} gameover_room {% endblock %}
 
 {% block content %}
@@ -21,7 +21,10 @@
                     <div class="col-8">
                         <h2 class="p-2 d-flex justify-content-center rounded-pill" style="font-weight: bold; font-size: 46px; color: orange">Спасибо за игру!</h2>
                         <div class="waiting-typing-done d-flex flex-column pt-2 pb-2">
-                            <a href="{% url 'main_room' %}" class="answer_link btn btn-primary alredy_done__link" >На главную</a>
+                            <a href="{% url 'main_room' %}" class="answer_link btn btn-primary alredy_done__link m-2" >На главную</a>
+                            {% if is_user_owner or user.is_superuser %}
+                                <a href="{% url 'gameover_room' slug %}?delete=1" class="answer_link btn btn-primary m-2">Удалить комнату</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

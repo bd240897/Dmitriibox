@@ -13,4 +13,10 @@ class UserSerializer(serializers.ModelSerializer):
 class GameRoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameRoom
-        fields = ("room_code", "status_game") #"__all__"
+        fields = ("room_code", "status")
+
+class GameStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GameRoom
+        fields = ("room_code", "status")
+        lookup_field = 'room_code'

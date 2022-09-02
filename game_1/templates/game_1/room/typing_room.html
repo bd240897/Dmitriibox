@@ -1,5 +1,8 @@
 {% extends 'game_1/base.html' %}
 
+{% load static %}
+
+{#TODO - заменим на название и номер#}
 {% block title %} typing_room {% endblock %}
 
 {% block content %}
@@ -19,7 +22,7 @@
     <section class="waiting">
         <div class="container pt-1 pb-1 border border-success animation-header">
             <div class="waiting-header">
-                <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Пишем ответы раунда №{{ round }}</h1>
+                <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Пишем ответы раунда №{{ round }} из {{ max_rounds }}</h1>
             </div>
 
             {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
@@ -31,9 +34,9 @@
             </div>
 
             {% if obj_question.img %}
-            <div class="d-flex flex-column justify-content-center align-items-center" >
-                <img src="{{ obj_question.img.url }}" class="img-fluid" alt="..." style="width: 100%; height: auto; max-width: 600px;">
-            </div>
+                <div class="d-flex flex-column justify-content-center align-items-center py-2" >
+                    <img src="{{ obj_question.img.url }}" class="img-fluid" alt="..." style="width: 100%; height: auto; max-width: 600px;">
+                </div>
             {% endif %}
 
             <form method="post">
@@ -49,4 +52,11 @@
 
         </div>
     </section>
+{% endblock %}
+
+{% block user_scripts %}
+
+    {# ОПРЕДЕЛИМ УРЛЫ #}
+    {% include '../blocks/urls_js.html' %}
+
 {% endblock %}

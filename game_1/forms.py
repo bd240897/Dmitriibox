@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django import forms
 
-from game_1.models import Players, AnswerPlayers, GameRoom
+from game_1.models import AnswerPlayers, GameRoom
 
 
 class RegisterUserForm(UserCreationForm):
