@@ -71,5 +71,16 @@
         </div>
     </section>
 
+    <button id="test">test</button>
+
 {% endblock %}
 
+
+{% block user_scripts %}
+    <script>
+        function relocation(status) {
+            console.log('main_room ', status)
+        }
+    </script>
+    <script src="{% static 'game_1/js/room/ws.js' %}"></script>
+{% endblock %}

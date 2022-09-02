@@ -7,6 +7,8 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
+from game_1.channel_logic import send_to_channel_layer
+
 
 class GameRoom(models.Model):
     """Игровая комната"""
@@ -94,10 +96,15 @@ class GameRoom(models.Model):
                            + str(self.room_code) + " изменен на " \
                            + str(self.status)
             messages.success(request, game_massage)
+
+            # отправим статус игры по channels
+            send_to_channel_layer(room_code=self.room_code, msg=self.status)
         elif status not in ALLOWED_STATUS:
             game_massage = "(switch_game_status) Статуса " + str(status) \
                            + " не существует"
             messages.error(request, game_massage)
+
+
 
     def redirect_to_game_status(self, request):
         game_massage = "(redirect_to_game_status) Перенаправление на  " + str(self.status)
