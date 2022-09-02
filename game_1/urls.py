@@ -14,8 +14,7 @@ urlpatterns_room = [
     path('main/', MainRoomView.as_view(), name='main_room'),
     path('waiting/<slug:slug>/', WaitingRoomTestView.as_view(), name='waiting_room'),
     # действия в waiting_room
-    path('waiting/start/<slug:slug>/', StartGameView.as_view(), name='start_game'),
-    path('waiting/rejoin/<slug:slug>/', RejoinGameView.as_view(), name='rejoin_game'),
+    path('rejoin/<slug:slug>/', RejoinGameView.as_view(), name='rejoin_game'),
 
     path('typing/<slug:slug>/', TypingRoomView.as_view(), name='typing_room'),
     path('waiting/typing/<slug:slug>/', WaitingTypingRoomView.as_view(), name='waiting_typing_room'),
@@ -44,7 +43,7 @@ urlpatterns_drf = [
 urlpatterns_test = [
     # ///////////////// TEST /////////////////////
     path('find/<slug:slug>', FindMethodsView.as_view(), name='find'),
-    re_path('find2/', FindMethodsSecondView.as_view(), name='find_2'), #/(?P<find_method_2>^)\d+
+    re_path('test/', TestView.as_view(), name='test'), #/(?P<find_method_2>^)\d+
     path('test-page/', WaitingRoomTestView.as_view(), name='test-page'),
     # path('test-api/', GetCurrentUsersAPI.as_view(), name='test-api'),
     # path('test-api/<slug:slug>', GetCurrentUsersAPI.as_view(), name='test-api'),

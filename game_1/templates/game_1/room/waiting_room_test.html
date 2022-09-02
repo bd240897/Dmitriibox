@@ -13,7 +13,9 @@
                 <div class="waiting-header">
                     <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Ждем игроков №{{ round }}</h1>
                 </div>
-
+                <div class="waiting-room-code">
+                    <h1 id="pop-room-code" class="pop_instr_1 pop_instr_2 p-2 d-flex justify-content-center bg-success text-white rounded-pill" style="font-weight: bold; font-size: 30px">Комната {{ room_code }}</h1>
+                </div>
                 {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
                 {% include '../blocks/django_messages.html' %}
 
@@ -33,7 +35,7 @@
                                 {#                                    <div class="d-inline p-2 mx-1 bg-success text-white">{{ p.player_in_room.username }}</div>#}
                                 {#                                {% endfor %}#}
                             </div>
-                            <button class="waiting-players-there-btn btn"> Обновить список </button>
+                            <button id="pop-list-players" class="pop_instr_1 pop_instr_2 waiting-players-there-btn btn"> Обновить список </button>
                         </div>
                     </div>
 
@@ -43,7 +45,7 @@
                         <a href="#" class="disabled btn btn-primary m-2" >Добавить бота</a>
 
                         {% if not is_user_in_room and not is_user_owner %}
-                            <a href="{% url 'waiting_room' slug %}?join=1" class="answer_link btn btn-primary m-2 " >Присоединиться к игре</a>
+                            <a id="pop-join" href="{% url 'waiting_room' slug %}?join=1" class=" pop_instr_2 answer_link btn btn-primary m-2 " >Присоединиться к игре</a>
                         {% elif  is_user_in_room and not is_user_owner %}
                             <a href="{% url 'waiting_room' slug %}?exit=1" class="answer_link btn btn-primary m-2 " >Выйти из игры</a>
                         {% endif %}
@@ -51,13 +53,13 @@
                         {% if is_user_owner or user.is_superuser %}
                             <a href="{% url 'waiting_room' slug %}?deleteplayers=1" class="answer_link btn btn-primary m-2 " >Удалить всех пользователей</a>
                             <a href="{% url 'waiting_room' slug %}?deleteroom=1" class="answer_link btn btn-primary m-2 " >Удалить комнату</a>
-                            <a href="{% url 'waiting_room' slug %}?startgame=1" class="answer_link btn btn-success m-2 " >Начать игру</a>
+                            <a id="pop-start-game" href="{% url 'waiting_room' slug %}?startgame=1" class="pop_instr_1 answer_link btn btn-success m-2 " >Начать игру</a>
                         {% else %}
                             <div class="waiting-typing-done d-flex flex-column pt-2 pb-2">
                                 Ждем пока создатель комнаты {{ owner }} начнет игру.
                             </div>
                             <div class="waiting-typing-done d-flex flex-column pt-2 pb-2 fw-bold fs-5 text-white justify-content-center align-items-center" style="background-color: orange">
-                            <div class="">
+                            <div id="pop-wait-owner-start" class="pop_instr_2">
                                 <p class="d-inline">Ждем пока создатель комнаты</p>
                                 <p class="d-inline" style="color: red;">{{ owner }}</p>
                                 <p class="d-inline"> начнет игру. </p>
@@ -69,6 +71,9 @@
             </div>
         </div>
     </section>
+
+    <button type="button" id="example" class="list_example btn btn-primary">example</button>
+
 {% endblock %}
 
 
@@ -103,5 +108,12 @@
     {# ЗАГРУЗКА JS - LOAD СПИСОК ИГРОКОВ #}
     <script src="{% static 'game_1/js/room/waiting_room_test.js' %}"></script>
 
+    {% if is_user_owner or user.is_superuser %}
+        {# POPOVER FOR OWNER #}
+        <script type="text/javascript" src="{% static 'game_1/js/room/waiting_room_instruction_1.js' %}"></script>
+    {% else %}
+        {# POPOVER FOR USER #}
+        <script type="text/javascript" src="{% static 'game_1/js/room/waiting_room_instruction_2.js' %}"></script>
+    {% endif %}
 {% endblock %}
 

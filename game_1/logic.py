@@ -21,7 +21,7 @@ class RoomMixin:
         # self.current_room self.current_round self.room_code self.current_user
         self.room_code = kwargs.get('slug')
         self.current_user = request.user
-        if self.is_game_exist():
+        if self.is_room_exist():
             self.current_room = self.get_current_room()
             self.current_round = self.current_room.round
             self.current_room_status = self.current_room.status
@@ -37,51 +37,9 @@ class RoomMixin:
 
         return super().get_context_data(**kwargs)
 
-    def switch_game_status(self, status):
-        """Смена статуса игры"""
-
-        ALLOWED_STATUS = [i[0] for i in GameRoom.CHOICES]
-        if (self.current_room.is_user_owner(self.current_user) or self.current_user.is_superuser) and status in ALLOWED_STATUS:
-            self.current_room.status = status
-            self.current_room.save()
-            game_massage = "(switch_game_status) Статус игры с кодом комнаты " \
-                           + str(self.current_room) + " изменен на " \
-                           + str(self.current_room.status)
-            messages.success(self.request, game_massage)
-        elif status not in ALLOWED_STATUS:
-            game_massage = "(switch_game_status) Статуса " + str(status) \
-                           + " не существует"
-            messages.error(self.request, game_massage)
-
-    # TODO
-    def redirect_to_game_status(self):
-        room_code = self.room_code
-        status = self.current_room_status
-
-        if status == 'created':
-            return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': room_code}))
-        elif status == 'typing':
-            return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': room_code}))
-        elif status == 'waiting':
-            return HttpResponseRedirect(reverse("waiting_typing_room", kwargs={'slug': room_code}))
-        elif status == 'looking':
-            return HttpResponseRedirect(reverse("result_room", kwargs={'slug': room_code}))
-        elif status == 'resulting' or status == 'ended':
-            return HttpResponseRedirect(reverse("result_list_room", kwargs={'slug': room_code}))
-        elif status == 'deleted':
-            return redirect("main_room")
-        else:
-            game_massage = "(redirect_to_game_status) Ошибка статуса " + str(status)
-            messages.error(self.request, game_massage)
-            return redirect("main_room")
-
-    def is_game_exist(self):
+    def is_room_exist(self):
         """Существует ли комната с игрой"""
         return GameRoom.objects.filter(room_code=self.room_code).exists()
-
-    def is_user_in_room(self):
-        """Есть ли пользователь в комнате"""
-        return self.current_room.players.filter(pk=self.current_user.pk).exists()
 
     def get_current_room(self):
         """Получить текущую комнату"""
@@ -104,60 +62,6 @@ class RoomMixin:
             GameRoom.objects.create(room_code=self.room_code, round=1)
             game_massage = "(create_room) Был создана комната с кодом " + str(self.room_code)
             messages.success(self.request, game_massage)
-
-    def delete_all_users(self):
-        """Удалить всх пользователй из игры c кодом"""
-        # TODO API
-        players_in_current_room = self.current_room.players
-        game_massage = "Было удалено " + str(len(players_in_current_room)) + " пользователей игры " + str(
-            self.room_code)
-        messages.success(self.request, game_massage)
-        players_in_current_room.clear()
-
-    def join_to_game(self):
-        """Добавить пользователя к комнате"""
-        # TODO API
-        is_current_user_in_game = self.current_room.players.filter(pk=self.current_user.pk).exists()
-
-        if is_current_user_in_game:
-            game_massage = "(add_user_to_game) Пользователь " + self.current_user.username + " уже есть в игре " + str(
-                self.room_code)
-            messages.error(self.request, game_massage)
-        else:
-            self.current_room.players.add(self.current_user)
-            game_massage = "(add_user_to_game) Пользователь " + self.current_user.username + " был добавлен в игру " + str(
-                self.room_code)
-            messages.success(self.request, game_massage)
-
-    def exit_to_game(self):
-        """Добавить пользователя к комнате"""
-        # TODO API
-        is_current_user_in_game = self.current_room.players.filter(pk=self.current_user.pk).exists()
-        if not is_current_user_in_game:
-            game_massage = "(remove_user_to_game) Пользователя " + self.current_user.username + " нет в игре " + str(
-                self.room_code)
-            messages.error(self.request, game_massage)
-        else:
-            self.current_room.players.remove(self.current_user)
-            game_massage = "(remove_user_to_game) Пользователь " + self.current_user.username + " был удален из игры " + str(
-                self.room_code)
-            messages.success(self.request, game_massage)
-
-    def players_in_game(self):
-        """Выводит игроков в текущей игре с кодом комнаты"""
-        # TODO API
-        return self.current_room.players.all()
-
-    def next_round(self):
-        """Повышаем раунд игры (меняем в БД статус)"""
-
-        self.current_room.round += 1
-        self.current_room.save()
-        self.current_round += 1
-        game_massage = "(next_round) Раунд комнаты с кодом " \
-                       + str(self.current_room) \
-                       + " увеличен до " + str(self.current_round)
-        messages.success(self.request, game_massage)
 
 
 # /////////////////////// ДЕКАРАТОРЫ /////////////////

@@ -4,6 +4,9 @@ from django.contrib import messages
 
 # TODO формить красиво поля БД (имена, related_namd,)
 # TODO добавить сортировку полей в модели по умолчанию
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 
 class GameRoom(models.Model):
     """Игровая комната"""
@@ -16,21 +19,8 @@ class GameRoom(models.Model):
     # при создании игры None, при запуске True, при окончании False
     round = models.IntegerField(blank=True, default=1)
 
-    # TODO стутусы waiting - мешает, gameover - нужен
-    # создана - таймер-начала - печатаем - ждем - смотрим - следущий раунд(печатаем) ... - закончена - удалена
-    # CHOICES_OLD = {
-    #     ('created', 'Игра создана'),
-    #     ('start_timer', 'Таймер начала'),
-    #     ('typing', 'Печатаем ответы'),
-    #     ('waiting', 'Ждем ответы'),
-    #     ('looking', 'Смотрим ответы'),
-    #     ('resulting', 'Вспомним все ответы'),
-    #     ('ended', 'Игра закончена'),
-    #     ('deleted', 'Игра удалена'),
-    # }
-
     CHOICES = {
-        ('main_room', 'Игра создана'),
+        # ('main_room', 'Игра создана'), # Этот статус я не использую
         ('waiting_room', 'Игра создана'),
         ('typing_room', 'Печатаем ответы'),
         ('waiting_typing_room', 'Ждем ответы'),
@@ -40,6 +30,79 @@ class GameRoom(models.Model):
     }
 
     status = models.CharField(max_length=32, default="main_room", blank=True, choices=CHOICES)
+
+    def join_to_game(self, request, user):
+        """Добавить пользователя к комнате"""
+        # TODO API
+        is_current_user_in_game = self.players.filter(pk=user.pk).exists()
+
+        if is_current_user_in_game:
+            game_massage = "(add_user_to_game) Пользователь " + user.username + " уже есть в игре " + str(
+                self.room_code)
+            messages.error(request, game_massage)
+        else:
+            self.players.add(user)
+            game_massage = "(add_user_to_game) Пользователь " + user.username + " был добавлен в игру " + str(
+                self.room_code)
+            messages.success(request, game_massage)
+
+    def exit_to_game(self, request, user):
+        """Добавить пользователя к комнате"""
+        # TODO API
+        is_current_user_in_game = self.players.filter(pk=user.pk).exists()
+        if not is_current_user_in_game:
+            game_massage = "(remove_user_to_game) Пользователя " + user.username + " нет в игре " + str(
+                self.room_code)
+            messages.error(request, game_massage)
+        else:
+            self.players.remove(user)
+            game_massage = "(remove_user_to_game) Пользователь " + user.username + " был удален из игры " + str(
+                self.room_code)
+            messages.success(request, game_massage)
+
+    def players_in_game(self):
+        """Выводит игроков в текущей игре с кодом комнаты"""
+        # TODO API
+        return self.players.all()
+
+    def delete_all_users(self, request):
+        """Удалить всх пользователй из игры c кодом"""
+        # TODO API
+        game_massage = "Было удалено " + str(len(self.players.count())) + \
+                       " пользователей игры " + str(self.room_code)
+        messages.success(request, game_massage)
+        self.players.clear()
+
+    def next_round(self, request):
+        """Повышаем раунд игры (меняем в БД статус)"""
+
+        self.round += 1
+        self.save()
+        game_massage = "(next_round) Раунд комнаты с кодом " \
+                       + str(self.room_code) \
+                       + " увеличен до " + str(self.round)
+        messages.success(request, game_massage)
+
+    def switch_game_status(self, request, user, status):
+        """Смена статуса игры"""
+
+        ALLOWED_STATUS = [i[0] for i in GameRoom.CHOICES]
+        if (self.is_user_owner(user) or user.is_superuser) and status in ALLOWED_STATUS:
+            self.status = status
+            self.save()
+            game_massage = "(switch_game_status) Статус игры с кодом комнаты " \
+                           + str(self.room_code) + " изменен на " \
+                           + str(self.status)
+            messages.success(request, game_massage)
+        elif status not in ALLOWED_STATUS:
+            game_massage = "(switch_game_status) Статуса " + str(status) \
+                           + " не существует"
+            messages.error(request, game_massage)
+
+    def redirect_to_game_status(self, request):
+        game_massage = "(redirect_to_game_status) Перенаправление на  " + str(self.status)
+        messages.success(request, game_massage)
+        return HttpResponseRedirect(reverse(self.status, kwargs={'slug': self.room_code}))
 
     def is_user_in_room(self, user):
         return self.players.filter(pk=user.pk).exists()

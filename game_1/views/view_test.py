@@ -68,10 +68,10 @@ class FindMethodsView(TemplateView):
     #     return super().as_view(cls, **initkwargs)
 
 
-class FindMethodsSecondView(TemplateView):
+class TestView(TemplateView):
     """Проверка реверса"""
 
-    template_name = 'game_1/find_methods.html'
+    template_name = 'game_1/test/test.html'
 
     def get(self, request, *args, **kwargs):
         # kwargs['find_method_2'] = "3333333333"

@@ -41,9 +41,8 @@ class MainRoomView(CreateView):
         if GameRoom.objects.filter(room_code=form_room_code).exists():
             game_massage = "Комната " + str(form_room_code) + " уже существует!"
             messages.error(self.request, game_massage)
-            # TODO редирект куда? уже на существующую игру
             # RejoinGameView
-            # return HttpResponseRedirect(reverse("rejoin_game", kwargs={'slug': self.room_code}))
+            return HttpResponseRedirect(reverse("rejoin_game", kwargs={'slug': form_room_code}))
         # создадим игру (комнату)
         else:
             # создает новую игру status = 'main_room'
@@ -86,19 +85,19 @@ class WaitingRoomTestView(RoomMixin, TemplateView):
             return redirect("main_room")
         # удалить игроков
         elif param_request_delete_players:
-            self.delete_all_users()
+            self.current_room.delete_all_users(self.request)
         # присоединиться к комнате
         elif param_request_join:
-            self.join_to_game()
+            self.current_room.join_to_game(self.request, self.current_user)
         # выйти из комнаты
         elif param_request_exit:
-            self.exit_to_game()
+            self.current_room.exit_to_game(self.request, self.current_user)
         # начать игру
         elif param_request_startgame:
             return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
 
         # Игра status = 'waiting_room'
-        self.switch_game_status(self.name_current_view_room)
+        self.current_room.switch_game_status(self.request, self.current_user, self.name_current_view_room)
 
         return super().get(*args, **kwargs)
 
@@ -106,34 +105,9 @@ class WaitingRoomTestView(RoomMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['is_user_in_room'] = self.current_room.is_user_in_room(self.request.user)
         context['is_user_owner'] = self.current_room.is_user_owner(self.request.user)
-        context['players'] = self.players_in_game()
+        context['players'] = self.current_room.players_in_game()
+        context['room_code'] = self.room_code
         return context
-
-
-class StartGameView(RoomMixin, View):
-    """Начинает игру (чисто редирект)"""
-    #
-    # def get(self, *args, **kwargs):
-    #
-    #     # проверяем есть ли пользователь в комнате
-    #     if self.is_user_in_room():
-    #         game_massage = "Пользователь " + str(self.current_user) + " есть в комнате " + str(self.room_code)
-    #         messages.success(self.request, game_massage)
-    #         # TODO ЭТА ПРОВЕРКА НЕ НУЖНА Т,К, ДАМИН ПО УМОЛЧАНИЮ В КОМНАТЕ - эта проверка нужна для "присиоединитьсяк игре"
-    #
-    #
-    #         return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
-    #     # TODO - а нужно ли проверять есть ли owner в комнате - мб сразу его добавить?
-    #     else:
-    #         game_massage = "Пользователя " + str(self.current_user) \
-    #                        + " нет в комнате " + str(self.room_code)
-    #         messages.error(self.request, game_massage)
-    #         return HttpResponseRedirect(reverse("waiting_room", kwargs={'slug': self.room_code}))
-    pass
-
-class RejoinGameView(RoomMixin, View):
-    pass
-    # TODO
 
 class WaitingRoomDeleteView(View):
     """Удалить пользователя из списка"""
@@ -156,7 +130,7 @@ class TypingRoomView(RoomMixin, CreateView):
     def get(self, request, *args, **kwargs):
 
         # Игра status = 'typing_room'
-        self.switch_game_status(self.name_current_view_room)
+        self.current_room.switch_game_status(self.request, self.current_user, self.name_current_view_room)
 
         return super().get(self, request, *args, **kwargs)
 
@@ -189,7 +163,7 @@ class WaitingTypingRoomView(RoomMixin, TemplateView):
     def get(self, request, *args, **kwargs):
 
         # Игра status = 'waiting_typing_room'
-        self.switch_game_status(self.name_current_view_room)
+        self.current_room.switch_game_status(self.request, self.current_user, self.name_current_view_room)
 
         return super().get(self, request, *args, **kwargs)
 
@@ -227,11 +201,11 @@ class ResultRoomView(RoomMixin, ListView):
                 return HttpResponseRedirect(reverse("result_list_room", kwargs={'slug': self.room_code}))
             # следующий раунд
             else:
-                self.next_round()
+                self.current_room.next_round(self.request)
                 return HttpResponseRedirect(reverse("typing_room", kwargs={'slug': self.room_code}))
 
         # Игра status = 'waiting_typing_room'
-        self.switch_game_status(self.name_current_view_room)
+        self.current_room.switch_game_status(self.request, self.current_user, self.name_current_view_room)
 
         return super().get(self, *args, **kwargs)
 
@@ -275,7 +249,7 @@ class ResultListView(RoomMixin, ListView):
             return HttpResponseRedirect(reverse("result_room", kwargs={'slug': self.room_code}) + "?nexround=1")
 
         # Игра status = 'result_list_room'
-        self.switch_game_status(self.name_current_view_room)
+        self.current_room.switch_game_status(self.request, self.current_user, self.name_current_view_room)
 
         return super().get(self, request, *args, **kwargs)
 
@@ -285,7 +259,6 @@ class ResultListView(RoomMixin, ListView):
         select = []
         for i in range(1, self.current_round+1):
             question = Questions.objects.get(round_for_question=i)
-            print(question, 111)
             obj_answer = AnswerPlayers.objects.filter(room=self.current_room, round_of_answer=i)
             one_obj = {"question": question,
                        "answers": obj_answer
@@ -314,7 +287,37 @@ class GamveoverRoomView(RoomMixin, TemplateView):
             return redirect("main_room")
 
         # Игра status = 'gameover_room'
-        self.switch_game_status(self.name_current_view_room)
+        self.current_room.switch_game_status(self.request, self.current_user, self.name_current_view_room)
 
         return super().get(self, request, *args, **kwargs)
 
+
+class RejoinGameView(RoomMixin, View):
+    """Возвращение в игру (чисто редирект)"""
+
+    def get(self, *args, **kwargs):
+
+        # если комната ожидания то можем присоединиться
+        if self.current_room_status == 'waiting_room':
+            return HttpResponseRedirect(reverse('waiting_room', kwargs={'slug': self.room_code}))
+        # если пользователя нет в комнате
+        elif not self.current_room.is_user_in_room(self.current_user):
+            game_massage = "Игрока " + self.current_user.username + " нет в комнате " + str(self.current_room)
+            messages.error(self.request, game_massage)
+            return HttpResponseRedirect(reverse('main_room'))
+
+        # если пользователь еще не ответил на вопрос
+        current_room_status = self.current_room.status
+        answer_exist = AnswerPlayers.objects.filter(room__room_code=self.current_room,
+                                                    round_of_answer=self.current_round,
+                                                    player=self.current_user).exists()
+
+        if current_room_status == 'waiting_typing_room' and not answer_exist:
+            game_massage = "Вы вернулись в игру " + str(self.current_room) + "со статусом " + str(current_room_status)
+            messages.success(self.request, game_massage)
+            return HttpResponseRedirect(reverse('typing_room', kwargs={'slug': self.room_code}))
+
+        # просто попытка вернуться в комнату
+        game_massage = "Вы вернулись в игру " + str(self.current_room) + "со статусом " + str(current_room_status)
+        messages.success(self.request, game_massage)
+        return HttpResponseRedirect(reverse(current_room_status, kwargs={'slug': self.room_code}))
