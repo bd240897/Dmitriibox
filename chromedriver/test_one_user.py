@@ -1,8 +1,9 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 import time
-from auth_data import vk_password, vk_phone
 import pickle
+from selenium.webdriver.common.by import By
 
 # options
 options = webdriver.ChromeOptions()
@@ -15,43 +16,56 @@ options.add_argument("--disable-blink-features=AutomationControlled")
 
 # headless mode
 # options.add_argument("--headless")
-options.headless = True
+# options.headless = True
 
+path_driver = ".\\chromedriver.exe"
+service = Service(path_driver)
 driver = webdriver.Chrome(
-    executable_path="/home/cain/PycharmProjects/selenium_python/chromedriver/chromedriver",
+    service=service,
     options=options
 )
 
-# "C:\\users\\selenium_python\\chromedriver\\chromedriver.exe"
-# r"C:\users\selenium_python\chromedriver\chromedriver.exe"
+url = "http://127.0.0.1:8000/room/main/"
 
 try:
-    driver.get("https://vk.com/")
-    time.sleep(5)
+    # вошли на главную страницы
+    driver.get(url)
+    time.sleep(1)
 
-    print("Passing authentication...")
-    email_input = driver.find_element_by_id("index_email")
-    email_input.clear()
-    email_input.send_keys(vk_phone)
-    time.sleep(5)
+    # ввели код комнаты в окошко и нашали войти
+    input_room_code = driver.find_element(By.CSS_SELECTOR, "[name='room_code']")
+    time.sleep(1)
 
-    password_input = driver.find_element_by_id("index_pass")
-    password_input.clear()
-    password_input.send_keys(vk_password)
-    time.sleep(3)
-    password_input.send_keys(Keys.ENTER)
+    btn_enter_game = driver.find_element(By.CSS_SELECTOR, "#btn-enter-game")
+    btn_enter_game.click()
+    time.sleep(4)
 
-    # login_button = driver.find_element_by_id("index_login_button").click()
-    time.sleep(10)
-
-    print("Going to the profile page...")
-    profile_page = driver.find_element_by_id("l_pr").click()
-    time.sleep(5)
-
-    print("Start watching the video...")
-    video_block = driver.find_element_by_class_name("VideoPreview__thumbWrap").click()
-    time.sleep(5)
-    print("Finish watching the video...")
+    # room_code_input.clear()
+    # room_code_input.send_keys("SQPQ")
+    #
+    # print("Passing authentication...")
+    # email_input = driver.find_element_by_id("index_email")
+    # email_input.clear()
+    # email_input.send_keys(vk_phone)
+    # time.sleep(5)
+    #
+    # password_input = driver.find_element_by_id("index_pass")
+    # password_input.clear()
+    # password_input.send_keys(vk_password)
+    # time.sleep(3)
+    # password_input.send_keys(Keys.ENTER)
+    #
+    # # login_button = driver.find_element_by_id("index_login_button").click()
+    # time.sleep(10)
+    #
+    # print("Going to the profile page...")
+    # profile_page = driver.find_element_by_id("l_pr").click()
+    # time.sleep(5)
+    #
+    # print("Start watching the video...")
+    # video_block = driver.find_element_by_class_name("VideoPreview__thumbWrap").click()
+    # time.sleep(5)
+    # print("Finish watching the video...")
 
 except Exception as ex:
     print(ex)
