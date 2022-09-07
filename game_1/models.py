@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.contrib import messages
+from django.core.validators import MinLengthValidator
 
 # TODO формить красиво поля БД (имена, related_namd,)
 # TODO добавить сортировку полей в модели по умолчанию
@@ -13,7 +14,7 @@ from game_1.channel_logic import send_to_channel_layer
 class GameRoom(models.Model):
     """Игровая комната"""
 
-    room_code = models.CharField(max_length=4)
+    room_code = models.CharField(max_length=4, validators=[MinLengthValidator(4)])
     create_time = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True, related_name='game_owner')
     # https://django.fun/docs/django/ru/3.1/topics/db/examples/many_to_many/

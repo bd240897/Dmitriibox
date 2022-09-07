@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -27,6 +28,8 @@ class MainRoomView(CreateView):
     form_class = CreateRoomForm
     template_name = 'game_1/room/main_room.html'
 
+    # TODO не работает если не войти
+    # @method_decorator(get_if_room_not_exist())
     def get(self, request, *args, **kwargs):
         return super().get(self, request, *args, **kwargs)
 
@@ -36,6 +39,10 @@ class MainRoomView(CreateView):
 
     def form_valid(self, form):
         form_room_code = form.cleaned_data.get("room_code")
+
+        # если пользователь не залогинился
+        if self.request.user.is_anonymous:
+            return HttpResponseRedirect(reverse("game_login"))
 
         # игра уже существует
         if GameRoom.objects.filter(room_code=form_room_code).exists():

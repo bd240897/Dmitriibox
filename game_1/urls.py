@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
+from rest_framework.routers import DefaultRouter
+
 from .views.views import *
 
 urlpatterns_login = [
@@ -21,6 +23,10 @@ urlpatterns_room = [
     path('gameover/<slug:slug>/', GamveoverRoomView.as_view(), name='gameover_room'),
 ]
 
+router = DefaultRouter()
+router.register(r'game', GameRoomViewSet, basename='game_room')
+print(router.urls)
+
 urlpatterns_drf = [
     # ///////////////// ApiView ИГРА /////////////////////
     path('gamestatus/<slug:slug>/', GameStatusApi.as_view(), name='game_status_API'),
@@ -32,7 +38,23 @@ urlpatterns_drf = [
     path('waiting/<slug:slug>/join/', WaitingRoomJoinAPI.as_view(), name='waiting_room_API_join'),
     path('waiting/<slug:slug>/addbot/', WaitingRoomAddBotAPI.as_view(), name='ting_room_api_addbot'),
 
+    ####### URL FOR VUE ########
+    # Start
+    path('waiting/<slug:slug>/', WaitingRoomAPI.as_view(), name='waiting_room_API'),
+    # Recive Answer
+    path('waiting/<slug:slug>/', TypingRoomAPI.as_view(), name='typing_room_API_recive'),
+    # Continue after watiting
+    path('waiting/typing/<slug:slug>/', WaitingTypingRoomAPI.as_view(), name='waiting_typing_room_API_continue'),
+    # список ответов раунда
+    path('result/<slug:slug>/', ResultRoomAPI.as_view(), name='waiting_typing_room_API_continue'),
+    # список ответов игры
+    path('result/list/<slug:slug>/', ResultListRoomAPI.as_view(), name='waiting_typing_room_API_continue'),
+    # следующий раунд <- result_room
+    # удалить игру
+    path('delete/<slug:slug>/', DeleteRoomAPI.as_view(), name='waiting_typing_room_API_continue'),
 ]
+
+
 
 urlpatterns_test = [
     # ///////////////// TEST /////////////////////
@@ -47,4 +69,7 @@ urlpatterns = [
     path('room/', include(urlpatterns_room)),
     path('api/v1/room/', include(urlpatterns_drf)),
     path('', include(urlpatterns_test)),
+
+    ################# ТЕСТИРУЮ ViewSet ######################
+    path('', include(router.urls)),
 ]

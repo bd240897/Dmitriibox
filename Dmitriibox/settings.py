@@ -42,14 +42,17 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'debug_toolbar',
+    'corsheaders', # заголовки чтоб vue работало
 
     'game_1.apps.Game1Config',
-    'chat'
+    'chat',
+    'start_vue'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # заголовки чтоб vue работало
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -153,3 +156,16 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
+
+############## CORS #################
+# https://www.youtube.com/watch?v=A4SrKBLXg_Q
+# https://stackoverflow.com/questions/35760943/how-can-i-enable-cors-on-django-rest-framework
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+    'http://192.168.37.5:8080',
+]
+
+# import mimetypes
+#
+# mimetypes.add_type("text/javascript", ".js", True)

@@ -22,10 +22,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('game_1.urls')),
     path('chat/', include('chat.urls')),
+    path('vue/', include('start_vue.urls')),
     path('api/v1/drf-auth/', include('rest_framework.urls')),
     path('api/v1/auth/', include('djoser.urls')),  # new
     re_path(r'^auth/', include('djoser.urls.authtoken')),  # new
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Django Debug Toolbar
 if settings.DEBUG:

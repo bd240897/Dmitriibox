@@ -1,10 +1,14 @@
+from rest_framework.decorators import action
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet, GenericViewSet, ModelViewSet
+
 from ..forms import *
 from ..logic import *
 from ..models import *
 from ..serializers import *
+
 
 # //////////////////////////// ApiVIew ////////////////////////////////////////
 
@@ -15,6 +19,7 @@ class GameStatusApi(RetrieveAPIView):
     queryset = GameRoom.objects.all()
     lookup_field = 'room_code'
     lookup_url_kwarg = 'slug'
+
 
 class WaitingRoomGetUsersAPI(ListAPIView):
     """ Получаем список игроков в typing_room + status_game"""
@@ -42,6 +47,7 @@ class WaitingRoomGetUsersAPI(ListAPIView):
         serializer_gameroom = GameRoomSerializer(queryset_gameroom, many=False)
         return Response({'users': serializer_users.data, 'gameroom': serializer_gameroom.data})
 
+
 class WaitingTypingRoomGetUsersAPI(RoomMixin, ListAPIView):
     """ Получаем список игроков в typing_room """
 
@@ -51,8 +57,8 @@ class WaitingTypingRoomGetUsersAPI(RoomMixin, ListAPIView):
         current_round = current_room.round
 
         # получили объект класса Юзер
-        select = AnswerPlayers.objects\
-            .filter(answer__isnull=False,round_of_answer=current_round)\
+        select = AnswerPlayers.objects \
+            .filter(answer__isnull=False, round_of_answer=current_round) \
             .filter(room__room_code=room_code)
         # TODO мб использовать values_list()
         select = [s.player for s in select]
@@ -62,6 +68,7 @@ class WaitingTypingRoomGetUsersAPI(RoomMixin, ListAPIView):
         queryset_users = self.get_queryset_users()
         serializer_users = UserSerializer(queryset_users, many=True)
         return Response({'users': serializer_users.data})
+
 
 class WaitingRoomExitAPI(RoomMixin, APIView):
     """ API Выход из комнаты """
@@ -84,4 +91,73 @@ class WaitingRoomAddBotAPI(ListAPIView):
     pass
 
 
+# //////////////////////////// URL FOR VUE ////////////////////////////////////////
+class WaitingRoomAPI(RoomMixin, APIView):
+    """ API """
 
+    ACTION = {"next_room": "NEXT_ROOM",
+              "start_game": "START_GAME"}
+
+    name_current_view_room = 'waiting_room'
+
+    # def get(self, request, *args, **kwargs):
+    #     return Response({'massage': str(self.current_user) + " зашел в комнату " + str(self.room_code),
+    #                      'next_url': reverse("typing_room", kwargs={'slug': self.room_code})
+    #                      })
+
+    def post(self, request, *args, **kwargs):
+
+        # https://proproprogs.ru/django/drf-bazovyy-klass-apiview-dlya-predstavleniy
+        action = request.data['action']  # {"action": "START_GAME"}
+        if action == "START_GAME":
+            # TODO registration for vue
+            # self.current_room.switch_game_status(self.request, self.current_user, "typing_room")
+            return Response({'massage': "Got msg " + action,
+                             'next_url': reverse("typing_room", kwargs={'slug': self.room_code})
+                             })
+        else:
+            return Response({'error': "undefined action",
+                             })
+
+
+class TypingRoomAPI(RoomMixin, APIView):
+    """ API """
+    pass
+
+
+class WaitingTypingRoomAPI(RoomMixin, APIView):
+    """ API """
+    pass
+
+
+class ResultRoomAPI(RoomMixin, APIView):
+    """ API """
+    pass
+
+
+class ResultListRoomAPI(RoomMixin, APIView):
+    """ API """
+    pass
+
+
+class DeleteRoomAPI(RoomMixin, APIView):
+    """ API """
+
+    def get(self, request, *args, **kwargs):
+        self.delete_room()
+        return Response({'massage': "Deleted room " + str(self.room_code),
+                         })
+
+
+################# ТЕСТИРУЮ ViewSet ######################
+class GameRoomViewSet(ModelViewSet):
+    queryset = GameRoom.objects.all()
+    serializer_class = GameRoomVueSerializer
+
+    @action(methods=['get'], detail=False, url_path='start')
+    def vs_start_game(self, request):
+        return Response({'massage': "vs_start_game"})
+
+    @action(methods=['get'], detail=False, url_path='delete')
+    def vs_delete_room(self, request):
+        return Response({'massage': "vs_start_game"})

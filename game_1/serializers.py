@@ -20,3 +20,10 @@ class GameStatusSerializer(serializers.ModelSerializer):
         model = GameRoom
         fields = ("room_code", "status")
         lookup_field = 'room_code'
+
+
+################# ТЕСТИРУЮ ViewSet ######################
+class GameRoomVueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GameRoom
+        fields = '__all__'

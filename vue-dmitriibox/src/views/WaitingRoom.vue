@@ -1,0 +1,122 @@
+<template>
+  <h1>WaitingRoom</h1>
+  {{ $route.params.room_code }}
+  <section class="waiting vh-100 ">
+    <div class="container pt-1 pb-1 h-100">
+      <div class="d-flex flex-column justify-content-center align-items-between h-100">
+
+        <div class="waiting-room-code">
+          <h1 id="pop-room-code" class="pop_instr_1 pop_instr_2 p-2 d-flex justify-content-center bg-success text-white rounded-pill" style="font-weight: bold; font-size: 30px">Комната {{ room_code }}</h1>
+        </div>
+
+        <div class="waiting-header p-2 bg-primary text-white rounded-pill text-center">
+          <!--          <h1 class="" style="font-weight: bold; font-size: 26px"> Вы вошли как {{ user.username }}. </h1>-->
+          <h1 class="" style="font-weight: bold; font-size: 26px"> Ждем остальных игроков. </h1>
+        </div>
+
+        <div class="waiting-body">
+
+          <div class="waiting-list border border-primary pt-3 pb-3 mb-3 bt-3 p-3">
+            <h2 class="waiting-list-text text-center">Список игроков в лобби</h2>
+            <div class="waiting-player pt-3 pb-3">
+              <!--              {% if not players %}-->
+              <div class="text-center">
+                Пока тут никого нет
+              </div>
+              <!--              {% endif %}-->
+
+              <div id="waitingPlayersThere" class="d-flex align-items-center justify-content-center">
+                <div v-for="player in list_players" :key="player.id" >
+                  <div class="d-inline p-2 mx-1 bg-success text-white"> {{ player.username }} </div>
+                </div>
+              </div>
+              <button id="pop-list-players" class="pop_instr_1 pop_instr_2 waiting-players-there-btn btn"> Обновить список </button>
+            </div>
+          </div>
+
+
+          <div class="waiting-action d-flex flex-column text-center border border-primary pt-1 pb-1">
+            <h2>Управление:</h2>
+            <a href="#" class="disabled btn btn-primary m-2" >Добавить бота</a>
+
+            <!--            {# ВХОД ВЫХОД DJANGO #}-->
+            <!--            {% if not is_user_in_room and not is_user_owner %}-->
+            <a id="pop-join" href="#" class=" pop_instr_2 answer_link btn btn-primary m-2 " >Присоединиться к игре</a>
+            <!--            {% elif  is_user_in_room and not is_user_owner %}-->
+            <a href="#" class="answer_link btn btn-primary m-2 " >Выйти из игры</a>
+            <!--            {% endif %}-->
+
+            <!--            {# ВХОД ВЫХОД API #}-->
+            <!--            {% if not is_user_in_room and not is_user_owner %}-->
+            <a id="waiting_room_API_join" class="pop_instr_2 answer_link btn btn-primary m-2">Присоединиться к игре API</a>
+            <a id="waiting_room_API_exit" class="answer_link btn btn-primary m-2" style="display: none">Выйти из игры API</a>
+            <!--            {% elif is_user_in_room and not is_user_owner %}-->
+            <a id="waiting_room_API_join" class="pop_instr_2 answer_link btn btn-primary m-2">Присоединиться к игре API</a>
+            <a id="waiting_room_API_exit" class="answer_link btn btn-primary m-2" style="display: none">Выйти из игры API</a>
+            <!--            {% endif %}-->
+
+
+            <!--            {% if is_user_owner or user.is_superuser %}-->
+            <a href="#" class="answer_link btn btn-primary m-2 " >Удалить всех пользователей</a>
+            <a href="#" class="answer_link btn btn-primary m-2 " >Удалить комнату</a>
+            <a id="pop-start-game" href="#" class="pop_instr_1 answer_link btn btn-success m-2 " >Начать игру</a>
+            <!--            {% else %}-->
+            <div class="waiting-typing-done d-flex flex-column pt-2 pb-2">
+              Ждем пока создатель комнаты {{ owner }} начнет игру.
+            </div>
+            <div class="waiting-typing-done d-flex flex-column pt-2 pb-2 fw-bold fs-5 text-white justify-content-center align-items-center" style="background-color: orange">
+              <div id="pop-wait-owner-start" class="pop_instr_2">
+                <p class="d-inline">Ждем пока создатель комнаты</p>
+                <p class="d-inline" style="color: red;">{{ owner }}</p>
+                <p class="d-inline"> начнет игру. </p>
+              </div>
+              <!--              {% endif %}-->
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script>
+// import store from '@/store/index.js';
+
+export default {
+  name: "WaitingRoom",
+  data(){
+    return {
+      list_players: '',
+      data: this.$store.state.name
+    }
+  },
+  created(){
+    this.loadPlayers()
+    setInterval(() => {
+      this.loadPlayers()
+    }, 5000)
+    // console.log("created", this.data)
+    // console.log("created", this.store)
+  },
+  methods:{
+    loadPlayers() {
+      $.ajax({
+        url: this.$store.state.waitingRoomPlayersUrlAPI, //"http://127.0.0.1:8000/api/v1/room/waiting/SQPQ/gatusers/",
+        type: "GET",
+        success: (response) => {
+          console.log(response)
+          this.list_players = response.users
+        }
+      })
+    },
+  }
+
+}
+
+
+</script>
+
+<style scoped>
+
+</style>
