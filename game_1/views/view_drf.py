@@ -120,44 +120,48 @@ class WaitingRoomAPI(RoomMixin, APIView):
                              })
 
 
-class TypingRoomAPI(RoomMixin, APIView):
-    """ API """
-    pass
-
-
-class WaitingTypingRoomAPI(RoomMixin, APIView):
-    """ API """
-    pass
-
-
-class ResultRoomAPI(RoomMixin, APIView):
-    """ API """
-    pass
-
-
-class ResultListRoomAPI(RoomMixin, APIView):
-    """ API """
-    pass
-
-
-class DeleteRoomAPI(RoomMixin, APIView):
-    """ API """
-
-    def get(self, request, *args, **kwargs):
-        self.delete_room()
-        return Response({'massage': "Deleted room " + str(self.room_code),
-                         })
-
-
 ################# ТЕСТИРУЮ ViewSet ######################
 class GameRoomViewSet(ModelViewSet):
     queryset = GameRoom.objects.all()
     serializer_class = GameRoomVueSerializer
 
+    ########## waiting_room ##########
+    # /game/start/
     @action(methods=['get'], detail=False, url_path='start')
     def vs_start_game(self, request):
         return Response({'massage': "vs_start_game"})
 
+    # /game/start/
     @action(methods=['get'], detail=False, url_path='delete')
     def vs_delete_room(self, request):
-        return Response({'massage': "vs_start_game"})
+        return Response({'massage': "vs_delete_game"})
+
+    ########## waiting_room ##########
+    @action(methods=['get'], detail=False, url_path='room/waiting')
+    def vs_waiting_room(self, request):
+        return Response({'massage': "vs_waiting_room"})
+
+    ########## typing_room ##########
+    # /game/room/typing/
+    # vs_post_answer
+    @action(methods=['post'], detail=False, url_path='room/typing')
+    def vs_typing_room(self, request):
+        return Response({'massage': "vs_typing_room"})
+
+    ########## waiting_typing_room ##########
+    # /game/room/typing/
+    @action(methods=['post'], detail=False, url_path='room/waiting/typing')
+    def vs_waiting_typing_room(self, request):
+        return Response({'massage': "vs_waiting_typing_room"})
+
+    ########## result_room ##########
+    # /game/room/result/
+    @action(methods=['get'], detail=False, url_path='room/result')
+    def vs_result_room(self, request):
+        return Response({'massage': "vs_result_room"})
+
+    ########## result_list_room ##########
+    # /game/room/result/list
+    @action(methods=['get'], detail=False, url_path='room/result/list')
+    def vs_result_list_room(self, request):
+        return Response({'massage': "vs_result_list_room"})

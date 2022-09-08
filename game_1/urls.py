@@ -41,17 +41,6 @@ urlpatterns_drf = [
     ####### URL FOR VUE ########
     # Start
     path('waiting/<slug:slug>/', WaitingRoomAPI.as_view(), name='waiting_room_API'),
-    # Recive Answer
-    path('waiting/<slug:slug>/', TypingRoomAPI.as_view(), name='typing_room_API_recive'),
-    # Continue after watiting
-    path('waiting/typing/<slug:slug>/', WaitingTypingRoomAPI.as_view(), name='waiting_typing_room_API_continue'),
-    # список ответов раунда
-    path('result/<slug:slug>/', ResultRoomAPI.as_view(), name='waiting_typing_room_API_continue'),
-    # список ответов игры
-    path('result/list/<slug:slug>/', ResultListRoomAPI.as_view(), name='waiting_typing_room_API_continue'),
-    # следующий раунд <- result_room
-    # удалить игру
-    path('delete/<slug:slug>/', DeleteRoomAPI.as_view(), name='waiting_typing_room_API_continue'),
 ]
 
 
