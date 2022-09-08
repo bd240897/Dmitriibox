@@ -28,7 +28,6 @@ incremental==21.3.0
 itypes==1.2.0
 Jinja2==3.1.2
 MarkupSafe==2.1.1
-numpy==1.23.2
 oauthlib==3.2.0
 outcome==1.2.0
 Pillow==9.2.0
@@ -53,6 +52,7 @@ sqlparse==0.4.2
 trio==0.21.0
 trio-websocket==0.9.2
 Twisted==22.4.0
+twisted-iocpsupport==1.0.2
 txaio==22.2.1
 typing_extensions==4.3.0
 tzdata==2022.1
