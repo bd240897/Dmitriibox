@@ -1,5 +1,7 @@
 import functools
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404, HttpResponseRedirect
@@ -90,4 +92,6 @@ def get_if_room_not_exist():
             return func(request, *args, **kwargs)
         return wrapper
     return decorator
+
+
 

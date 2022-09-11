@@ -5,6 +5,7 @@ from ..serializers import *
 
 # //////////////////////////// TESTS ////////////////////////////////////////
 
+
 class FindMethodsView(TemplateView):
     """Узнаем в каком порядке вызываютя методы"""
     """

@@ -1,5 +1,7 @@
+{% load static %}
 
 {#///////// ОПРЕДЕЛИМ УРЛЫ ///////////////#}
+
 <script>
 
     //////// API ////////////
@@ -42,9 +44,16 @@
         return "{% url 'gameover_room' slug %}"
     }
 
-
-
+    {# TODO при использовании chanel мб не пригодится #}
+    {# ЗАГРУЗКА JS - ОБНОВЛЕНИЕ STATUS GAME #}
+    {#<script src="{% static 'game_1/js/room/temp.js' %}"></script>#}
 </script>
 
-{# ЗАГРУЗКА JS - ОБНОВЛЕНИЕ STATUS GAME #}
-{#<script src="{% static 'game_1/js/room/temp.js' %}"></script>#}
+{# TODO а нужен ли админу веб соекет? скорее всего нет! И можно обойтись без этого. Просто его не добавлять в сокет. #}
+{% if is_user_owner or user.is_superuser %}
+    <script src="{% static 'game_1/js/room/relocation_owner.js' %}"></script>
+{% else %}
+    <script src="{% static 'game_1/js/room/relocation_user.js' %}"></script>
+{% endif %}
+
+<script src="{% static 'game_1/js/room/ws.js' %}"></script>

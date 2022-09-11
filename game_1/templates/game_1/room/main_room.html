@@ -61,7 +61,7 @@
                             {{ form.room_code }}
                         </div>
                         <div class="col-auto">
-                            <button type="submit" class="btn btn-primary mb-3">Войти в комнату</button>
+                            <button id="btn-enter-game" type="submit" class="btn btn-primary mb-3">Войти в комнату</button>
                         </div>
                         {% csrf_token %}
                     </form>
@@ -71,5 +71,16 @@
         </div>
     </section>
 
+    <button id="test">test</button>
+
 {% endblock %}
 
+
+{% block user_scripts %}
+    <script>
+        function relocation(status) {
+            console.log('main_room ', status)
+        }
+    </script>
+    <script src="{% static 'game_1/js/room/ws.js' %}"></script>
+{% endblock %}
