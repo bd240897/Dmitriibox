@@ -1,6 +1,5 @@
 <template>
   <h1>WaitingRoom</h1>
-  {{ $route.params.room_code }}
   <section class="waiting vh-100 ">
     <div class="container pt-1 pb-1 h-100">
       <div class="d-flex flex-column justify-content-center align-items-between h-100">
@@ -84,7 +83,7 @@
 // import store from '@/store/index.js';
 
 export default {
-  name: "WaitingRoom",
+  name: "WaitingRoomOld",
   data(){
     return {
       list_players: '',

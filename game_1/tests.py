@@ -6,10 +6,9 @@ from selenium.webdriver.common.keys import Keys
 import time
 import pickle
 from selenium.webdriver.common.by import By
-import numpy as np
 from selenium.webdriver.firefox.webdriver import WebDriver
 
-
+# TODO unused
 class MySeleniumTests(StaticLiveServerTestCase):
 
     @classmethod

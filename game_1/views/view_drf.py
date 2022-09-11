@@ -92,6 +92,8 @@ class WaitingRoomAddBotAPI(ListAPIView):
 
 
 # //////////////////////////// URL FOR VUE ////////////////////////////////////////
+
+# TODO не используется удалить?
 class WaitingRoomAPI(RoomMixin, APIView):
     """ API """
 

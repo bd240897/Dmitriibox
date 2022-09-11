@@ -1,11 +1,10 @@
 <template>
-  WaitingTypingRoom
-  {{ $route.params.room_code }}
+  <h1>ResultListRoom</h1>
 </template>
 
 <script>
 export default {
-  name: "WaitingTypingRoom"
+  name: "ResultListRoom"
 }
 </script>
 

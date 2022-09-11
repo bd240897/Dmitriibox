@@ -29,6 +29,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         message = response.get("message", None)
 
         # можно добваить обработку if avtion == Move...
+        if action == "CLOSE_SOCKET":
+            await self.close()
 
         # Send message to room group
         await self.channel_layer.group_send(

@@ -9,3 +9,11 @@ def send_to_channel_layer(room_code='SQPQ', msg='AAAAA1111'):
         'message': msg,
         'action': 'MOVE'
     })
+
+
+def close_socket(room_code='SQPQ'):
+    layer = get_channel_layer()
+    async_to_sync(layer.group_send)(room_code, {
+        'type': 'chat_message',
+        'action': 'CLOSE_SOCKET'
+    })

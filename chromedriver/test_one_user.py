@@ -4,7 +4,7 @@ from selenium.webdriver.common.keys import Keys
 import time
 import pickle
 from selenium.webdriver.common.by import By
-import numpy as np
+import random
 
 # https://www.youtube.com/watch?v=Myl8Br5aRf4&list=PLqGS6O1-DZLp1kgiQNpueIMCHRNzgHa1r
 # options
@@ -32,8 +32,9 @@ driver = webdriver.Chrome(
 # https://www.youtube.com/watch?v=cInWsj199Kk&list=PLqGS6O1-DZLp1kgiQNpueIMCHRNzgHa1r&index=5
 
 class TestGame:
+
     # https://docs.djangoproject.com/en/4.1/topics/testing/tools/
-    room_code = np.random.choice(['A', "B", "C", "D", "E", "F"], size=4)
+    room_code = random.choices(['A', "B", "C", "D", "E", "F"]*3, k=4)
 
     def __init__(self):
         print(self.room_code)

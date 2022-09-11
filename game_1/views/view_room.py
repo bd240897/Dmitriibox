@@ -290,6 +290,7 @@ class GamveoverRoomView(RoomMixin, TemplateView):
         # удалить игру
         param_request_delete = self.request.GET.get("delete", 0)
         if param_request_delete:
+            close_socket(room_code=self.room_code)
             self.delete_room()
             return redirect("main_room")
 

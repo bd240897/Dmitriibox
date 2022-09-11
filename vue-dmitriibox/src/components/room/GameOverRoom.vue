@@ -1,11 +1,10 @@
 <template>
-  ResultListRoom
-  {{ $route.params.room_code }}
+  <h1>GameOverRoom</h1>
 </template>
 
 <script>
 export default {
-  name: "ResultListRoom"
+  name: "GameOverRoom"
 }
 </script>
 

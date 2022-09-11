@@ -24,6 +24,7 @@ urlpatterns = [
     path('chat/', include('chat.urls')),
     path('vue/', include('start_vue.urls')),
     path('api/v1/drf-auth/', include('rest_framework.urls')),
+    # DJOSER
     path('api/v1/auth/', include('djoser.urls')),  # new
     re_path(r'^auth/', include('djoser.urls.authtoken')),  # new
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

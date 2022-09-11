@@ -8,7 +8,7 @@ from django.core.validators import MinLengthValidator
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from game_1.channel_logic import send_to_channel_layer
+from game_1.channel_logic import send_to_channel_layer, close_socket
 
 
 class GameRoom(models.Model):

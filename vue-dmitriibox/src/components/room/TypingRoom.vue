@@ -1,6 +1,5 @@
 <template>
   <h1>TypingRoom</h1>
-  {{ $route.params.room_code }}
   {{ api_msg.massage }}
 </template>
 

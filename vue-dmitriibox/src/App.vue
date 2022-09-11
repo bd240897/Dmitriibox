@@ -4,13 +4,9 @@
     <router-link to="/">Home</router-link> | <!-- это ссылка местного фремворка межлу странцами -->
     <router-link to="/about">About</router-link> |
     <!--    https://v3.router.vuejs.org/ru/guide/essentials/named-routes.html-->
-    <router-link :to="{ name: 'MainRoom', params: { room_code: 'SQPQ' }}">MainRoom</router-link> |
-    <router-link :to="{ name: 'WaitingRoom', params: { room_code: 'SQPQ' }}">WaitingRoom</router-link> |
-    <router-link :to="{ name: 'TypingRoom', params: { room_code: 'SQPQ' }}">TypingRoom</router-link> |
-    <router-link :to="{ name: 'WaitingTypingRoom', params: { room_code: 'SQPQ' }}">WaitingTypingRoom</router-link> |
-    <router-link :to="{ name: 'ResultRoom', params: { room_code: 'SQPQ' }}">ResultRoom</router-link> |
-    <router-link :to="{ name: 'ResultListRoom', params: { room_code: 'SQPQ' }}">ResultListRoom</router-link> |
-    <router-link :to="{ name: 'GameOverRoom', params: { room_code: 'SQPQ' }}">GameOverRoom</router-link> |
+    <router-link :to="{ name: 'MainRoom'}">MainRoom</router-link> |
+    <router-link :to="{ name: 'GameRooms', params: { roomCode: 'SQPQ' }}">GameRooms</router-link> |
+    <router-link :to="{ name: 'Login'}">Login</router-link> |
   </nav>
   <router-view/>
 </template>
