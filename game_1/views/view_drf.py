@@ -1,5 +1,8 @@
+import json
+
 from rest_framework.decorators import action
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet, GenericViewSet, ModelViewSet
@@ -123,7 +126,7 @@ class WaitingRoomAPI(RoomMixin, APIView):
 
 
 ################# ТЕСТИРУЮ ViewSet ######################
-class GameRoomViewSet(ModelViewSet):
+class GameRoomViewSet(RoomMixin, ModelViewSet):
     queryset = GameRoom.objects.all()
     serializer_class = GameRoomVueSerializer
 
@@ -148,7 +151,25 @@ class GameRoomViewSet(ModelViewSet):
     # vs_post_answer
     @action(methods=['post'], detail=False, url_path='room/typing')
     def vs_typing_room(self, request):
-        return Response({'massage': "vs_typing_room"})
+        current_user = self.request.user
+        if current_user.is_anonymous:
+            return Response({'error': "User is anonymous"})
+
+        name_current_view_room = 'typing_room'
+        answer = request.data.get('answer')
+        room_code = request.data.get('room_code')
+
+        current_room = GameRoom.objects.get(room_code=room_code)
+
+        current_room.switch_game_status(self.request, current_user, name_current_view_room)
+        AnswerPlayers.objects.create(player=current_user,
+                                     answer=answer,
+                                     round_of_answer=current_room.round,
+                                     room=current_room)
+
+        return Response({'success': "Massage sent",
+                         'massage': "vs_typing_room",
+                         'echo': JSONRenderer().render(dict(request.data))})
 
     ########## waiting_typing_room ##########
     # /game/room/typing/

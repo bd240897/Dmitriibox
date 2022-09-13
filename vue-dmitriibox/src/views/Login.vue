@@ -5,7 +5,6 @@
     <p>auth_token = {{auth_token}}</p>
     <p>username = {{username}}</p>
     <p>auth = {{ auth }}</p>
-    <p>temp = {{ temp }}</p>
   </div>
 
   <div>
@@ -28,7 +27,7 @@ export default {
       login: 'amid',
       password: '1',
       auth_token: '',
-      username: '',
+      // username: this.$store.username,
     }
   },
   // TODO разница между mounted and crated???
@@ -36,11 +35,7 @@ export default {
 
   },
   watch:{
-    auth: function() {
-      // https://v3.ru.vuejs.org/ru/api/options-lifecycle-hooks.html#mounted
-      // TODO delete
-      console.log('changed');
-    }
+
   },
 
   computed:{
@@ -54,6 +49,10 @@ export default {
         console.log("auth full")
         return !!sessionStorage.getItem('auth_token')
       }
+    },
+    username() {
+      console.log('computed', this.$store.state.username)
+      return this.$store.state.username
     },
   },
   methods: {
@@ -98,7 +97,7 @@ export default {
         success: (response) => {
           sessionStorage.removeItem("auth_token")
           this.auth_token = ''
-          this.username = ''
+          this.$store.state.username = ''
           this.removeAjaxSetup()
           console.log("(logout) Текущий auth_token удален из sessionStorage")
         },
@@ -115,8 +114,8 @@ export default {
         headers: {'Authorization': "Token " + sessionStorage.getItem('auth_token')},
         success: (response) => {
           console.log(response)
-          this.username = response.username
-          console.log("(getUsername) Имя " + response.username + " записано в перменную username")
+          this.$store.state.username = response.username
+          console.log("(getUsername) Имя " + this.$store.username + " записано в store")
         },
         error: (response) => {
           alert("(getUsername) Ошибка получения username", response)

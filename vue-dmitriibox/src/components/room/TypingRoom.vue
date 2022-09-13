@@ -1,6 +1,16 @@
 <template>
   <h1>TypingRoom</h1>
-  {{ api_msg.massage }}
+
+  <div>{{this.$store.state.name}}</div>
+
+
+  <div>
+    <p>{{ form.textarea }}</p>
+    <textarea v-model="form.textarea"
+              :rows="4"
+              placeholder="Введите текст сообщения"></textarea>
+    <div><button class="btn-send" @click="sendAnswer">Отправить</button></div>
+  </div>
 </template>
 
 <script>
@@ -8,28 +18,39 @@ export default {
   name: "TypingRoom",
   data() {
     return {
-      api_msg: '',
+      form: {
+        textarea: '',
+      },
+      username: '',
+      roomCode: 'SQPQ',
+      previous_room: 'waiting_room',
+      current_room: 'typing_room',
+      next_room: 'waiting_typing_room'
     }
   },
   created() {
-    this.loadMovie()
+
   },
   methods: {
-
-    // отправить POST запрос на API
-    // https://learn.javascript.ru/fetch
-    async loadMovie() {
-      this.api_msg  = await fetch(`http://127.0.0.1:8000/api/v1/room/waiting/SQPQ/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({"action": "START_GAME"})
-      }).then(response => response.json());
-    }
-
-  }
+    sendAnswer(){
+      $.ajax({
+        url:  "http://127.0.0.1:8000/game/room/typing/",
+        type: "POST",
+        dataType: 'json',
+        data: {
+          room_code: this.roomCode,
+          answer: this.form.textarea,
+          username: this.username},
+        success: (response) => {
+          console.log(response)
+        }
+      })
+    },
+  },
 }
+
+
+
 </script>
 
 <style scoped>
