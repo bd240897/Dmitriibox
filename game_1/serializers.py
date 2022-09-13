@@ -21,9 +21,19 @@ class GameStatusSerializer(serializers.ModelSerializer):
         fields = ("room_code", "status")
         lookup_field = 'room_code'
 
-
-################# ТЕСТИРУЮ ViewSet ######################
+################# ТЕСТИРУЮ Vue ######################
 class GameRoomVueSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameRoom
         fields = '__all__'
+
+class AnswerPlayersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnswerPlayers
+        fields = '__all__'
+
+class QuestionsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Questions
+        fields = '__all__'
+
