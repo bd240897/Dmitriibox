@@ -6,44 +6,88 @@
 {% block title %} main_room {% endblock %}
 
 {% block content %}
+    <style>
+        /* ЗАГОЛОВОК СТРАНИЦЫ */
+        .header__text{
+            font-weight: bold; 
+            font-size: 26px; 
+        }
+
+        /* ОПОВЕЩЕНИЯ ДЖАНГИ */
+        /* pass */
+        
+        /* ВЫ ВОШЛИ КАК */
+        .user__container{
+            background-color: cornsilk; 
+            font-weight:bold; 
+            font-size: 20px; 
+            color: black; 
+            border-radius: 50px;"
+        }
+        .user__joined__username{
+            color: red;
+        }
+
+        /* ОПИСАНИЕ ИГРЫ */
+        .description__text{
+            background-color: cornsilk; 
+            font-weight:bold;
+             font-size: 20px; 
+             color: black; 
+             height: 200px; 
+             border-radius: 50px;
+        }
+
+        /* ПРАВИЛА ИГРЫ  */
+        /* pass */
+
+        /* ВОЙТИ В КОМНАТУ */
+        /* pass1 */
+    </style>
+
+
     <section class="main-room vh-100">
         <div class="container pt-1 pb-1 h-100">
             <div class="d-flex flex-column justify-content-center align-items-between h-100">
 
-                {# ЗАГОЛОВОК СТРАНИЦЫ #}
+                <!-- ЗАГОЛОВОК СТРАНИЦЫ -->
 
-                <div class="main-room-header py-1">
-                    <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Игра #1</h1>
+                <div class="header py-1">
+                    <h1 class="header__text p-2 d-flex justify-content-center bg-primary text-white rounded-pill">Игра #1</h1>
                 </div>
 
-                {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
+                <!-- ОПОВЕЩЕНИЯ ДЖАНГИ -->
 
                 {% include '../blocks/django_messages.html' %}
 
-                {# ВЫ ВОШЛИ КАК #}
+                <!-- ВЫ ВОШЛИ КАК -->
 
-                <div class="main-room-user py-1">
-                    <h2 class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 20px; color: black; border-radius: 50px;">
+                <div class="user py-1">
+                    <div class="user__container p-2 d-flex justify-content-center align-items-center">
                         {% if user.is_authenticated %}
-                            <div>Вы вошли как:&nbsp;</div>
-                            <div style="color: red"> {{ user.username }}</div>
+                        <div class="user__joined">
+                            <span class="user__joined__text">Вы вошли как:&nbsp;</span>
+                            <span class="user__joined__username"> {{ user.username }}</span>
+                        </div>
                         {% else %}
-                            <div>Вы не вошли в систему&nbsp;</div>
+                        <div class="user__nojoined"></div>
+                            <div class="user__nojoined__text">Вы не вошли в систему&nbsp;</div>
+                        </div>
                         {% endif %}
-                    </h2>
+                    </div>
                 </div>
 
-                {# ЛПИСАНИЕ ИГРЫ #}
+                <!-- ОПИСАНИЕ ИГРЫ -->
 
-                <div class="main-room-description py-1">
-                    <h1 class="p-2 d-flex justify-content-center align-items-center" style="background-color: cornsilk; font-weight:bold; font-size: 20px; color: black; height: 200px; border-radius: 50px;">Краткое поисание тут.Краткое поисание тут.Краткое поисание тут</h1>
+                <div class="description py-1">
+                    <h1 class="description__text p-2 d-flex justify-content-center align-items-center">Краткое поисание тут.Краткое поисание тут.Краткое поисание тут</h1>
                 </div>
 
-                {# ПРАВИЛА ИГРЫ #}
+                <!-- ПРАВИЛА ИГРЫ -->
 
-                <div class="main-room-rules py-1">
+                <div class="rules py-1">
                     <div class="d-grid gap-2">
-                        <button class="btn btn-primary h-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                        <button id="btn-rules" class="btn btn-primary h-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
                             Правила игры
                         </button>
                     </div>
@@ -53,25 +97,22 @@
                     </div>
                 </div>
 
-                {# ВОЙТИ В КОМНАТУ #}
+                <!-- ВОЙТИ В КОМНАТУ -->
 
-                <div class="d-flex flex-column justify-content-center align-items-center py-2">
-                    <form class="row g-3" method="post">
-                        <div class="col-auto">
+                <div class="enter-game d-flex flex-column justify-content-center align-items-center py-2">
+                    <form class="enter-game__form row g-3" method="post">
+                        <div class="enter-game__input col-auto">
                             {{ form.room_code }}
                         </div>
-                        <div class="col-auto">
+                        <div class="enter-game__btn col-auto">
                             <button id="btn-enter-game" type="submit" class="btn btn-primary mb-3">Войти в комнату</button>
                         </div>
                         {% csrf_token %}
                     </form>
-                    {#                    <a href="{% url 'waiting_room' slug %}?create=1" class="answer_link btn btn-success m-2 alredy_done__link" >Играть</a>#}
                 </div>
             </div>
         </div>
     </section>
-
-    <button id="test">test</button>
 
 {% endblock %}
 

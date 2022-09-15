@@ -7,7 +7,10 @@
 
 {% block content %}
     <style>
-        .animation-header {
+
+        /* АНИМАЦИЯ */
+
+        .animation-container {
             opacity: 0;
             animation: ani 2.5s forwards;
         }
@@ -16,35 +19,68 @@
             0% {opacity: 0;}
             100% {opacity: 1;}
         }
+
+        /* ЗАГОЛОВОК  */
+        .header__text{
+            font-weight: bold; 
+            font-size: 26px;
+        }
+
+        /* ОПОВЕЩЕНИЯ ДЖАНГИ */
+        /* pass1 */
+
+        /* ВОПРОС  */
+        .question{
+            background-color: #f5d060; 
+            border-radius: 20px;
+        }
+        /* TODO check */
+        .question__img img{
+            width: 100%; 
+            height: auto; 
+            max-width: 600px;
+        }
+        /* ВОЙТИ В КОМНАТУ */
+        /* pass1 */
+
     </style>
 
 
-    <section class="waiting">
-        <div class="container pt-1 pb-1 border border-success animation-header">
-            <div class="waiting-header">
-                <h1 class="p-2 d-flex justify-content-center bg-primary text-white rounded-pill" style="font-weight: bold; font-size: 26px">Пишем ответы раунда №{{ round }} из {{ max_rounds }}</h1>
+    <section class="typing-room">
+        <div class="container pt-1 pb-1 border border-success animation-container">
+
+            <!-- ЗАГОЛОВОК -->
+
+            <div class="header">
+                <h1 class="header__text p-2 d-flex justify-content-center bg-primary text-white rounded-pill">Пишем ответы раунда №{{ round }} из {{ max_rounds }}</h1>
             </div>
 
-            {# ОПОВЕЩЕНИЯ ДЖАНГИ #}
+            <!-- ОПОВЕЩЕНИЯ ДЖАНГИ -->
+
             {% include '../blocks/django_messages.html' %}
+            
+            <!-- ВОПРОС -->
 
-            <div class="results-answer pt-2 pb-2" style="background-color: #f5d060; border-radius: 20px;">
-                <h2 class="text-center">Вопрос:</h2>
-                <h2 class="text-center">{{ obj_question.question }}</h2>
+            <div class="question pt-2 pb-2">
+                <h2 class="question__text text-center">Вопрос:</h2>
+                <h2 class="question_text text-center">{{ obj_question.question }}</h2>
+
+                {% if obj_question.img %}
+                <div class="question__img d-flex flex-column justify-content-center align-items-center py-2" >
+                    <img src="{{ obj_question.img.url }}" class="img-fluid" alt="...">
+                </div>
+                {% endif %}
             </div>
 
-            {% if obj_question.img %}
-                <div class="d-flex flex-column justify-content-center align-items-center py-2" >
-                    <img src="{{ obj_question.img.url }}" class="img-fluid" alt="..." style="width: 100%; height: auto; max-width: 600px;">
-                </div>
-            {% endif %}
 
-            <form method="post">
-                <div class="mb-3">
+            <!-- ФОРМА ОТВЕТА -->
+
+            <form class="send-form" method="post">
+                <div class="send-form__answer mb-3">
                     <label for="answer" class="form-label">Ответ</label>
                     {{ form.answer }}
                 </div>
-                <div class="d-grid gap-2">
+                <div class="send-form__btn d-grid gap-2">
                     <button type="submit" class="btn btn-primary btn-lg" value="Submit">Отправить</button>
                 </div>
                 {% csrf_token %}
