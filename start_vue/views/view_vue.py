@@ -1,12 +1,10 @@
 import json
-
 from rest_framework.decorators import action
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet, GenericViewSet, ModelViewSet
-
 from game_1.logic import *
 from game_1.models import *
 from game_1.serializers import *
