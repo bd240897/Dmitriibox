@@ -159,14 +159,16 @@ CHANNEL_LAYERS = {
 }
 
 ############## CORS #################
+# TODO delete it
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 # https://www.youtube.com/watch?v=A4SrKBLXg_Q
 # https://stackoverflow.com/questions/35760943/how-can-i-enable-cors-on-django-rest-framework
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
     'http://127.0.0.1:8080',
     'http://192.168.37.5:8080',
-    # TODO delete it
-    '*',
+
 ]
 
 # import mimetypes
