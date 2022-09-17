@@ -5,6 +5,8 @@ import MainRoom from "@/views/MainRoom";
 import store from '../store'
 import GameRooms from "@/views/GameRooms";
 import Login from "@/views/Login";
+import test_resize from "@/views/test_resize";
+import test_mixins from "@/views/test_mixins";
 
 const routes = [
   {
@@ -13,17 +15,17 @@ const routes = [
     component: HomeView
   },
   {
-    path: store.state.roomStartURL + '/main',
+    path: '/vue/room' + '/main',
     name: 'MainRoom',
     component: MainRoom
   },
   {
-    path: store.state.roomStartURL + '/room/:roomCode',
-    name: 'GameRooms',
+    path: '/vue/room' + '/game',
+    name: 'GameRoom',
     component: GameRooms
   },
   {
-    path: '/vue' + '/login',
+    path: '/vue/room' + '/login',
     name: 'Login',
     component: Login
   },
@@ -34,7 +36,18 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+  },
+  /////////////////////// TEST /////////////////////////////
+  {
+    path: '/test_resize',
+    name: 'test_resize',
+    component: test_resize
+  },
+  {
+    path: '/test_mixins',
+    name: 'test_mixins',
+    component: test_mixins
+  },
 ]
 
 const router = createRouter({

@@ -1,7 +1,7 @@
 <template>
   GameRooms
-  {{ $route.params.roomCode }}
-  <h6>WebSocket gameStatus = {{ gameStatus }}</h6>
+  <Navigation/>
+
 
   <!--Тут рендерятся комнаты-->
   <div class="rooms-block">
@@ -11,12 +11,6 @@
     <ResultRoom v-if="gameStatus === 'result_room'"/> <!-- gameStatus === 'result_room' -->
     <ResultListRoom v-if="gameStatus === 'result_list_room'"/> <!-- gameStatus === 'result_list_room' -->
     <GameOverRoom v-if="gameStatus === 'gameover_room'"/> <!-- gameStatus === 'gameover_room' -->
-  </div>
-
-  <div>
-    <div>{{this.$store.state.nameCurrentRoom}}</div>
-    <button v-on:click="toPreviousRoom">Previous room</button>
-    <button v-on:click="toNextRoom">Next room</button>
   </div>
 
   <!-- Тут подключается ws -->
@@ -33,10 +27,13 @@ import WaitingTypingRoom from "@/components/room/WaitingTypingRoom";
 import ResultListRoom from "@/components/room/ResultListRoom";
 import GameOverRoom from "@/components/room/GameOverRoom";
 import WebSocket from "@/components/WebSocket";
+import Navigation from "@/components/Navigation";
 
 export default {
   name: "GameRooms",
-  components: {WebSocket, GameOverRoom, ResultListRoom, WaitingTypingRoom, WaitingRoom, TypingRoom, ResultRoom},
+  components: {
+    Navigation,
+    WebSocket, GameOverRoom, ResultListRoom, WaitingTypingRoom, WaitingRoom, TypingRoom, ResultRoom},
   data(){
     return {
       roomCode: '',
@@ -51,18 +48,7 @@ export default {
 
   },
   methods:{
-    // ПЕРЕКЛЮЧЕНИЕ КОМНАТ
-    toPreviousRoom() {
-      console.log('1')
-      this.$store.state.toPreviousRoom()
-    },
-    toNextRoom() {
-      console.log('2')
-      this.$store.state.toNextRoom()
-    },
-    getGameStatus(){
-      // ***Получает текущий статус игры***
-    },
+
 
   },
 

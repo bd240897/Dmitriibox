@@ -1,0 +1,166 @@
+<head>
+    <title> result </title>
+</head>
+
+<html>
+<body>
+    <style>
+        /* АНИМАЦИЯ */
+        @keyframes wipe-enter {
+            0% {
+                transform: scale(0, .025);
+            }
+            50% {
+                transform: scale(1, .025);
+            }
+        }
+
+        .square {
+            animation-name: wipe-enter;
+            animation-duration: 1s;
+            animation-iteration-count: 1;
+        }
+
+    /* ЗАГОЛОВОК */
+    .header__text{
+        font-weight: bold;
+        font-size: 26px;
+    }
+
+    /* ОПОВЕЩЕНИЯ ДЖАНГИ */
+    /* pass */
+
+    /* ВОПРОС */
+    .question{
+        background-color: #f5d060; 
+        border-radius: 20px;
+    }
+    .question_img img{
+        width: 100%; 
+        height: auto; 
+        max-width: 600px;
+    }
+    /* ОТВЕТЫ */
+    .answer__header{
+        font-weight: bold; 
+        font-size: 26px;
+    }
+    /* TODO  сделать модификатором или поискать в бустрапе*/
+    .answer__header__username{
+        color: red;
+    }
+    .answer__text{
+        background-color: cornsilk; 
+        font-weight:bold; 
+        font-size: 26px; 
+        color: red; 
+        height: 200px; 
+        border-radius: 50px;
+    }
+    .right-answer__text{
+        background-color: rgba(255,255,0,0.5); 
+        font-weight:bold; 
+        font-size: 26px; 
+        color: red; height: 
+        200px; border-radius: 50px;
+
+    }
+    .right-answer__header{
+        font-weight: bold; 
+        font-size: 26px;
+    }
+    /* КНОПКИ УПРАВЛЕНИЯ */
+    .waiting-owner__body__owner{
+       color: red;
+    }
+    .waiting-owner__body{
+        background-color: orange;
+    }
+
+    </style>
+
+
+    <section class="resul-room">
+        <div class="container pt-1 pb-1">
+
+            <!-- ЗАГОЛОВОК -->
+
+            <div class="header">
+                <h1 class="header__text p-2 d-flex justify-content-center bg-primary text-white rounded-pill">Результаты раунда round из max_rounds</h1>
+            </div>
+
+            <!-- ОПОВЕЩЕНИЯ ДЖАНГИ -->
+            <div class="messages">
+                <div class="massage__success alert alert-success" role="alert">
+                    some text
+                </div>
+                <div class="massage__danger waiting-massage alert alert-danger" role="alert">
+                    some text
+                </div>
+            </div>
+
+            <!-- ВОПРОС -->
+
+            <div class="question pt-2 pb-2">
+                <h1 class="question_text text-center">Вопрос был:</h1>
+                <h1 class="question_text text-center">obj_question.question</h1>
+
+                <div class="question_img d-flex flex-column justify-content-center align-items-center py-2" >
+                    <img src="#" class="img-fluid" alt="...">
+                </div>
+            </div>
+
+            <!-- ОТВЕТЫ -->
+
+            <div class="answers pt-2 pb-2">
+            <!-- Тут цикл -->
+                <div class="answer d-flex flex-column bd-highlight mb-3 square ">
+
+                    <div class="answer__header p-2 d-flex justify-content-center bg-primary text-white rounded-pill">
+                        <div class="answer__header__text"> Игрок</div>
+                        <div class="answer__header__username">&nbsp;user.username&nbsp;</div>
+                        <div class="answer__header__text"> написал/а</div>
+                    </div>
+
+                    <div class="answer__text p-2 d-flex justify-content-center align-items-center text-center">p.answer</div>
+                    <div class="answer__cooment p-2 bg-warning ms-auto" >Неплохой ответ</div>
+                </div>
+
+                
+                <div class="right-answer d-flex flex-column bd-highlight mb-3 square ">
+                    <div class="right-answer__header p-2 d-flex justify-content-center bg-primary text-white rounded-pill">
+                        <div> Правильный ответ</div>
+                    </div>
+                    <div class="right-answer__text p-2 d-flex justify-content-center align-items-center text-center">obj_question.right_answer</div>
+                </div>
+
+            </div>
+
+            <!-- КНОПКИ УПРАВЛЕНИЯ -->
+            <!-- TODO delete answer_link -->
+            <div class="player-actions">
+
+                <div class="results_to_end d-flex justify-content-between">
+                        <a href="#" class="answer_link btn btn-primary" >Показать результаты</a>
+                        <a href="#" class="answer_link btn btn-primary" >Следующий раунд</a>
+                </div>
+
+                <!-- Тут условие if -->
+                <div class="waiting-owner">
+                    <div class="waiting-owner__header d-flex flex-column pt-2 pb-2">
+                        Ждем пока создатель комнаты owner продолжит игру.
+                    </div>
+                    <!-- TODO delete id-->
+                    <div id="pop-wait-owner-start" class="waiting-owner__body pop-instruction--user d-flex flex-column pt-2 pb-2 fw-bold fs-5 text-white justify-content-center align-items-center">
+                        <p class="waiting-owner__body__text d-inline">Ждем пока создатель комнаты</p>
+                        <p class="waiting-owner__body__owner d-inline">owner</p>
+                        <p class="waiting-owner__body__text d-inline"> начнет следующий раунд. </p>
+                    </div>
+                </div>
+
+                </div>
+            </div>
+
+    </section>
+</body>
+</html>

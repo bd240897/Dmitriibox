@@ -5,7 +5,7 @@
     <router-link to="/about">About</router-link> |
     <!--    https://v3.router.vuejs.org/ru/guide/essentials/named-routes.html-->
     <router-link :to="{ name: 'MainRoom'}">MainRoom</router-link> |
-    <router-link :to="{ name: 'GameRooms', params: { roomCode: 'SQPQ' }}">GameRooms</router-link> |
+    <router-link :to="{ name: 'GameRoom'}">GameRooms</router-link> |
     <router-link :to="{ name: 'Login'}">Login</router-link> |
   </nav>
   <router-view/>

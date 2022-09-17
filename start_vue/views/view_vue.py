@@ -49,15 +49,19 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
         current_room.switch_game_status(self.request, self.request.user, new_status)
         return Response({'massage': f"Статус игры {room_code} изменен на {new_status}"})
 
-    ########## waiting_room ##########
-
     # /game/create/
-    @action(methods=['get'], detail=False, url_path='create')
+    @action(methods=['post'], detail=False, url_path='create')
     def vs_create_room(self, request):
         room_code = request.data.get('room_code')
+
+        # пользователь не вошел
+        if self.request.user.is_anonymous:
+            return Response({'error': "User is anonymous"})
+
         # игра уже существует
         if GameRoom.objects.filter(room_code=room_code).exists():
-            return Response({'massage': f"Комната {room_code} уже существует!"})
+            return Response({'error': f"Комната {room_code} уже существует!"})
+            # TODO если существует то пустить в суще-ую комнату
         # создадим игру (комнату)
         else:
             # создает новую игру status = 'main_room'
@@ -66,49 +70,92 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
                                              status='waiting_room')
             # добавим сразу в комнату owners
             object.players.add(self.request.user)
-            return Response({'massage': f"Была создана комната {room_code}"})
+            return Response({'success': f"Была создана комната {room_code}"})
+
+    ########## waiting_room ##########
+
+    # /game/players/
+    @action(methods=['get'], detail=False, url_path='players')
+    def vs_players_room(self, request):
+        # room_code = request.data.get('room_code')
+        room_code = request.query_params.get('room_code')
+        if not GameRoom.objects.filter(room_code=room_code).exists():
+            return Response({'error': f"Комнаты {room_code} не существует!"})
+
+        queryset = User.objects.filter(game_players__room_code=room_code)
+        serializer = UserSerializer(queryset, many=True)
+        return Response({'players': serializer.data})
 
     # /game/delete/
     @action(methods=['get'], detail=False, url_path='delete')
     def vs_delete_room(self, request):
-        room_code = request.data.get('room_code')
+        room_code = request.query_params.get('room_code')
+
         if not GameRoom.objects.filter(room_code=room_code).exists():
-            return Response({'massage': f"Комнаты {room_code} не существует!"})
+            return Response({'error': f"Комнаты {room_code} не существует!"})
+
         current_room = GameRoom.objects.get(room_code=room_code)
         current_room.delete()
-        return Response({'massage': f"Комната {room_code} удалена!"})
+        return Response({'success': f"Комната {room_code} удалена!"})
 
     # /game/join/
     @action(methods=['get'], detail=False, url_path='join')
     def vs_join_room(self, request):
-        room_code = request.data.get('room_code')
+        room_code = request.query_params.get('room_code')
+
+        # пользователь не вошел
+        if self.request.user.is_anonymous:
+            return Response({'error': "User is anonymous"})
 
         # проверка существует ли комната
         if not GameRoom.objects.filter(room_code=room_code).exists():
-            return Response({'massage': f"Комнаты {room_code} не существует!"})
+            return Response({'error': f"Комнаты {room_code} не существует!"})
 
         current_room = GameRoom.objects.get(room_code=room_code)
         if current_room.is_user_in_room(self.request.user):
-            return Response({'massage': f"{self.request.user} уже есть в комнате {room_code}"})
+            return Response({'error': f"{self.request.user} уже есть в комнате {room_code}"})
+
         current_room.join_to_game(self.request, self.request.user)
-        return Response({'massage': f"{self.request.user} зашел в комнату {room_code}"})
+        return Response({'success': f"{self.request.user} зашел в комнату {room_code}"})
 
     # /game/exit/
     @action(methods=['get'], detail=False, url_path='exit')
     def vs_exit_room(self, request):
-        room_code = request.data.get('room_code')
+        room_code = request.query_params.get('room_code')
+
+        # пользователь не вошел
+        if self.request.user.is_anonymous:
+            return Response({'error': "User is anonymous"})
+
+        # проверка существует ли комната
+        if not GameRoom.objects.filter(room_code=room_code).exists():
+            return Response({'error': f"Комнаты {room_code} не существует!"})
+
+        current_room = GameRoom.objects.get(room_code=room_code)
+        if not current_room.is_user_in_room(self.request.user):
+            return Response({'error': str(self.request.user) + " нет в комнате " + str(room_code)})
+
+        current_room.exit_to_game(self.request, self.request.user)
+        return Response({'success': f"{self.request.user} вышел из комнаты {room_code}"})
+
+    ########## typing_room ##########
+
+    # /game/question/
+    @action(methods=['get'], detail=False, url_path='question')
+    def vs_get_questions(self, request):
+        room_code = request.query_params.get('room_code')
 
         # проверка существует ли комната
         if not GameRoom.objects.filter(room_code=room_code).exists():
             return Response({'massage': f"Комнаты {room_code} не существует!"})
 
-        current_room = GameRoom.objects.get(room_code=room_code)
-        if not current_room.is_user_in_room(self.request.user):
-            return Response({'massage': str(self.request.user) + " нет в комнате " + str(room_code)})
-        current_room.exit_to_game(self.request, self.request.user)
-        return Response({'massage': f"{self.request.user} вышел из комнаты {room_code}"})
+        current_round = GameRoom.objects.get(room_code=room_code).round
+        queryset = Questions.objects.get(round_for_question=current_round)
+        serializer = QuestionsSerializer(queryset)
 
-    ########## typing_room ##########
+        return Response({'massage': serializer.data})
+
+
     # /game/send/
     # vs_post_answer
     @action(methods=['post'], detail=False, url_path='send')

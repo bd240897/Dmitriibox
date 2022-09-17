@@ -1,0 +1,15 @@
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="massage__success alert alert-success" role="alert">
+                    {{ message|safe }}
+                </div>
+            {% elif message.tags == 'error' %}
+                <div class="massage__danger waiting-massage alert alert-danger" role="alert">
+                    {{ message|safe }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}

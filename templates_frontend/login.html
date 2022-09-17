@@ -1,0 +1,50 @@
+
+<style>
+    /* ЗАГОЛОВОК  */
+    .header__text{
+        font-weight: bold;
+        font-size: 26px;
+        background-color: orange;
+    },
+    /* ВХОД  */
+</style>
+
+<section class="login-page vh-100">
+    <div class="header container h-100">
+
+        <!--ЗАГОЛОВОК-->
+        <div class="header">
+            <h1 class="header__text p-2 d-flex justify-content-center text-white rounded-pill">Страница входа</h1>
+        </div>
+
+        <!--ВХОД-->
+        <div class="entry row d-flex justify-content-center align-items-center h-100">
+            <div class="col-sm-10 col-lg-6">
+                <form class="entry__form" method="post">
+
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="entry__form__error form-error alert alert-success" role="alert">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    {% for f in form %}
+                        <div class="entry__form__input form-group">
+                            <p><label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</p>
+                            <div class="form-error">{{ f.errors }}</div>
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="entry__form__btn w-100 btn btn-primary">Войти</button>
+                </form>
+
+                <div class="entry__register text-center">
+                    <a href="{% url 'game_register' %}" class="" role="button">Зарегистрироваться</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>

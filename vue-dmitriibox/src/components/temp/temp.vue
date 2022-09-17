@@ -60,3 +60,5 @@ export default {
 <!--    toNextRoom() {-->
 <!--      this.$store.state.nameCurrentRoom = this.next_room-->
 <!--    }-->
+
+

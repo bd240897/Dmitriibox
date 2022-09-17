@@ -1,0 +1,96 @@
+<head>
+    <title> main_room </title>
+</head>
+
+<html>
+<body>
+    <style>
+
+        /* АНИМАЦИЯ */
+
+        .animation-container {
+            opacity: 0;
+            animation: ani 2.5s forwards;
+        }
+
+        @keyframes ani {
+            0% {opacity: 0;}
+            100% {opacity: 1;}
+        }
+
+        /* ЗАГОЛОВОК  */
+        .header__text{
+            font-weight: bold; 
+            font-size: 26px;
+        }
+
+        /* ОПОВЕЩЕНИЯ ДЖАНГИ */
+        /* pass1 */
+
+        /* ВОПРОС  */
+        .question{
+            background-color: #f5d060; 
+            border-radius: 20px;
+        }
+        /* TODO check */
+        .question__img img{
+            width: 100%; 
+            height: auto; 
+            max-width: 600px;
+        }
+        /* ВОЙТИ В КОМНАТУ */
+        /* pass1 */
+
+    </style>
+
+
+    <section class="typing-room">
+        <div class="container pt-1 pb-1 border border-success animation-container">
+
+            <!-- ЗАГОЛОВОК -->
+
+            <div class="header">
+                <h1 class="header__text p-2 d-flex justify-content-center bg-primary text-white rounded-pill">Пишем ответы раунда №{{ round }} из {{ max_rounds }}</h1>
+            </div>
+
+            <!-- ОПОВЕЩЕНИЯ ДЖАНГИ -->
+
+            <div class="messages">
+                <div class="massage__success alert alert-success" role="alert">
+                    some text
+                </div>
+                <div class="massage__danger waiting-massage alert alert-danger" role="alert">
+                    some text
+                </div>
+            </div>
+            
+            <!-- ВОПРОС -->
+
+            <div class="question pt-2 pb-2">
+                <h2 class="question__text text-center">Вопрос:</h2>
+                <h2 class="question_text text-center"> obj_question.question </h2>
+
+                <div class="question__img d-flex flex-column justify-content-center align-items-center py-2" >
+                    <img src="#" class="img-fluid" alt="...">
+                </div>
+            </div>
+
+
+            <!-- ФОРМА ОТВЕТА -->
+
+            <form class="send-form" method="post">
+                <div class="send-form__answer mb-3">
+                    <label for="answer" class="form-label">Ответ</label>
+                    
+                    <!-- TODO -->
+                    <textarea></textarea>
+                </div>
+                <div class="send-form__btn d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg" value="Submit">Отправить</button>
+                </div>
+            </form>
+
+        </div>
+    </section>
+</body>
+</html>

@@ -1,5 +1,6 @@
 <template>
-
+<!--  {{ $route.params.roomCode }}-->
+<!--  <h6>WebSocket gameStatus = {{ gameStatus }}</h6>-->
 </template>
 
 <script>
