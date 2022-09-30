@@ -6,7 +6,7 @@ const store = createStore({
         name: "Vue",
         username: '',
         roomCode: '',
-        host: 'http://127.0.0.1:8000',
+        host: 'http://127.0.0.1:8000', //'http://45.67.58.152:8000',//
 
         numberCurrentRoom: 1,
         listRooms: ['waiting_room', 'typing_room', 'waiting_typing_room', 'result_room', 'result_list_room', 'gameover_room'],

@@ -104,7 +104,7 @@ export default {
           this.setAjaxSetup()
           this.getUsername()
           console.log("(setLogin) Новый auth_token записан в sessionStorage")
-          // this.$router.push({ name: 'MainRoom'})
+          this.$router.push({ name: 'MainRoom'})
         },
         error: (response) => {
           if (response.status === 400) {

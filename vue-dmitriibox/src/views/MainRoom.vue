@@ -77,14 +77,14 @@
         <!-- ВОЙТИ В КОМНАТУ -->
 
         <div class="enter-game d-flex flex-column justify-content-center align-items-center py-2">
-<!--          <form class="enter-game__form row g-3" method="post">-->
+          <form class="enter-game__form row g-3" method="post">
             <div class="enter-game__input col-auto">
               <input type="text" class="form-control text-center" placeholder="Номер комнаты" v-model="roomCode">
             </div>
             <div class="enter-game__btn col-auto">
-              <button id="btn-enter-game" class="btn btn-primary mb-3" v-on:click="goToGameRooms">Войти в комнату</button>
+              <button id="btn-enter-game" class="btn btn-primary mb-3" v-on:click.prevent="goToGameRooms">Войти в комнату</button>
             </div>
-<!--          </form>-->
+          </form>
         </div>
       </div>
     </div>
@@ -125,6 +125,13 @@ export default {
           console.log(response)
           this.success = response.success;
           this.error = response.error;
+
+          // TODO to know
+          // если комната уже существует то перейдем в игру
+          if (response.next_room){
+            this.$store.state.roomCode = this.roomCode;
+            this.$router.push({ name: 'GameRoom'})
+          }
 
           // если пришел успех переходим в комнату ожидания
           if (response.success){

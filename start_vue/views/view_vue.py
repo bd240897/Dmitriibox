@@ -60,7 +60,8 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
 
         # игра уже существует
         if GameRoom.objects.filter(room_code=room_code).exists():
-            return Response({'error': f"Комната {room_code} уже существует!"})
+            return Response({'error': f"Комната {room_code} уже существует!",
+                             'next_room': f"Переход в комнату ожидания"})
             # TODO если существует то пустить в суще-ую комнату
         # создадим игру (комнату)
         else:
@@ -147,14 +148,13 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
 
         # проверка существует ли комната
         if not GameRoom.objects.filter(room_code=room_code).exists():
-            return Response({'massage': f"Комнаты {room_code} не существует!"})
+            return Response({'error': f"Комнаты {room_code} не существует!"})
 
         current_round = GameRoom.objects.get(room_code=room_code).round
         queryset = Questions.objects.get(round_for_question=current_round)
         serializer = QuestionsSerializer(queryset)
 
         return Response({'massage': serializer.data})
-
 
     # /game/send/
     # vs_post_answer
@@ -163,17 +163,18 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
         name_current_view_room = 'typing_room'
         answer = request.data.get('answer')
         room_code = request.data.get('room_code')
+        print(answer)
 
         if self.request.user.is_anonymous:
-            return Response({'massage': "User is anonymous"})
+            return Response({'error': "User is anonymous"})
 
         # проверка существует ли комната
         if not GameRoom.objects.filter(room_code=room_code).exists():
-            return Response({'massage': f"Комнаты {room_code} не существует!"})
+            return Response({'error': f"Комнаты {room_code} не существует!"})
 
         # проверка существует ли комната
         if not answer:
-            return Response({'massage': "Поле answer пустое или не существует"})
+            return Response({'error': "Поле answer пустое или не существует"})
 
         current_room = GameRoom.objects.get(room_code=room_code)
 
@@ -184,9 +185,25 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
                                      room=current_room)
         # TODO начать использовать f-строки везде
         # https://python-scripts.com/f-strings
-        return Response({'massage': f"Cообщение пользователя {self.request.user} на раунд {current_room.round} для игры {room_code} записано!"})
+        return Response({'success': f"Cообщение пользователя {self.request.user} на раунд {current_room.round} для игры {room_code} записано!",
+                         'next_room': f"Переход в комнату ожидания #2"})
 
     ########## waiting_typing_room ##########
+
+    # /game/tying/players/
+    @action(methods=['get'], detail=False, url_path='tying/players')
+    def vs_typing_players_room(self, request):
+        room_code = request.query_params.get('room_code')
+        current_room = GameRoom.objects.get(room_code=room_code)
+        current_round = current_room.round
+        if not GameRoom.objects.filter(room_code=room_code).exists():
+            return Response({'error': f"Комнаты {room_code} не существует!"})
+
+        queryset = AnswerPlayers.objects.filter(answer__isnull=False,
+                                                        round_of_answer=current_round,
+                                                        room=current_room)
+        serializer = AnswerPlayersSerializer(queryset, many=True)
+        return Response({'players': serializer.data})
 
     ########## result_room ##########
     # /game/result/
@@ -201,8 +218,8 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
         current_room = GameRoom.objects.get(room_code=room_code)
         current_round = GameRoom.objects.get(room_code=room_code).round
         queryset = AnswerPlayers.objects.filter(answer__isnull=False,
-                                              round_of_answer=current_round,
-                                              room=current_room)
+                                                round_of_answer=current_round,
+                                                room=current_room)
         serializer = AnswerPlayersSerializer(queryset, many=True)
         return Response({'massage': serializer.data})
 
@@ -220,7 +237,7 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
         current_round = GameRoom.objects.get(room_code=room_code).round
 
         select = []
-        for i in range(1, current_round+1):
+        for i in range(1, current_round + 1):
             question = Questions.objects.get(round_for_question=i)
             answer = AnswerPlayers.objects.filter(room=current_room, round_of_answer=i)
             one_obj = {"question": QuestionsSerializer(question, many=False).data,
@@ -254,4 +271,3 @@ class UNUSEDSet(RoomMixin, ModelViewSet):
         name_current_view_room = 'typing_room'
         room_code = request.data.get('room_code')
         return Response({'massage': "vs_waiting_typing_room"})
-

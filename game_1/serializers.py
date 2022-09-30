@@ -28,6 +28,11 @@ class GameRoomVueSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AnswerPlayersSerializer(serializers.ModelSerializer):
+    player = serializers.SerializerMethodField()
+
+    def get_player(self, obj):
+        return obj.player.username
+
     class Meta:
         model = AnswerPlayers
         fields = '__all__'

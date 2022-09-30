@@ -7,7 +7,8 @@ export default {
         question: '',
         right_answer: '',
         img: '',
-      }
+      },
+      answer: '',
     }
   },
   methods: {
@@ -39,10 +40,16 @@ export default {
         dataType: 'json',
         data: {
           room_code: this.roomCode,
-          answer: this.form.textarea,
+          answer: this.answer,
         },
         success: (response) => {
           console.log(response)
+          this.success = response.success
+          this.error = response.error
+          if (response.next_room){
+            // TODO to know
+            this.$store.state.toNextRoom();
+          }
         },
         error: (response) => {
           console.log(response)

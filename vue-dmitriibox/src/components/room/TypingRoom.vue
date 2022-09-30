@@ -26,24 +26,18 @@
       <!-- ВОПРОС -->
 
       <div class="question pt-2 pb-2">
-        <button v-on:click="getQuestion">GET QUESTION</button>
         <h2 class="question__text text-center">Вопрос:</h2>
         <h2 class="question_text text-center"> {{questionObj.question}} </h2>
-
         <div class="question__img d-flex flex-column justify-content-center align-items-center py-2" >
           <img :src="questionObj.img" class="img-fluid" alt="...">
         </div>
       </div>
 
-
       <!-- ФОРМА ОТВЕТА -->
 
       <form class="send-form" method="post">
         <div class="send-form__answer mb-3">
-          <!--                    <label for="answer" class="form-label">Ответ</label>-->
-
-          <!-- TODO -->
-          <!--                    <textarea></textarea>-->
+          <textarea v-model="answer" class="form-control" type="text" placeholder="Напишите Ваше сообщение" style="height: 200px"></textarea>
         </div>
         <div class="send-form__btn d-grid gap-2">
           <button v-on:click.prevent="sendAnswer" type="submit" class="btn btn-primary btn-lg" value="Submit">Отправить</button>
@@ -70,7 +64,7 @@ export default {
     }
   },
   created() {
-    //pass
+    this.getQuestion()
   },
   methods: {
     //pass

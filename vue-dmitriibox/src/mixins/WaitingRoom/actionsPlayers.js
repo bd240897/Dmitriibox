@@ -57,6 +57,7 @@ export default {
     startGame(){
       // начинает игру
       // this.$store.state.nameCurrentRoom = 'typing_room';
+      // TODO to know
       this.$store.state.toNextRoom();
     },
   }
