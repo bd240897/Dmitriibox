@@ -1,6 +1,5 @@
 # //////////////////////////// URL FOR VUE ////////////////////////////////////////
 
-# TODO не используется удалить?
 class WaitingRoomAPI(RoomMixin, APIView):
     """ API """
 
@@ -19,7 +18,7 @@ class WaitingRoomAPI(RoomMixin, APIView):
         # https://proproprogs.ru/django/drf-bazovyy-klass-apiview-dlya-predstavleniy
         action = request.data['action']  # {"action": "START_GAME"}
         if action == "START_GAME":
-            # TODO registration for vue
+            # registration for vue
             # self.current_room.switch_game_status(self.request, self.current_user, "typing_room")
             return Response({'massage': "Got msg " + action,
                              'next_url': reverse("typing_room", kwargs={'slug': self.room_code})

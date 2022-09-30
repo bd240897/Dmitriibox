@@ -2,7 +2,6 @@
 
 {% load static %}
 
-{#TODO - заменим на название и номер#}
 {% block title %} main_room {% endblock %}
 
 {% block content %}
@@ -63,7 +62,6 @@
                 <!-- ВЫ ВОШЛИ КАК -->
 
                 <div class="user py-1">
-                    <!--TODO странная верстка все тусит в h2-->
                     <div class="user__container p-2 d-flex justify-content-center align-items-center">
                         {% if user.is_authenticated %}
                         <div class="user__joined">

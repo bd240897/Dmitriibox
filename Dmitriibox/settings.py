@@ -159,7 +159,7 @@ CHANNEL_LAYERS = {
 }
 
 ############## CORS #################
-# TODO delete it
+# TODO delete it in deploy
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 # https://www.youtube.com/watch?v=A4SrKBLXg_Q

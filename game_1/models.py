@@ -2,25 +2,21 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.contrib import messages
 from django.core.validators import MinLengthValidator
-
-# TODO формить красиво поля БД (имена, related_namd,)
-# TODO добавить сортировку полей в модели по умолчанию
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-
 from game_1.channel_logic import send_to_channel_layer, close_socket
 
 
 class GameRoom(models.Model):
     """Игровая комната"""
 
-    room_code = models.CharField(max_length=4, validators=[MinLengthValidator(4)])
-    create_time = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(User, on_delete=models.PROTECT, related_name='game_owner')  # blank=True, null=True,
+    room_code = models.CharField(verbose_name="Код комнаты", max_length=4, validators=[MinLengthValidator(4)])
+    create_time = models.DateTimeField(verbose_name="Дата создания", auto_now=True)
+    owner = models.ForeignKey(User, verbose_name="Создатель", on_delete=models.PROTECT, related_name='game_owner')  # blank=True, null=True,
     # https://django.fun/docs/django/ru/3.1/topics/db/examples/many_to_many/
-    players = models.ManyToManyField(User, blank=True, related_name='game_players')
+    players = models.ManyToManyField(User, verbose_name="Игрок", blank=True, related_name='game_players')
     # при создании игры None, при запуске True, при окончании False
-    round = models.IntegerField(blank=True, default=1)
+    round = models.IntegerField(verbose_name="Раунд", blank=True, default=1)
 
     CHOICES = {
         # ('main_room', 'Игра создана'), # Этот статус я не использую
@@ -32,11 +28,11 @@ class GameRoom(models.Model):
         ('gameover_room', 'Игра закончена'),
     }
 
-    status = models.CharField(max_length=32, default="main_room", blank=True, choices=CHOICES)
+    status = models.CharField(verbose_name="Статус игры", max_length=32, default="main_room", blank=True, choices=CHOICES)
 
     def join_to_game(self, request, user):
         """Добавить пользователя к комнате"""
-        # TODO API
+
         is_current_user_in_game = self.players.filter(pk=user.pk).exists()
 
         if is_current_user_in_game:
@@ -51,7 +47,7 @@ class GameRoom(models.Model):
 
     def exit_to_game(self, request, user):
         """Добавить пользователя к комнате"""
-        # TODO API
+
         is_current_user_in_game = self.players.filter(pk=user.pk).exists()
         if not is_current_user_in_game:
             game_massage = "(remove_user_to_game) Пользователя " + user.username + " нет в игре " + str(
@@ -65,12 +61,12 @@ class GameRoom(models.Model):
 
     def players_in_game(self):
         """Выводит игроков в текущей игре с кодом комнаты"""
-        # TODO API
+
         return self.players.all()
 
     def delete_all_users(self, request):
         """Удалить всх пользователй из игры c кодом"""
-        # TODO API
+
         game_massage = "Было удалено " + str(len(self.players.count())) + \
                        " пользователей игры " + str(self.room_code)
         messages.success(request, game_massage)
@@ -105,56 +101,77 @@ class GameRoom(models.Model):
                            + " не существует"
             messages.error(request, game_massage)
 
+    # TODO my be unused
     def redirect_to_game_status(self, request):
+        """Перенаправление по статусу комнаты"""
         game_massage = "(redirect_to_game_status) Перенаправление на  " + str(self.status)
         messages.success(request, game_massage)
         return HttpResponseRedirect(reverse(self.status, kwargs={'slug': self.room_code}))
 
     def is_user_in_room(self, user):
+        """Проверка есть ли пользователь в комнате"""
         return self.players.filter(pk=user.pk).exists()
 
     def is_user_owner(self, user):
+        """Проверка является ли пользователь владельцем"""
         return bool(self.owner == user)
 
     def __str__(self):
         return str(self.room_code)
 
+    class Meta:
+        verbose_name = 'Комната'
+        verbose_name_plural = 'Комнаты'
+        ordering = ('owner', 'create_time', )
 
-# TODO убрать множественное число из названия модели
+
 class AnswerPlayers(models.Model):
     """Ответы игроков по раундам"""
 
     # увеличивается каждый раунд
-    player = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='answer_player')
-    answer = models.TextField()  # blank=True, null=False
-    round_of_answer = models.IntegerField()  # blank=True, default=1
-    room = models.ForeignKey(GameRoom, on_delete=models.CASCADE, null=True)
+    player = models.ForeignKey(User, verbose_name="Игрок", on_delete=models.CASCADE, blank=True, null=True, related_name='answer_player')
+    answer = models.TextField(verbose_name="Ответ",)  # blank=True, null=False
+    round_of_answer = models.IntegerField(verbose_name="Раунд ответа",)  # blank=True, default=1
+    room = models.ForeignKey(GameRoom, verbose_name="Комната", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return str(self.player) + "_AnswerPlayers"
+        return f"{self.player} AnswerPlayers"
+
+    class Meta:
+        verbose_name = 'Ответ'
+        verbose_name_plural = 'Ответы'
+        ordering = ('room', )
 
 
-# TODO убрать множественное число из названия модели
 class Questions(models.Model):
     """Список вопросов"""
 
     # увеличивается каждый раунд
-    question = models.TextField(blank=True, null=True)
-    right_answer = models.TextField(blank=True, null=True)
-    round_for_question = models.IntegerField(blank=True, default=1)
-    author = models.CharField(max_length=16, default='Dmitrii')
-    img = models.ImageField(upload_to='images/game_1/questions', blank=True, null=True)
+    question = models.TextField(verbose_name="Вопрос", blank=True, null=True)
+    right_answer = models.TextField(verbose_name="Правильный ответ", blank=True, null=True)
+    round_for_question = models.IntegerField(verbose_name="Раунд ответа", blank=True, default=1)
+    author = models.CharField(verbose_name="Автор вопроса", max_length=16, default='Dmitrii')
+    img = models.ImageField(verbose_name="Картинка", upload_to='images/game_1/questions', blank=True, null=True)
 
     def __str__(self):
-        return str(self.round_for_question) + "_Questions"
+        return f"{self.round_for_question} Questions"
+
+    class Meta:
+        verbose_name = 'Вопрос'
+        verbose_name_plural = 'Вопросы'
+        ordering = ('round_for_question', )
 
 
-# TODO убрать множественное число из названия модели
 class Rules(models.Model):
-    number = models.IntegerField()
-    header = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    img = models.ImageField(upload_to='images/game_1/rules/', blank=True, null=True)
+    number = models.IntegerField(verbose_name="Номер",)
+    header = models.TextField(verbose_name="Название", blank=True, null=True)
+    description = models.TextField(verbose_name="Текст", blank=True, null=True)
+    img = models.ImageField(verbose_name="Картинка", upload_to='images/game_1/rules/', blank=True, null=True)
 
     def __str__(self):
-        return str(self.number) + "_Rules"
+        return f"{self.number} Rules"
+
+    class Meta:
+        verbose_name = 'Правило'
+        verbose_name_plural = 'Правила'
+        ordering = ('number', )
