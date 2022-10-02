@@ -44,11 +44,24 @@ https://infoit.com.ua/linux/kak-ustanovit-python-3-8-na-debian-10/
 
 # Install Postgres
 https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04-ru
-
-    sudo apt install -y postgresql postgresql-contrib
-aanather instuction
+anather instuction
 https://www.youtube.com/watch?v=FLiKTJqyyvs
 
+    sudo apt install -y postgresql postgresql-contrib
+    sudo apt install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx curl
+    sudo -u postgres psql
+    CREATE DATABASE DmitriiBox;
+    CREATE USER amid WITH PASSWORD '1234qwer';
+    ALTER ROLE amid SET client_encoding TO 'utf8';
+    ALTER ROLE amid SET default_transaction_isolation TO 'read committed';
+    ALTER ROLE amid SET timezone TO 'UTC';
+    GRANT ALL PRIVILEGES ON DATABASE DmitriiBox TO amid;
+    \q
+    //test
+    \list - list bd '\l'
+    \connect dmitriibox; - connect '\c name'
+    \dt - list table
+    SELECT * FROM auth_user;
 
 
 #### run test project
@@ -125,6 +138,7 @@ To restart the process after the code updates run:
 
     sudo supervisorctl restart game_muster
 
-
+notes
+    twisted-iocpsupport==1.0.2 - onle for Windows (delete from req.txt!)
 
  
