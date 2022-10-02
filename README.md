@@ -1,3 +1,5 @@
+https://github.com/bd240897/Dmitriibox
+
 # Dmitrii Box
 
 Игра Викторина
@@ -5,6 +7,7 @@
 ## ДИПЛОЙ НА https://cloud.yandex.ru
 
 ### Ветки
+
 #### master
 Главная ветка - не помню что тут сейчас
 
@@ -38,6 +41,15 @@ https://infoit.com.ua/linux/kak-ustanovit-python-3-8-na-debian-10/
     sudo make -j 2
     sudo make altinstall
     python3.8 --version
+
+# Install Postgres
+https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04-ru
+
+    sudo apt install -y postgresql postgresql-contrib
+aanather instuction
+https://www.youtube.com/watch?v=FLiKTJqyyvs
+
+
 
 #### run test project
     cd ~/home/amid/

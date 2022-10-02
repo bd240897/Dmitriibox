@@ -15,7 +15,7 @@ from django.core.asgi import get_asgi_application
 import chat.routing
 import game_1.routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Dmitriibox.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Dmitriibox.settings.dev')
 
 application = ProtocolTypeRouter({
   "http": get_asgi_application(),

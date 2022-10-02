@@ -1,3 +1,4 @@
+https://github.com/python-dev-blog/game_muster
 # Game Muster
 
 Тестовое приложение, отображающее список игр из IGDB API, созданное для демонстрации [подготовки django-приложения к деплойменту](https://www.youtube.com/watch?v=03egj6YEUFY)
