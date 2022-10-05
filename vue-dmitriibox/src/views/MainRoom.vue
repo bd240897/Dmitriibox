@@ -30,7 +30,7 @@
               <span class="user__joined__username"> {{username}} </span>
             </div>
             <div class="user__nojoined" v-else>
-                <span class="user__nojoined__text">Вы не вошли в систему&nbsp;</span>
+              <span class="user__nojoined__text">Вы не вошли в систему&nbsp;</span>
             </div>
           </div>
         </div>
@@ -124,7 +124,6 @@ export default {
         success: (response) => {
           console.log(response)
           this.success = response.success;
-          this.error = response.error;
 
           // TODO to know
           // если комната уже существует то перейдем в игру
@@ -137,6 +136,12 @@ export default {
           if (response.success){
             this.$store.state.roomCode = this.roomCode;
             this.$router.push({ name: 'GameRoom'})
+          }
+        },
+        error: (xhr, ajaxOptions, thrownError)=>{
+          if(xhr.status===404){
+            console.log(xhr.responseJSON.error)
+            this.error = xhr.responseJSON.error;
           }
         }
       })

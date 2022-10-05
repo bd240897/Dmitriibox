@@ -11,6 +11,7 @@ urlpatterns = [
     path('', include('game_1.urls')),
     path('vue/', include('game_1_vue.urls')),
     path('vuestart/', include('start_vue.urls')),
+    path('lms/', include('lms.urls')),
 ]
 
 # REST FRAMEWORK

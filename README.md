@@ -41,6 +41,9 @@ https://infoit.com.ua/linux/kak-ustanovit-python-3-8-na-debian-10/
     sudo make -j 2
     sudo make altinstall
     python3.8 --version
+    
+    \\ notes
+    pip install ipython - подстветка синтаксиса в nano, vim ...
 
 # Install Postgres
 https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04-ru
@@ -57,12 +60,23 @@ https://www.youtube.com/watch?v=FLiKTJqyyvs
     ALTER ROLE amid SET timezone TO 'UTC';
     GRANT ALL PRIVILEGES ON DATABASE DmitriiBox TO amid;
     \q
-    //test
+
+    \\ test
     \list - list bd '\l'
     \connect dmitriibox; - connect '\c name'
     \dt - list table
     SELECT * FROM auth_user;
-
+    
+    \\ test django
+    source venv/bin/activate
+    python3 manage.py migrate --settings=Dmitriibox.settings.test
+    python3 manage.py createsuperuser --settings=Dmitriibox.settings.test
+    python3 manage.py runserver 0.0.0.0:8000 --settings=Dmitriibox.settings.test
+    
+    \\ notes
+    service postgresql status - status psql
+    sudo apt install net-tools
+    sudo netstat -nl | grep postgres - port psql
 
 #### run test project
     cd ~/home/amid/

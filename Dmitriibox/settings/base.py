@@ -26,7 +26,8 @@ INSTALLED_APPS = [
 
     'game_1.apps.Game1Config',
     'game_1_vue.apps.Game1VueConfig',
-    'start_vue'
+    'start_vue',
+    'lms'
 ]
 
 MIDDLEWARE = [

@@ -1,6 +1,7 @@
 import json
 from rest_framework.decorators import action
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,13 +9,14 @@ from rest_framework.viewsets import ViewSet, GenericViewSet, ModelViewSet
 from ..logic import *
 from ..models import *
 from ..serializers import *
-
+from rest_framework import status
 
 ################# ТЕСТИРУЮ ViewSet ######################
 
 class GameRoomViewSet(RoomMixin, ModelViewSet):
     queryset = GameRoom.objects.all()
     serializer_class = GameRoomVueSerializer
+    # permission_classes = (IsAuthenticated,)
 
     ########## COMMON ##########
     # /game/gamestatus/
@@ -25,10 +27,11 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
 
         # проверка существует ли комната
         if not GameRoom.objects.filter(room_code=room_code).exists():
-            return Response({'massage': f"Комнаты {room_code} не существует!!!!"})
+            return Response({'error': f"Комнаты {room_code} не существует!!!!"})
 
-        status = GameRoom.objects.get(room_code=room_code).status
-        return Response({'massage': f"Статус игры {room_code}: {status}"})
+        game_status = GameRoom.objects.get(room_code=room_code).status
+        # you can send status as , status=status.HTTP_400_BAD_REQUEST
+        return Response({'massage': f"Статус игры {room_code}: {game_status}"})
 
     # /game/switch/status/
     @action(methods=['get'], detail=False, url_path='switch/status')
@@ -39,12 +42,12 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
         current_room = GameRoom.objects.get(room_code=room_code)
         if not current_room.is_user_owner(self.request.user):
             return Response(
-                {'massage': f"Пользователь {self.request.user} не создатель комнаты {room_code}"})
+                {'error': f"Пользователь {self.request.user} не создатель комнаты {room_code}"})
 
         new_status = request.data.get('new_status')
         ALLOWED_STATUS = [i[0] for i in GameRoom.CHOICES]
         if new_status not in ALLOWED_STATUS:
-            return Response({'massage': f"Статуса {new_status} не существует!"})
+            return Response({'error': f"Статуса {new_status} не существует!"})
 
         current_room.switch_game_status(self.request, self.request.user, new_status)
         return Response({'massage': f"Статус игры {room_code} изменен на {new_status}"})
@@ -56,7 +59,7 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
 
         # пользователь не вошел
         if self.request.user.is_anonymous:
-            return Response({'error': "User is anonymous"})
+            return Response({'error': "User is anonymous"}, status=status.HTTP_404_NOT_FOUND)
 
         # игра уже существует
         if GameRoom.objects.filter(room_code=room_code).exists():
@@ -231,7 +234,7 @@ class GameRoomViewSet(RoomMixin, ModelViewSet):
 
         # проверка существует ли комната
         if not GameRoom.objects.filter(room_code=room_code).exists():
-            return Response({'massage': f"Комнаты {room_code} не существует!"})
+            return Response({'error': f"Комнаты {room_code} не существует!"})
 
         current_room = GameRoom.objects.get(room_code=room_code)
         current_round = GameRoom.objects.get(room_code=room_code).round
